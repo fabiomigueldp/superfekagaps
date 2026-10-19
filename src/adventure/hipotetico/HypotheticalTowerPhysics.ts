@@ -78,7 +78,7 @@ export class HypotheticalTowerPhysics {
         const p=towerBodyPoint(parent,d.x+Math.sin(sway)*8,d.y),angle=parent.angle+sway;
         b.vx=p[0]-b.x;b.vy=p[1]-b.y;b.spin=angle-b.angle;b.x=p[0];b.y=p[1];b.angle=angle;
     }
-    private surface(x:number,previousY:number,ignore?:TowerBody){
+    surface(x:number,previousY:number,ignore?:TowerBody){
         // Retained plinth, rear street, then already-settled masonry. Crossing
         // from above prevents a piece beside a wall from snapping onto its top.
         let floor=FLOOR;

@@ -1,4 +1,4 @@
-import { smoothMotion, riderBend } from './HypotheticalMotion';
+import { smoothMotion, riderBend, dinosaurFootAnchor } from './HypotheticalMotion';
 import { scenicDistrict, SCENIC_STARTS } from './HypotheticalDevastation';
 import { SIEGE_SECTORS, SIEGE_WIDTH } from './HypotheticalSiege';
 import type { Bystander } from './HypotheticalBackdrop';
@@ -9,6 +9,7 @@ import {AFTERMATH_SCALE,DEBRIS_GRIP_X,createAftermathProp,handlingForMaterial,ha
 import {AftermathEnvironment,type YardIncident} from './HypotheticalAftermathEnvironment';
 import {aftermathReaction,reactionDuration,reactionReplies} from './HypotheticalAftermathReaction';
 import {fragmentLanding} from './HypotheticalAftermathParticles';
+import {aftermathFooting,type PlantedFeet} from './HypotheticalAftermathFooting';
 import {HypotheticalTower,BASTION_TOWER,TOWER_SEQUENCE,launcherGeometry,towerLauncherPose,type TowerCue} from './HypotheticalTower';
 import {TOWER_SEARCH} from './HypotheticalTowerSearch';
 
@@ -84,6 +85,7 @@ export class HypotheticalAftermath {
     private noticeTicks=40;
     private recoverTicks=32;
     private reply:YardIncident|null=null;
+    private feetFrom:PlantedFeet=[[0,0],[0,0]];
 
     get yard(){ return this.yards[this.district]; }
     get origin(){ return AFTERMATH_YARDS[this.district]?.origin ?? 0; }
@@ -115,6 +117,13 @@ export class HypotheticalAftermath {
         }
     }
     private enter(phase:Activity){
+        if(phase==='perform'){
+            const p=this.pose(false);
+            this.feetFrom=p.feet??[
+                dinosaurFootAnchor(p.gait,true,(1-p.bow)*p.stride,p.tuck,p.brace),
+                dinosaurFootAnchor(p.gait,false,(1-p.bow)*p.stride,p.tuck,p.brace),
+            ];
+        }
         this.phase=phase; this.age=0; this.fromX=this.x; this.fromFacing=this.facing;
         if(phase==='recover')this.recoverTicks=(aftermathFamily(this.action)==='search'?20:32)+Math.floor(this.repertoire.random()*25);
         if(phase==='tower')this.tower.begin();
@@ -136,6 +145,7 @@ export class HypotheticalAftermath {
             material:material??(this.district===2?'iron':this.district===3?'stone':'timber')};
         if(kind!=='step')contact.landingAt=this.tick+fragmentLanding(contact);
         this.contacts.push(contact);
+        if(this.yard&&(kind==='step'||strength>=.45))this.yard.environment.disturb(x-this.origin,this.tick,kind==='step'?strength*.5:strength);
         if(kind!=='step')this.events.push(material==='iron'?'distant-metal':material==='timber'?'distant-wood'
             :material==='stone'?'distant-stone':kind==='break'?'distant-thud':'distant-debris');
     }
@@ -212,10 +222,12 @@ export class HypotheticalAftermath {
         this.targetX=target?this.origin+AFTERMATH_PROPS[target.i].offset:this.x;
         this.targetY=target?AFTERMATH_PROPS[target.i].top:0;
         this.destination=target?.x??(lo<=hi?Math.max(lo,Math.min(hi,this.x)):this.origin+222);
-        this.roamTicks=Math.max(48,Math.min(144,Math.ceil(Math.abs(this.destination-this.x)*1.45)));
+        const distance=Math.abs(this.destination-this.x);
+        this.roamTicks=Math.max(18,Math.min(144,Math.ceil(distance*1.45)));
         this.planView=this.viewX;
         this.destinationFacing=target?.facing??this.facing;
         const finalFacing=this.destinationFacing;
+        if(distance<.01){this.orient(finalFacing,'perform');return;}
         // First turn toward the walking direction; then plant and turn toward
         // the selected target. No backwards gliding or instantaneous mirroring.
         this.orient(Math.abs(this.destination-this.x)>2?Math.sign(this.destination-this.x):this.facing,'roam');
@@ -242,7 +254,7 @@ export class HypotheticalAftermath {
     get barrel(){
         const p=this.pose(false),scale=AFTERMATH_SCALE,r=p.recoil-p.tuck*10;
         const shoulder={x:this.x+this.facing*(7-r+riderBend(14,p.riderLean))*scale,
-            y:p.lift+(-78+p.compression+p.riderDrop)*scale};
+            y:p.lift+(-78+p.bow*39+p.compression+p.riderDrop)*scale};
         return {x:shoulder.x+this.facing*Math.cos(p.aim)*31*scale,y:shoulder.y+Math.sin(p.aim)*31*scale,
             dx:this.facing*Math.cos(p.aim),dy:Math.sin(p.aim)};
     }
@@ -365,10 +377,15 @@ export class HypotheticalAftermath {
             if(this.action==='ram')this.x=this.fromX+this.facing*8*pulse(a-20,28,34,84);
             if(this.action==='breach')this.x=this.fromX+this.facing*8*pulse(a-24,28,34,56);
             if(this.action==='rake')this.x=this.fromX+this.facing*3*pulse(a,26,timing.duration-28,timing.duration);
+            if(this.action!=='stomp'&&(a===14||a===25)){
+                const foot=this.pose(false).feet?.[a===14?0:1];
+                if(foot){const x=this.x+this.facing*(foot[0]+3)*AFTERMATH_SCALE;if(this.inView(x))this.contact('step',x,.25);}
+            }
             if(timing.beats.includes(a)){
                 if(this.action==='bellow'){
                     if(this.inView(this.x)){
                         this.events.push('distant-roar');this.yard.roarAt=this.tick;this.scatterBirds();
+                        this.yard.environment.disturb(this.x-this.origin,this.tick,.5);
                         for(const p of this.yard.props){p.struckAt=this.tick;p.force=.18;}
                     }
                 }else{
@@ -481,9 +498,15 @@ export class HypotheticalAftermath {
         }
         this.shots=this.shots.filter(s=>s.remaining>0&&s.age<60).slice(-12);
         if(['roam','orient','perform','recover','notice','tower','tower-await','tower-search'].includes(this.phase)){
-            const old=this.x;this.routine();this.velocity=this.x-old;this.travel+=Math.abs(this.velocity);
+            const old=this.x,walking=this.phase==='roam'||this.phase==='tower-search';
+            this.routine();this.velocity=this.x-old;
+            if(walking)this.travel+=Math.abs(this.velocity);
             const step=Math.floor(this.travel/(Math.PI*11*AFTERMATH_SCALE));
-            if(step>this.lastStep&&this.phase==='roam'&&this.stride>.15&&this.inView(this.x))this.contact('step',this.x+this.facing*(step%2?9:-7),.4);
+            if(step>this.lastStep&&this.phase==='roam'&&this.stride>.15){
+                const p=this.pose(false),foot=dinosaurFootAnchor(p.gait,step%2===1,(1-p.bow)*p.stride,p.tuck,p.brace);
+                const x=this.x+this.facing*(foot[0]+3)*AFTERMATH_SCALE;
+                if(foot[1]>-1&&this.inView(x))this.contact('step',x,.4);
+            }
             this.lastStep=step;
             return;
         }
@@ -611,12 +634,13 @@ export class HypotheticalAftermath {
             neckDrop=((desiredY-bodyLift)/AFTERMATH_SCALE+59-bow*25-breath-compression-10-jaw*6)*h.reach;
         }
         const recoil=gunRecoil(this.muzzle),tuck=lift*.55+rise*.6;
-        const shoulderY=bodyLift+(-78+compression+riderDrop)*AFTERMATH_SCALE;
+        const shoulderY=bodyLift+(-78+bow*39+compression+riderDrop)*AFTERMATH_SCALE;
         const shoulderX=this.x+this.facing*(7-recoil+tuck*10+riderBend(14,riderLean))*AFTERMATH_SCALE;
         const aimTarget=this.aimTarget;
         const gunAngle=Math.atan2(aimTarget.y-shoulderY,Math.max(12,(aimTarget.x-shoulderX)*this.facing));
         const pose={
-            facing:this.facing, gait:this.travel/(AFTERMATH_SCALE*11), stride:performing?(ram?this.stride*.35:0):this.stride,
+            facing:this.facing, gait:this.travel/(AFTERMATH_SCALE*11), stride:performing?0:this.stride,
+            feet:performing&&!stomping?aftermathFooting(a,timing.duration,(this.fromX-this.x)*this.facing/AFTERMATH_SCALE,this.feetFrom,!!handling):undefined,
             pivot:turn||orienting?Math.sin(Math.PI*turnProgress)*.98:0,
             bow,
             lift:bodyLift, breath, compression,

@@ -5,11 +5,25 @@ export type YardIncidentKind='creak'|'settle'|'rattle'|'draft'|'leak';
 export interface YardIncident {
     kind:YardIncidentKind; prop:number; born:number; variant:number; strength:number; noticed:boolean;
 }
+export interface YardImpulse {x:number;born:number;strength:number}
+
+/** A disturbance reaches nearby fittings first and loses energy with distance. */
+export const yardImpulseAge=(p:YardImpulse,x:number,tick:number)=>tick-p.born-Math.abs(x-p.x)/9;
+export function yardVibration(e:AftermathEnvironment,x:number,tick:number){
+    let movement=0;
+    for(const p of e.impulses){
+        const age=yardImpulseAge(p,x,tick);if(age<0||age>110)continue;
+        const force=p.strength/(1+Math.abs(x-p.x)/105);
+        movement+=Math.sin(age*.24)*Math.exp(-age/28)*force;
+    }
+    return Math.max(-1.2,Math.min(1.2,movement));
+}
 
 /** Small events belong to surviving hardware, not to another demolition.
  * Off-screen yards cannot start events. Settling pieces keep their own physics. */
 export class AftermathEnvironment {
     incidents:YardIncident[]=[];
+    impulses:YardImpulse[]=[];
     wet=0;windAt=-10000;lastAt=-1000;
     private nextAt=0;
     private previous:YardIncidentKind|null=null;
@@ -18,12 +32,22 @@ export class AftermathEnvironment {
     constructor(readonly district:number){this.seed=(district+1)*0x1f123bb5;}
     private random(){let n=this.seed;n^=n<<13;n^=n>>>17;n^=n<<5;this.seed=n>>>0;return (this.seed+.5)/4294967296;}
 
+    disturb(x:number,tick:number,strength:number){
+        if(strength<.16)return;
+        const previous=this.impulses[this.impulses.length-1];
+        // Several fragments from one landing are one impulse, not six resets.
+        if(previous&&tick-previous.born<8&&Math.abs(previous.x-x)<24){previous.strength=Math.max(previous.strength,strength);return;}
+        this.impulses.push({x,born:tick,strength:Math.min(1.2,strength)});
+        this.impulses=this.impulses.slice(-6);
+    }
+
     stir(prop:number,tick:number,strength:number){
         if(strength<.45||tick-this.lastAt<180||this.pending)return;
         this.pending={prop,due:tick+30+Math.floor(this.random()*40),strength};
     }
     update(tick:number,props:AftermathProp[],enabled:boolean,visible:(prop:number)=>boolean,occupied:number):YardIncident|undefined {
         this.incidents=this.incidents.filter(e=>tick-e.born<270);
+        this.impulses=this.impulses.filter(p=>tick-p.born<160);
         if(this.pending&&tick-this.pending.due>240)this.pending=null;
         if(!enabled)return;
         if(!this.nextAt)this.nextAt=tick+220+Math.floor(this.random()*240);

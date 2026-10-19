@@ -1,7 +1,7 @@
 import {box,oval,pixelLine,polygon} from '../WorldPainting';
 import {smoothMotion} from './HypotheticalMotion';
 import {AFTERMATH_PROPS} from './HypotheticalAftermathScore';
-import type {AftermathEnvironment,YardIncident} from './HypotheticalAftermathEnvironment';
+import {yardVibration,yardImpulseAge,type AftermathEnvironment,type YardIncident} from './HypotheticalAftermathEnvironment';
 import {drawAftermathContact} from './HypotheticalAftermathParticles';
 
 const P={ink:'#526f72',dark:'#6b8279',metal:'#80968c',light:'#b5b69b',wood:'#a49c7e',rust:'#958a72',dust:'#a9b39c',water:'#86a99e'};
@@ -15,7 +15,7 @@ export function drawAftermathFittings(c:CanvasRenderingContext2D,origin:number,b
     box(c,x,base-31,2,31,P.dark);box(c,x,base-30,1,28,P.wood);
     pixelLine(c,x-3,base-30,x+18,base-30,P.dark,2);
     for(const dx of [1,12])pixelLine(c,x+dx,base-29,x+dx,base-25,P.rust);
-    const cloth=(reduced?0:Math.sin(tick/37)*.6)+wind*Math.sin(tick/7);
+    const cloth=(reduced?0:Math.sin(tick/37)*.6+yardVibration(e,x-origin,tick)*4)+wind*Math.sin(tick/7);
     polygon(c,[[x+1,base-26],[x+14,base-26],[x+14+cloth,base-16],[x+10,base-18],[x+7,base-15],[x+1+cloth*.4,base-17]],'#8c9380');
     pixelLine(c,x+2,base-25,x+13,base-25,P.light);
     pixelLine(c,x+4,base-23,x+11+cloth*.4,base-22,'#a6a58c');
@@ -34,7 +34,8 @@ export function drawAftermathFittings(c:CanvasRenderingContext2D,origin:number,b
     const iron=origin+AFTERMATH_PROPS[2].offset;
     const rattle=[...e.incidents].reverse().find(a=>a.kind==='rattle');
     const age=rattle?tick-rattle.born:1000;
-    const swing=reduced?0:age<110?Math.sin(age*.24)*Math.exp(-age/34)*4:wind*.2;
+    const swing=reduced?0:(age<110?Math.sin(age*.24)*Math.exp(-age/34)*4:wind*.2)
+        +yardVibration(e,AFTERMATH_PROPS[2].offset+17,tick)*4;
     box(c,iron+15,base-36,4,4,P.dark);box(c,iron+16,base-35,2,1,P.light);
     for(let j=0;j<6;j++){
         const xx=iron+17+swing*j/6,yy=base-31+j*3;
@@ -54,6 +55,17 @@ export function drawAftermathFittings(c:CanvasRenderingContext2D,origin:number,b
             for(let j=0;j<3;j++)box(c,iron+27-j,base-20+j*6,1,4,'#6f9185');
             oval(c,iron+15,base-2,12+e.wet*12,3,'#6d928b');
             pixelLine(c,iron+20,base-1,iron+28+e.wet*5,base-1,P.water);
+            if(!reduced)for(const p of e.impulses){
+                const a=yardImpulseAge(p,AFTERMATH_PROPS[2].offset+24,tick),force=p.strength/(1+Math.abs(p.x-334)/105);
+                if(force<.13)continue;
+                for(let j=0;j<2;j++){
+                    const t=a-j*11;if(t<0||t>28)continue;
+                    const radius=Math.min(4+e.wet*5,1+t*.26),center=iron+23+e.wet*3;
+                    pixelLine(c,center-radius,base-1,center-radius+2,base-2,P.water);
+                    pixelLine(c,center+radius-2,base-2,center+radius,base-1,P.water);
+                    if(t<17)pixelLine(c,center-radius+2,base,center+radius-2,base,'#779b91');
+                }
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ import {AFTERMATH_SCALE,DEBRIS_GRIP_X,type HeldDebris} from './HypotheticalAfter
 import {drawTowerEffects} from './HypotheticalTowerArt';
 import {drawLauncher,drawLauncherHands} from './HypotheticalLauncherArt';
 import type {LauncherPose} from './HypotheticalTower';
+import type {PlantedFeet} from './HypotheticalAftermathFooting';
 import { drawHypotheticalScenery, drawHypotheticalDestruction, drawHypotheticalMasonry, drawHypotheticalFittings } from './HypotheticalScenery';
 import { drawHypotheticalCanister } from './HypotheticalGuardArt';
 export { drawHypotheticalGuard } from './HypotheticalGuardArt';
@@ -24,7 +25,7 @@ const P = { ink: '#172c36', deep: '#263f3d', shade: '#556047', hide: '#92845a', 
     suit: '#304659', lapel: '#607487', skin: '#c58d68', face: '#edbc8e', hair: '#3c3034',
     brass: '#d3a75c', mint: '#99e0cf', hot: '#ffb267', scute:'#6e7953', skinLight:'#f7d2a6',
     mouth:'#593b40', tongue:'#bc796a', leather:'#583f38', stitch:'#b8885d', clothShade:'#203644' };
-export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander }
+export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet }
 const fogPalette=new Map<string,string>();
 function distantColor(color:string){
     if(!fogPalette.has(color)){
@@ -151,7 +152,7 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
         poly([[a[0]+nx*ra,a[1]+ny*ra],[b[0]+nx*rb,b[1]+ny*rb],[b[0]-nx*rb,b[1]-ny*rb],[a[0]-nx*ra,a[1]-ny*ra]],color);
     };
     const leg = (rear:boolean) => {
-        const {hip,knee,hock,foot}=dinosaurLeg(body,pose.gait,rear,(1-bow)*pose.stride,pose.tuck,pose.brace);
+        const {hip,knee,hock,foot}=dinosaurLeg(body,pose.gait,rear,(1-bow)*pose.stride,pose.tuck,pose.brace,pose.feet?.[rear?0:1]);
         const shade=rear?P.deep:P.shade,hide=rear?P.shade:P.hide;
         bone(hip,knee,10,7,P.ink);bone(knee,hock,7,4,P.ink);
         ell(knee[0]-7,knee[1]-7,14,14,P.ink);

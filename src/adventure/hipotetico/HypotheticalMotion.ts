@@ -80,8 +80,8 @@ export function dinosaurFootAnchor(gait: number, rear: boolean, stride: number, 
 }
 
 /** Fixed thigh/shin lengths around the same planted or tucked foot anchor. */
-export function dinosaurLeg(body: number, gait: number, rear: boolean, stride: number, tuck: number, brace: number) {
-    const foot = dinosaurFootAnchor(gait, rear, stride, tuck, brace);
+export function dinosaurLeg(body: number, gait: number, rear: boolean, stride: number, tuck: number, brace: number, plantedFoot?:Point) {
+    const foot = plantedFoot??dinosaurFootAnchor(gait, rear, stride, tuck, brace);
     const hip: Point = [rear ? -5 : -12, body + 6];
     const hock: Point = [foot[0] - 5, foot[1] - 9];
     const dx = hock[0] - hip[0], dy = hock[1] - hip[1];
