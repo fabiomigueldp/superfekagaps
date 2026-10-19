@@ -1,5 +1,4 @@
 import test from 'node:test';
-import {SCENIC_STARTS} from '../src/adventure/hipotetico/HypotheticalDevastation';
 import assert from 'node:assert/strict';
 import { HypotheticalGame } from '../src/adventure/hipotetico/HypotheticalGame';
 import { HypotheticalGuard } from '../src/adventure/hipotetico/HypotheticalGuards';
@@ -27,7 +26,7 @@ test('a cleared district opens gradually, never wakes the next district or compl
     for(let n=0;n<600;n++)route.update(300+SIEGE_APPROACH,0);
     assert.equal(route.cleared,1);assert.equal(route.canExit(SIEGE_EXIT),false);
     route.update(464+SIEGE_APPROACH,3);assert.equal(route.active,true);
-    const complete=new HypotheticalSiege(3);
+    const complete=new HypotheticalSiege(SIEGE_SECTORS.length);
     assert.equal(complete.canExit(SIEGE_EXIT-40),false);assert.equal(complete.canExit(SIEGE_EXIT),true);
 });
 
@@ -46,7 +45,7 @@ test('waiting patrols cannot move, emit attacks or damage Feka before their enco
 test('each defeated guard releases one pin, while partial progress cannot raise a gate or leak into the next post',()=>{
     const route=new HypotheticalSiege();
     route.update(96+SIEGE_APPROACH,2);route.update(200+SIEGE_APPROACH,1);
-    assert.deepEqual(route.remaining,[1,3,4]);assert.equal(route.releasedThisTick,true);
+    assert.deepEqual(route.remaining,[1,3,4,2]);assert.equal(route.releasedThisTick,true);
     for(let n=0;n<60;n++)route.update(200+SIEGE_APPROACH,1);
     assert.deepEqual(route.lockTicks[0],[SIEGE_LOCK_TICKS,0]);assert.equal(route.gateHeight(0),224);
     assert.equal(route.cleared,0);assert.equal(route.releasedThisTick,false);
@@ -56,9 +55,9 @@ test('each defeated guard releases one pin, while partial progress cannot raise 
         if(n<=SIEGE_UNLOCK_TICKS)assert.equal(route.gateHeight(0),224,'the bolt retracts before the grille moves');
         if(n>=SIEGE_UNLOCK_TICKS+SIEGE_LIFT_TICKS)assert.equal(route.gateHeight(0),0,'settling cannot close on Feka');
     }
-    assert.equal(route.gatePhase(0),'open');assert.deepEqual(route.remaining,[0,3,4]);
+    assert.equal(route.gatePhase(0),'open');assert.deepEqual(route.remaining,[0,3,4,2]);
     const retry=new HypotheticalSiege(1);
-    assert.deepEqual(retry.remaining,[0,3,4]);assert.deepEqual(retry.lockTicks,[[18,18],[0,0,0],[0,0,0,0]]);
+    assert.deepEqual(retry.remaining,[0,3,4,2]);assert.deepEqual(retry.lockTicks,[[18,18],[0,0,0],[0,0,0,0],[0,0]]);
     assert.equal(retry.gatePhase(0),'open');assert.equal(retry.gatePhase(1),'locked');
 });
 
@@ -117,9 +116,10 @@ test('elevated launchers threaten the floor with a complete telegraph, then comm
     assert.equal(objects.barrels[0].vx<0,true);assert.equal(e.lastRelease,e.age);
 });
 
-test('native play crosses three physical gates, defeats every garrison and preserves districts across a death',t=>{
+test('native play crosses four physical gates, defeats every garrison and preserves districts across a death',t=>{
     const h=sceneLifecycleBrowser(t),g=new HypotheticalGame(h.canvas as unknown as HTMLCanvasElement);
     let held=new Set<string>(),previousPlayer=g.player,priorCleared=0,entered=false,sawRetry=false,maxCamera=0;
+    let previousBackdrop=g.fight.backdrop;
     const districts=new Set<number>(),defeated=new Set<string>(),opens=new Set<number>();
     try{
         for(const [count,keys] of tape.runs as [number,string[]][]){
@@ -130,7 +130,7 @@ test('native play crosses three physical gates, defeats every garrison and prese
             for(let n=0;n<count;n++){
                 g.update(dt);
                 if(g.act==='siege'){
-                    if(!entered){assert.equal(g.foes.length,9);assert.ok(g.foes.every(e=>e instanceof HypotheticalGuard&&!e.awake));entered=true;}
+                    if(!entered){assert.equal(g.foes.length,11);assert.ok(g.foes.every(e=>e instanceof HypotheticalGuard&&!e.awake));entered=true;}
                     const route=g.fight.route;
                     assert.ok(route.cleared>=priorCleared,'completed districts cannot be lost on a retry');priorCleared=route.cleared;
                     if(route.active)districts.add(route.cleared);
@@ -142,16 +142,16 @@ test('native play crosses three physical gates, defeats every garrison and prese
                     }
                     if(g.player!==previousPlayer&&priorCleared>0){
                         sawRetry=true;assert.equal(g.player.data.position.x,route.checkpoint);
-                        assert.ok(g.fight.destroyed>=priorCleared);assert.equal(g.fight.backdrop.tick,SCENIC_STARTS[priorCleared]);
-                        assert.ok(g.fight.backdrop.casualties>=priorCleared*2);
+                        assert.equal(g.fight.backdrop,previousBackdrop,'a retry retains the actual witnessed scenery');
                         assert.ok(g.foes.every(e=>(e as HypotheticalGuard).wave>priorCleared));
                     }
                     maxCamera=Math.max(maxCamera,g.camera.x);
                 }
                 if(g.player!==previousPlayer){held=new Set();previousPlayer=g.player;}
+                previousBackdrop=g.fight.backdrop;
             }
         }
-        assert.deepEqual([...districts],[0,1,2]);assert.deepEqual([...opens],[0,1,2]);assert.equal(defeated.size,9);
+        assert.deepEqual([...districts],[0,1,2,3]);assert.deepEqual([...opens],[0,1,2,3]);assert.equal(defeated.size,11);
         assert.ok(sawRetry);assert.ok(maxCamera>=950);assert.equal(g.receipt.won,true);
     }finally{g.dispose();}
 });

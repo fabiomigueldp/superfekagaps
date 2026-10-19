@@ -3,12 +3,12 @@ import { clamp, overlaps } from '../types';
 import { dinosaurFootAnchor, dinosaurTail, hypotheticalMotion, riderBend, smoothMotion, type DinosaurMotion } from './HypotheticalMotion';
 import { HypotheticalBackdrop } from './HypotheticalBackdrop';
 import { ARENA_COLUMNS, CHASE_ATTACKS, CHASE_EXIT, CHASE_WIDTH, CHASE_GAPS, CHASE_BREAKS } from './HypotheticalLayout';
-import { HypotheticalSiege, SIEGE_WIDTH } from './HypotheticalSiege';
+import { HypotheticalSiege, SIEGE_WIDTH, SIEGE_SECTORS } from './HypotheticalSiege';
 import {chaseDeckSpans,chaseMaterialAt,chaseTerraceFall,chaseRuinAt,CHASE_WATER_Y} from './HypotheticalChaseDetails';
 import { RIFLE_BURSTS, RIFLE_SPEED, type GunImpact } from './HypotheticalGunfire';
 import {chaseReactionStarts,updateChaseReactions} from './HypotheticalChaseLife';
 import {ARRIVAL,arrivalGate} from './HypotheticalArrival';
-import {SCENIC_STARTS} from './HypotheticalDevastation';
+import {SCENIC_STARTS,nextScenicTick} from './HypotheticalDevastation';
 
 export type HypotheticalAct = 'chase' | 'siege' | 'duel';
 export type HypotheticalState = 'arrival' | 'rest' | 'tell' | 'reload' | 'attack' | 'turn' | 'recover' | 'hurt' | 'roar' | 'won';
@@ -61,7 +61,7 @@ export class HypotheticalModel {
     private readonly backdropOffset: number;
     private arrivalWait=0;
     armed = [0, 0]; snared = false; muzzle = 0; destroyed = 0; backgroundX = -70; backgroundStamp = 0;
-    get wave() { return Math.min(3, this.route.cleared + 1); }
+    get wave() { return Math.min(SIEGE_SECTORS.length, this.route.cleared + 1); }
     nextAct = false; volley = 0; heat = 0; reloadX = 0;
     chainStep = 0; followup: HypotheticalAttack | null = null;
     chainTotal=1; private adaptiveFinisher=false;
@@ -75,14 +75,14 @@ export class HypotheticalModel {
     bridgeDebris:Array<{x:number;born:number;material:number}>=[];
     chaseBreaks:number[]=CHASE_BREAKS.map(()=>-1);
     chaseReactions:number[]=chaseReactionStarts(0);
-    constructor(readonly act: HypotheticalAct = 'chase', health: number = HYPOTHETICAL.health, cleared = 0, readonly chaseStart=0, readonly arrivalSeen=false) {
+    constructor(readonly act: HypotheticalAct = 'chase', health: number = HYPOTHETICAL.health, cleared = 0, readonly chaseStart=0, readonly arrivalSeen=false, previousBackdrop?:HypotheticalBackdrop) {
         this.route = new HypotheticalSiege(cleared);
-        this.backdrop = new HypotheticalBackdrop(act === 'siege');
-        this.backdropOffset = act === 'siege' ? (this.route.cleared?SCENIC_STARTS[Math.min(2,this.route.cleared)]:arrivalSeen?ARRIVAL.release:0) : 0;
+        this.backdrop = previousBackdrop??new HypotheticalBackdrop(act === 'siege');
+        this.backdropOffset = previousBackdrop?.tick??(act === 'siege' ? (this.route.cleared?SCENIC_STARTS[Math.min(SCENIC_STARTS.length-1,this.route.cleared)]:arrivalSeen?ARRIVAL.release:0) : 0);
         // A checkpoint preserves the ruined districts and advances the distant rider
         // to the same street. Replaying only this deterministic scenery never creates
         // foreground damage, emits old audio, or advances Feka's encounter clock.
-        for(let tick=1;tick<=this.backdropOffset;tick++)this.backdrop.update(tick);
+        if(!previousBackdrop)for(let tick=1;tick<=this.backdropOffset;tick++)this.backdrop.update(tick);
         this.destroyed = this.backdrop.breaches.filter(t=>t>=0).length;
         this.backgroundX = this.backdrop.x;
         this.health = health;
@@ -410,9 +410,12 @@ export class HypotheticalModel {
         if (this.route.openedThisTick) {
             this.shots = []; this.marks = []; this.frameHazards = []; this.emit('snare');
         }
-        const backdropTick=this.arrivalTime+this.backdropOffset;
+        const backdropTick=this.arrivalTime<=ARRIVAL.hold&&!this.arrivalSkipped
+            ?this.arrivalTime:nextScenicTick(this.backdrop.tick,player.x,this.route.cleared);
         const advanced=backdropTick>this.backdrop.tick;
+        if(backdropTick>this.backdrop.tick+1)this.backdrop.cancel();
         if(advanced)this.backdrop.update(backdropTick);
+        else {this.backdrop.velocity=0;this.backdrop.events=[];}
         this.backgroundX = this.backdrop.x;
         if(advanced)this.events.push(...this.backdrop.events);
         this.destroyed=this.backdrop.breaches.filter(t=>t>=0).length;

@@ -123,11 +123,11 @@ function belongings(c:CanvasRenderingContext2D,p:Bystander,tick:number,base:numb
 }
 
 /** Articulated street actors share the game's pixel grid and retain their clothing as they fall. */
-export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBackdrop,street:number,reduced:boolean,openingOnly=false){
-    if(!openingOnly)drawBlood(output,b,street,reduced,false);
-    for(const p of [...b.people].sort((a,b)=>(a.depth??0)-(b.depth??0))){
+export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBackdrop,street:number,reduced:boolean,openingOnly=false,actors?:readonly Bystander[]){
+    if(!openingOnly&&!actors)drawBlood(output,b,street,reduced,false);
+    for(const p of [...(actors??b.people)].sort((a,b)=>(a.depth??0)-(b.depth??0))){
         const behindDino=Boolean(p.opening)||(p.exitAtShelter===true&&p.shelter===116&&b.tick>0&&b.tick<OPENING.join);
-        if(behindDino!==openingOnly)continue;
+        if(!actors&&behindDino!==openingOnly)continue;
         const base=street+(p.depth??0);
         const site=p.district===0?(p.originX>320?1:0):p.district+1;
         belongings(output,p,b.tick,p.opening?street:base,b.breaches[site],reduced);
@@ -179,7 +179,7 @@ export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBac
             box(c,x-7,torso+(reduced?2:2+pose.clothSway*1.4),2,1,'#d0a184');
         }
     }
-    if(openingOnly)return;
+    if(openingOnly||actors)return;
     drawBlood(output,b,street,reduced,true);
     for(const s of b.shots)drawGunTracer(output,s,0,street,reduced,true);
     for(const p of b.impacts)drawGunImpact(output,p,b.tick,0,street,reduced,true);

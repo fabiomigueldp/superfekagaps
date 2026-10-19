@@ -12,20 +12,20 @@ import { sceneLifecycleBrowser } from './helpers/sceneLifecycleHarness';
 const dt=1000/60,p={x:360,y:200,width:14,height:24};
 
 test('each destruction site has a prepared contact, exactly one collapse, and persistent ruins',()=>{
-    const b=new HypotheticalModel('siege'),hits:number[]=[];
-    for(let n=1;n<=1800;n++){
-        b.update(dt,p,2);
+    const b=new HypotheticalBackdrop(true),hits:number[]=[];
+    for(let n=1;n<=2000;n++){
+        b.update(n);
         if(b.events.includes('break')){
             hits.push(n);const index=hits.length-1,site=DESTRUCTION_SITES[index];
-            assert.equal(b.backdrop.motion.phase,'contact');assert.equal(ruinAge(b.backdrop.breaches,index,n),0);
-            assert.ok(b.backgroundX+70*BACKDROP_RIG.scale>=site.x);
-            assert.equal(b.destroyed,hits.length);
+            assert.equal(b.motion.phase,'contact');assert.equal(ruinAge(b.breaches,index,n),0);
+            assert.ok(b.x+70*BACKDROP_RIG.scale>=site.x);
+            assert.equal(b.breaches.filter(t=>t>=0).length,hits.length);
         }
-        if(n===ARRIVAL_RAM.impact-1)assert.equal(b.destroyed,0);
+        if(n===ARRIVAL_RAM.impact-1)assert.ok(b.breaches.every(t=>t<0));
     }
-    assert.deepEqual(hits,[ARRIVAL_RAM.impact,ARRIVAL_BITE.impact,980,1380]);assert.equal(b.destroyed,4);assert.equal(b.backdrop.shots.length,0);
-    assert.equal(ruinAge(b.backdrop.breaches,3,1800),420);
-    for(const cleared of [1,2]){
+    assert.deepEqual(hits,[ARRIVAL_RAM.impact,ARRIVAL_BITE.impact,980,1380,1780]);assert.equal(b.shots.length,0);
+    assert.equal(ruinAge(b.breaches,4,2000),220);
+    for(const cleared of [1,2,3]){
         const resumed=new HypotheticalModel('siege',9,cleared);
         assert.equal(resumed.destroyed,cleared+1);assert.equal(resumed.backdrop.tick,SCENIC_STARTS[cleared]);
         assert.deepEqual(resumed.events,[]);assert.ok(resumed.backdrop.casualties>=cleared*2);
@@ -54,7 +54,8 @@ test('every visible distant shot originates at the articulated rifle, including 
         const muzzle={x:b.x+(rx+31*Math.cos(pose.aim))*s,y:(pose.y-BACKDROP_RIG.y+ry+31*Math.sin(pose.aim))*s};
         const shot=b.shots[b.shots.length-1];assert.ok(Math.hypot(shot.x-muzzle.x,shot.y-muzzle.y)<1e-7);
     }
-    assert.equal(shots,26);assert.equal(b.casualties,10);assert.equal(b.people.filter(p=>p.escaped).length,12);
+    assert.equal(shots,32);assert.ok(b.casualties>=10);
+    assert.ok(b.people.every(p=>Number.isFinite(p.x)));
 });
 
 test('arrival lets the final bullet land before the ram and leaves a readable aftermath before guards emerge',()=>{

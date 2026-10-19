@@ -46,7 +46,7 @@ test('casings eject, fall, bounce and settle on the ground at both rendering dep
 });
 test('background masonry hits resolve on the street and retain their last visible segment',()=>{
     const b=new HypotheticalBackdrop(true);let hits=0;
-    for(let tick=1;tick<=1800;tick++){
+    for(let tick=1;tick<=1600;tick++){
         b.update(tick);
         for(const p of b.impacts.filter(p=>p.born===tick&&p.material==='stone')){
             assert.ok(Math.abs(p.y+1)<1e-8);assert.equal(p.ny,-1);

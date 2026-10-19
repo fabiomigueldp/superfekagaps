@@ -1,5 +1,5 @@
 import { dinosaurFootAnchor, riderBend, smoothMotion } from './HypotheticalMotion';
-import { devastationAt,DESTRUCTION_SITES,SCENIC_STARTS } from './HypotheticalDevastation';
+import { devastationAt,DESTRUCTION_SITES,SCENIC_STARTS,SCENIC_END } from './HypotheticalDevastation';
 import {SIEGE_SECTORS,SIEGE_WIDTH} from './HypotheticalSiege';
 import { bystanderIntersection } from './HypotheticalBystanderMotion';
 import { gunRecoil, type GunImpact } from './HypotheticalGunfire';
@@ -78,6 +78,14 @@ export class HypotheticalBackdrop {
             distance:0,velocity:0,alertAt:OPENING.notice,speed:.22,district:0,clothes:'star-shirt',
             stoppedAt:null,threatenedAt:null,startledAt:null,reactionTimes:[],appearance:17,depth:0,
             belonging:'papers',opening:true});
+        if(wide)for(let i=0;i<4;i++){
+            const x=SIEGE_SECTORS[3].origin+220+i*24;
+            this.people.push({x,originX:x,shelter:i<2?x+22:SIEGE_SECTORS[3].origin+354,
+                escaped:false,fleeing:i>=2,hitAt:null,color:i,distance:0,velocity:0,
+                alertAt:SCENIC_STARTS[3]+38+i*9,speed:.9,district:3,
+                clothes:i%2?'workcoat':'star-shirt',stoppedAt:null,threatenedAt:null,startledAt:null,
+                reactionTimes:[],appearance:10+i,exitAtShelter:i>=2,runTicks:86+i*12});
+        }
     }
     private target = -1;
     get aimedPerson(){return this.people[this.target]??null;}
@@ -93,7 +101,7 @@ export class HypotheticalBackdrop {
     get angle() {
         const s = this.shoulder,{local,district} = this.motion,plaza=district===0&&local>=404;
         const start = plaza?(local>=444?444:404):local >= 146 ? 146 : 90, age = local - start,hold=36;
-        const weight = this.tick >= 1600 || this.target < 0 || age < 0 || age > hold+14 ? 0
+        const weight = this.tick >= SCENIC_END || this.target < 0 || age < 0 || age > hold+14 ? 0
             : age < 20 ? smoothMotion(age / 20) : age <= hold ? 1 : 1 - smoothMotion((age - hold) / 14);
         return -.12 + (Math.atan2(this.targetY - s.y, Math.max(1, this.targetX - s.x)) + .12) * weight;
     }
@@ -168,7 +176,7 @@ export class HypotheticalBackdrop {
         const pass = m.district, local = m.local;
         // The fictional villain prefers the red-star shirts within the current group.
         // Each burst commits to an escape destination after a visible shoulder/aim tell.
-        if (tick < 1600 && (local === 90 || local === 146 || pass===0&&(local===404||local===444))) {
+        if (tick < SCENIC_END && (local === 90 || local === 146 || pass===0&&(local===404||local===444))) {
             const barrel = this.barrel;
             const available = this.people.map((p, i) => ({ p, i })).filter(({ p }) =>
                 !p.fleeing && !p.escaped && p.district===pass && p.hitAt === null && p.x > barrel.x + 18
@@ -180,7 +188,7 @@ export class HypotheticalBackdrop {
             }
         }
         const volley=pass===0?[110,116,122,128,166,172,178,184,424,429,434,464,469,474]:[110,118,126,166,174,182];
-        if (tick < 1600 && this.target >= 0 && volley.includes(local)) {
+        if (tick < SCENIC_END && this.target >= 0 && volley.includes(local)) {
             this.muzzle = 5; this.heat = Math.min(1, this.heat + .23);
             const m = this.barrel, a = this.angle;
             this.shots.push({ x: m.x, y: m.y, px: m.x, py: m.y, vx: Math.cos(a) * 5, vy: Math.sin(a) * 5, life: 70,age:0 });

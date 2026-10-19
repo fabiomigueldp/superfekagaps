@@ -2,7 +2,7 @@ import { box, oval, pixelLine, polygon } from '../WorldPainting';
 import type { WorldLevel, WorldObjects, MovingBody } from '../WorldPhysics';
 import { HYPOTHETICAL, type HypotheticalModel } from './HypotheticalModel';
 import { ARENA_BALCONIES, ARENA_COLUMNS, CHASE_GAPS } from './HypotheticalLayout';
-import { SIEGE_SECTORS, SIEGE_UNLOCK_TICKS, SIEGE_LOCK_TICKS } from './HypotheticalSiege';
+import { SIEGE_SECTORS, SIEGE_WIDTH, SIEGE_UNLOCK_TICKS, SIEGE_LOCK_TICKS } from './HypotheticalSiege';
 import { DESTRUCTION_SITES, ruinAge, rubbleApproach } from './HypotheticalDevastation';
 import { backdropBaseline } from './HypotheticalBackdrop';
 import {drawChaseLandmarks,drawChaseTerrace} from './HypotheticalChaseArt';
@@ -11,6 +11,7 @@ import {CHASE_QUAYS,chaseQuayX,chaseQuayBase} from './HypotheticalChaseLife';
 import {drawChaseIndustry,drawChaseQuayLife,drawChaseSkiffs} from './HypotheticalChaseLifeArt';
 import {drawChaseQuayGround,drawChaseFrontage,drawChaseShoreWater} from './HypotheticalChaseQuayArt';
 import {drawArrivalCourtyard,drawArrivalPlaza,drawArrivalFittings} from './HypotheticalArrivalArt';
+import {drawForecourt} from './HypotheticalForecourt';
 
 const S = {
     ink: '#213545', joint: '#354956', stone: '#677b7c', stoneShade: '#516571',
@@ -273,7 +274,7 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
         }
     }else if(b.act==='siege'){
         for(const [i,s] of SIEGE_SECTORS.entries()){
-            const x=s.origin-cx,width=i===0?672:416,siteIndex=i===0?0:i+1;
+            const x=s.origin-cx,width=(SIEGE_SECTORS[i+1]?.origin??SIEGE_WIDTH)-s.origin,siteIndex=i===0?0:i+1;
             if(x>340||x+width<-20)continue;
             const damageAge=ruinAge(b.backdrop.breaches,siteIndex,b.backdrop.tick);
             facade(c,x+24,base-5,57,56+i%2*15,i);
@@ -317,6 +318,29 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
                 const loadX=x+(drop>=41?0:sway);
                 box(c,loadX+206,base-45+drop,34,4,'#718679');box(c,loadX+210,base-59+drop,26,14,'#9c9e7d');
                 for(const dx of [214,229])box(c,loadX+dx,base-59+drop,2,14,'#6b8278');
+            }else if(i===3){
+                // The last post is a fortified customs yard, with buttresses and
+                // a bell tower grounded on the same rear street as its facade.
+                const tx=x+102,top=base-108;
+                box(c,tx,top,46,104,'#718b82');box(c,tx+3,top+5,40,99,'#95a28e');
+                for(const dx of [0,39]){box(c,tx+dx-3,top+9,9,95,'#6b827c');box(c,tx+dx-2,top+10,2,92,'#b4b49a');}
+                roof(c,tx-3,top,52,true);arch(c,tx+12,top+16,22,37,'#435f65');
+                const sway=reduced?0:Math.sin(time/90)*2;
+                pixelLine(c,tx+22,top+18,tx+22+sway,top+31,'#b2a586',2);
+                polygon(c,[[tx+17+sway,top+29],[tx+28+sway,top+29],[tx+32+sway,top+41],[tx+13+sway,top+41]],'#b6a06e');
+                box(c,tx+13+sway,top+40,19,2,'#dfc28b');box(c,tx+21+sway,top+42,3,3,'#6c7469');
+                arch(c,tx+12,base-30,24,26,'#4c6a69');box(c,tx+11,base-6,27,2,'#b9b095');
+                for(const dx of [278,318,358,398,438]){
+                    box(c,x+dx,base-39,8,35,'#7a9185');box(c,x+dx-2,base-42,12,4,'#b1b49a');
+                    if(dx<438){arch(c,x+dx+8,base-32,32,28,'#536f70');pixelLine(c,x+dx+8,base-32,x+dx+39,base-32,'#94a78e',2);}
+                }
+                const fall=damageAge<0?0:Math.min(1,damageAge/50);
+                pixelLine(c,x+268,base-44,x+320,base-50+fall*28,'#a3ab91');
+                polygon(c,[[x+278,base-46+fall*5],[x+302,base-49+fall*22],[x+300,base-32+fall*25],[x+281,base-30+fall*7]],'#8f6961');
+                if(!reduced&&damageAge>=0)for(let j=0;j<4;j++){
+                    const t=(damageAge+j*19)%90;
+                    box(c,x+219+t*.3,base-34-t*.38,7+t*.06,3,'#a9aea0');
+                }
             }else{
                 // The arsenal has reinforced doors, vent stacks and pressure pipes.
                 box(c,x+94,base-91,64,87,'#7c9186');box(c,x+89,base-94,74,5,'#adb29a');
@@ -518,7 +542,7 @@ function siegeDeck(c: CanvasRenderingContext2D, p: MovingBody, cx: number, cy: n
         }
         return;
     }
-    const iron=index===2;
+    const iron=index>=2;
     for(const px of [x+5,x+w-10]){
         box(c,px,y+7,5,floor-y-7,iron?S.iron:S.woodShade);
         box(c,px+1,y+9,1,floor-y-12,iron?S.ironLight:S.woodLight);
@@ -625,7 +649,7 @@ function balcony(c: CanvasRenderingContext2D, p: MovingBody, cx: number, cy: num
 }
 
 export function drawHypotheticalFittings(c: CanvasRenderingContext2D, o: WorldObjects, b: HypotheticalModel, cx: number, cy: number) {
-    if(b.act==='siege')drawArrivalFittings(c,b,cx,cy);
+    if(b.act==='siege'){drawForecourt(c,b,cx,cy);drawArrivalFittings(c,b,cx,cy);}
     for(const p of o.bodies){
         if(p.x>cx+350||p.x+p.width<cx-30)continue;
         if(p.kind==='support'){

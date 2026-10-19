@@ -19,7 +19,7 @@ function setup(kind:FoeSpec['kind'],x=100,y=224,wave=1){
 
 test('authored garrisons have room bounds and every launcher stands on its own scaffold',()=>{
     const stage=hypotheticalStage('siege');
-    assert.equal(stage.foes.length,9);
+    assert.equal(stage.foes.length,11);
     for(const [i,sector] of SIEGE_SECTORS.entries())for(const spec of siegeGarrison(i)){
         const e=new HypotheticalGuard(spec,i+1,()=>[],{left:sector.origin+12,right:sector.gate});
         assert.ok(e.x>=sector.origin&&e.x+e.width<sector.gate);

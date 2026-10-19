@@ -7,13 +7,34 @@ export const DEVASTATION = { period:400, prepare:136, strike:166, impact:180, ho
 /** The opening gives the rifle, ram and aftermath separate beats before combat resumes. */
 export const ARRIVAL_RAM={prepare:200,strike:228,impact:244,hold:254,recover:302} as const;
 export const ARRIVAL_BITE={prepare:480,strike:508,impact:526,hold:536,recover:574} as const;
-export const SCENIC_STARTS=[0,800,1200] as const;
-export const scenicDistrict=(tick:number)=>tick<800?0:tick<1200?1:2;
+export const SCENIC_STARTS=[0,800,1200,1600] as const;
+export const SCENIC_END=SCENIC_STARTS[SCENIC_STARTS.length-1]+DEVASTATION.period;
+export const scenicDistrict=(tick:number)=>SCENIC_STARTS.reduce<number>((district,start,i)=>tick>=start?i:district,0);
+
+/** A street opens its scene only after Feka can see the stage. Holding here is
+ * deliberately before the entrance, not halfway through a strike or fall. */
+export function nextScenicTick(tick:number,playerX:number,cleared:number){
+    const next=Math.min(SCENIC_END,tick+1),district=scenicDistrict(next);
+    // A quick player may leave a street before its performance finishes. Start
+    // the visible street without replaying any skipped contacts off camera.
+    let visible=0;
+    for(let i=1;i<SIEGE_SECTORS.length;i++)if(cleared>=i&&playerX>=SIEGE_SECTORS[i].origin+96)visible=i;
+    if(visible>scenicDistrict(tick))return SCENIC_STARTS[visible];
+    if(district>0&&next===SCENIC_STARTS[district]
+        &&(cleared<district||playerX<SIEGE_SECTORS[district].origin+96))return tick;
+    // Wait at a planted neutral pose before winding up if Feka backed away.
+    if(district>0&&next-SCENIC_STARTS[district]>=DEVASTATION.prepare&&next-SCENIC_STARTS[district]<DEVASTATION.recover){
+        const center=DESTRUCTION_SITES[district+1].x+38;
+        if(playerX<center-164||playerX>center+108)return tick;
+    }
+    return next;
+}
 export const DESTRUCTION_SITES = [
     { x:184, width:76, height:66, variant:0, kind:'ram',district:0 },
     { x:440, width:84, height:54, variant:1, kind:'bite',district:0 },
     { x:856, width:76, height:72, variant:1, kind:'bite',district:1 },
     { x:1272, width:76, height:78, variant:2, kind:'stamp',district:2 },
+    { x:1688, width:76, height:84, variant:2, kind:'ram',district:3 },
 ] as const;
 
 export function devastationAt(tick:number) {

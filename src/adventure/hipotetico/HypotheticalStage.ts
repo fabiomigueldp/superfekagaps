@@ -49,6 +49,9 @@ export function hypotheticalStage(act: HypotheticalAct): AdventureStage {
         for(const [i,x] of [396,434,816,854].entries())
             s.pickups.push({id:`hipotetico:link:${i}`,kind:'coin',x:x+SIEGE_APPROACH,y:i%2?138:158});
         s.pickups.push({id:'hipotetico:siege:helmet',kind:'helmet',x:900+SIEGE_APPROACH,y:158});
+        s.pickups.push({id:'hipotetico:bastion:helmet',kind:'helmet',x:1532,y:194});
+        for(const [i,x] of [1484,1524].entries())
+            s.pickups.push({id:`hipotetico:bastion:approach:${i}`,kind:'coin',x,y:i?146:160});
     } else {
         s.mechanisms = ARENA_BALCONIES.map(p=>({...p}));
         if (act === 'duel') s.mechanisms.push(

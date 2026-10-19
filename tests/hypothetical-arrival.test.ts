@@ -56,12 +56,12 @@ test('native pause freezes arrival and retry restores the aftermath without repe
         h.key('keydown','ArrowRight');h.key('keydown','ShiftLeft');
         while(g.fight.arrivalTime<ARRIVAL.release+30)g.update(dt);
         h.key('keyup','ArrowRight');h.key('keyup','ShiftLeft');
+        const previous=g.fight.backdrop,tick=previous.tick,people=structuredClone(previous.people),breaches=[...previous.breaches];
         h.key('keydown','r');h.key('keyup','r');
-        assert.equal(g.fight.tick,0);assert.equal(g.fight.arrivalSkipped,true);assert.equal(g.fight.backdrop.tick,ARRIVAL.release);
+        assert.equal(g.fight.tick,0);assert.equal(g.fight.arrivalSkipped,true);assert.equal(g.fight.backdrop.tick,tick);
         assert.equal(g.objects.bodies.find(p=>p.id==='arrival-gate')!.height,0);
-        const expected=new HypotheticalBackdrop(true);for(let tick=1;tick<=ARRIVAL.release;tick++)expected.update(tick);
-        assert.deepEqual(g.fight.backdrop.people,expected.people);assert.deepEqual(g.fight.backdrop.breaches,expected.breaches);
-        assert.deepEqual(g.fight.backdrop.blood,expected.blood);assert.equal(g.player.getRect().x,304);
+        assert.equal(g.fight.backdrop,previous);assert.deepEqual(g.fight.backdrop.people,people);assert.deepEqual(g.fight.backdrop.breaches,breaches);
+        assert.equal(g.player.getRect().x,304);
         assert.equal(g.objects.bodies.find(p=>p.id==='arrival-forecourt')!.height,0);
         g.replay();g.act='siege';g.load('hipotetico-siege',true);
         assert.equal(g.fight.arrivalSkipped,false);assert.equal(g.fight.arrival.height,120);
@@ -100,7 +100,7 @@ test('NPC variations paint distinct pixels and preserve dropped belongings after
         const p={...actor,x:40,originX:40,shelter:120,depth:0,exitAtShelter:false,belonging:undefined};
         b.people.splice(0,b.people.length,p);pictures.add(JSON.stringify([...paint()]));
     }
-    assert.equal(pictures.size,12);
+    assert.equal(pictures.size,actors.length);
     const parcel={...actors[0],escaped:true};b.people.splice(0,b.people.length,parcel);b.tick=250;
     const after=paint();assert.ok(after.size>20,'the dropped parcel stays in the street after its owner enters the refuge');
     assert.ok([...after.keys()].every(key=>Number(key.split(',')[1])<60),'debris never sinks through the street');

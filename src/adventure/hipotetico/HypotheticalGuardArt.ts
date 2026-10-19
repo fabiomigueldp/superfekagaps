@@ -4,6 +4,8 @@ import type { WorldFoe } from '../WorldEnemies';
 import type { Barrel } from '../WorldPhysics';
 import { HypotheticalGuard } from './HypotheticalGuards';
 import { guardActionPose } from './HypotheticalGuardMotion';
+import { HypotheticalVanguard } from './HypotheticalVanguard';
+import { drawVanguard } from './HypotheticalVanguardArt';
 
 const C = { ink:'#172c36', navy:'#304659', seam:'#607487', cloth:'#203644', brass:'#d3a75c', light:'#fff0ce',
     jade:'#627c78', jadeLight:'#9bb3a0', jadeShade:'#3e5958', wood:'#8c5149', grain:'#bd8263', leather:'#583f38',
@@ -57,6 +59,7 @@ export function drawHypotheticalCanister(c:CanvasRenderingContext2D,b:Barrel,cx:
 }
 
 export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:number,cy:number,reduced=false){
+    if(e instanceof HypotheticalVanguard){drawVanguard(c,e,cx,cy,reduced);return;}
     if(e.dead&&e.deadTimer>=420)return;
     const x=Math.round(e.x-cx),y=Math.round(e.y-cy),w=e.width,h=e.height,d=e.facing||1;
     const pose=guardPose(e,reduced),kind=e.spec.kind,hit=e.flash>0;

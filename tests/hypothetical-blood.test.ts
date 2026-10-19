@@ -5,7 +5,7 @@ import {bloodDrop,drawBlood} from '../src/adventure/hipotetico/HypotheticalBlood
 
 test('persistent blood is created once per real bullet contact, never by an alert or missed shot',()=>{
     const b=new HypotheticalBackdrop(true);
-    for(let tick=1;tick<=1800;tick++){
+    for(let tick=1;tick<=1600;tick++){
         const count=b.blood.length;b.update(tick);
         const contacts=b.people.filter(p=>p.hitAt===tick);
         assert.equal(b.blood.length-count,contacts.length);

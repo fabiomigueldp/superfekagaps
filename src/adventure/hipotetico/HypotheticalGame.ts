@@ -1,6 +1,8 @@
 import { WorldGame } from '../WorldGame';
 import { BossEncounter } from '../BossEncounter';
 import { HypotheticalGuard } from './HypotheticalGuards';
+import { HypotheticalVanguard } from './HypotheticalVanguard';
+import type { HypotheticalBackdrop } from './HypotheticalBackdrop';
 import type { WorldLevel, WorldObjects } from '../WorldPhysics';
 import type { Rect } from '../../types';
 import { TileType } from '../../constants';
@@ -23,8 +25,8 @@ export class HypotheticalEncounter extends BossEncounter {
     livingGuards = 0;
     garrison: HypotheticalGuard[] = [];
     private collapsedColumns=0;
-    constructor(act: HypotheticalAct, health: number, cleared = 0, chaseStart=0, arrivalSeen=false) {
-        super('J1'); this.character = 'yasmin'; this.model = new HypotheticalModel(act, health, cleared,chaseStart,arrivalSeen); this.sync();
+    constructor(act: HypotheticalAct, health: number, cleared = 0, chaseStart=0, arrivalSeen=false,backdrop?:HypotheticalBackdrop) {
+        super('J1'); this.character = 'yasmin'; this.model = new HypotheticalModel(act, health, cleared,chaseStart,arrivalSeen,backdrop); this.sync();
     }
     private sync() {
         const b=this.model,body=b.vulnerable?b.weakpoint:b.body;
@@ -158,6 +160,13 @@ export class HypotheticalGame extends WorldGame {
             return closest.x<this.player.data.position.x?'PATRULHA A ESQUERDA. VOLTE AO POSTO':'PATRULHA A DIREITA. AVANCE COM CUIDADO';
         }
         const stunned=visible.find(e=>e.phase==='stunned');
+        const elite=visible.find(e=>e instanceof HypotheticalVanguard);
+        if(elite instanceof HypotheticalVanguard){
+            if(elite.exposed)return 'VANGUARDA EXPOSTO! SALTE OU USE A SENTADA';
+            if(elite.move==='vault'&&['warning','attack'].includes(elite.phase))return 'SALTO MARCADO! SAIA DO POUSO E CONTRA-ATAQUE';
+            if(elite.move==='cross'&&['warning','attack'].includes(elite.phase))return elite.strike?'SEGUNDO CORTE! CRUZE POR CIMA':'CORTE DUPLO! GUARDE ESPACO PARA O SEGUNDO';
+            return 'INVESTIDA! SALTE E ATAQUE PELAS COSTAS';
+        }
         if(stunned)return stunned.spec.kind==='charger'?'TETO QUEBRADO! SALTE NO ARIETE':'SEM CAPACETE! SALTE DE NOVO';
         const vault=visible.find(e=>e instanceof HypotheticalGuard&&e.vaultTarget);
         if(vault instanceof HypotheticalGuard){
@@ -183,12 +192,15 @@ export class HypotheticalGame extends WorldGame {
         this.weaponAudio?.cancel();
         if(!resume){this.act='chase';this.arrivalSeen=false;this.retryHealth=HYPOTHETICAL.health;this.siegeCheckpoint=0;this.chaseCheckpoint=0;}
         const stage=hypotheticalStage(this.act);
+        const backdrop=resume&&this.arrivalSeen&&this.act==='siege'&&this.encounter?.model.act==='siege'?this.encounter.model.backdrop:undefined;
         if(this.act==='chase'&&this.chaseCheckpoint)stage.level.playerSpawn.x=this.chaseCheckpoint/16;
         super.load(stage.id,false,stage);
-        this.encounter=new HypotheticalEncounter(this.act,this.retryHealth,this.siegeCheckpoint,this.chaseCheckpoint,this.arrivalSeen);this.boss=this.encounter;
+        this.encounter=new HypotheticalEncounter(this.act,this.retryHealth,this.siegeCheckpoint,this.chaseCheckpoint,this.arrivalSeen,backdrop);this.boss=this.encounter;
         if(this.act==='siege'){
             this.foes=SIEGE_SECTORS.flatMap((s,i)=>i<this.siegeCheckpoint?[]:siegeGarrison(i).map(spec=>
-                new HypotheticalGuard(spec,i+1,()=>this.foes,{left:s.origin+12,right:s.gate})));
+                spec.id.endsWith(':vanguard')
+                    ?new HypotheticalVanguard(spec,i+1,()=>this.foes,{left:s.origin+12,right:s.gate})
+                    :new HypotheticalGuard(spec,i+1,()=>this.foes,{left:s.origin+12,right:s.gate})));
             this.encounter.garrison=this.foes as HypotheticalGuard[];
             for(const e of this.encounter.garrison)e.awake=false;
             this.player.data.position.x=this.fight.arrivalSkipped?this.fight.route.checkpoint:48;
@@ -264,7 +276,7 @@ export class HypotheticalGame extends WorldGame {
         workshopPanel(c,0,0,320,31,false,true);
         pixelText(c,'FLAVIO HIPOTETICO',7,5,WORKSHOP_UI.paper);
         const district=Math.min(3,Math.floor(this.player.data.position.x/1120));
-        pixelText(c,this.act==='chase'?`${district+1}/4 ${CHASE_DISTRICTS[district].name}`:this.act==='siege'&&!b.arrival.ready?'CHEGADA AO ARSENAL':this.act==='siege'?`${b.route.entered+1}/3 ${b.route.currentSector.name}`:`FASE ${b.phaseNumber}/3`,121,5,WORKSHOP_UI.light);
+        pixelText(c,this.act==='chase'?`${district+1}/4 ${CHASE_DISTRICTS[district].name}`:this.act==='siege'&&!b.arrival.ready?'CHEGADA AO ARSENAL':this.act==='siege'?`${b.route.entered+1}/${SIEGE_SECTORS.length} ${b.route.currentSector.name}`:`FASE ${b.phaseNumber}/3`,121,5,WORKSHOP_UI.light);
         if(this.act==='chase')for(let i=0;i<4;i++){c.fillStyle=i<=district?'#dfad56':'#435969';c.fillRect(244+i*6,6,4,5);}
         if(this.act==='siege'&&b.arrival.ready){
             const i=b.route.entered,total=SIEGE_SECTORS[i].guards.length,left=b.route.remaining[i];
