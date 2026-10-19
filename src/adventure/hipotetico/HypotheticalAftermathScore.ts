@@ -55,7 +55,11 @@ export class AftermathRepertoire {
             if(action===prompt)weight*=2.8;
             const key=-Math.log(this.random())/weight-(absence>=10?20+absence:0);
             return {action,key};
-        }).filter(p=>!recent.slice(-2).includes(p.action)).sort((a,b)=>a.key-b.key).map(p=>p.action);
+        }).filter(p=>!recent.slice(-2).includes(p.action)).sort((a,b)=>
+            // Age weighting must not overrule the quiet beat after two loud
+            // actions. The planner can still skip a material out of reach.
+            (loud?Number(aftermathFamily(b.action)==='search')-Number(aftermathFamily(a.action)==='search'):0)
+            ||a.key-b.key).map(p=>p.action);
     }
 }
 

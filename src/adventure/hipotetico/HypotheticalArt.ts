@@ -4,14 +4,14 @@ import { box, oval, pixelLine, polygon, type Point } from '../WorldPainting';
 import { pixelText } from '../../graphics/BitmapFont';
 import type { WorldLevel, WorldObjects } from '../WorldPhysics';
 import { HYPOTHETICAL, type HypotheticalModel } from './HypotheticalModel';
-import { dinosaurLeg, dinosaurTail, dinosaurHeadPoint, hypotheticalMotion, riderBend, riderTorsoPoint, smoothMotion } from './HypotheticalMotion';
+import { dinosaurLeg, dinosaurTail, dinosaurHeadPoint, dinosaurJawPoint, dinosaurMouthPoint, hypotheticalMotion, riderBend, riderTorsoPoint, smoothMotion } from './HypotheticalMotion';
 import { BACKDROP_RIG, backdropBaseline, type HypotheticalBackdrop } from './HypotheticalBackdrop';
 import { drawBystanders,drawCarriedBystander,type CarriedBystander } from './HypotheticalBystanders';
 import {drawTowerSearchActors,drawTowerSearchDust} from './HypotheticalTowerSearchArt';
 import {drawOpeningAftermath} from './HypotheticalOpening';
 import {drawAftermathYards,drawAftermathEffects} from './HypotheticalAftermathArt';
 import {drawDebrisPiece} from './HypotheticalDebrisArt';
-import {AFTERMATH_SCALE,DEBRIS_GRIP_X,type HeldDebris} from './HypotheticalAftermathHandling';
+import {AFTERMATH_SCALE,type HeldDebris} from './HypotheticalAftermathHandling';
 import {drawTowerEffects} from './HypotheticalTowerArt';
 import {drawLauncher,drawLauncherHands} from './HypotheticalLauncherArt';
 import type {LauncherPose} from './HypotheticalTower';
@@ -26,7 +26,7 @@ const P = { ink: '#172c36', deep: '#263f3d', shade: '#556047', hide: '#92845a', 
     suit: '#304659', lapel: '#607487', skin: '#c58d68', face: '#edbc8e', hair: '#3c3034',
     brass: '#d3a75c', mint: '#99e0cf', hot: '#ffb267', scute:'#6e7953', skinLight:'#f7d2a6',
     mouth:'#593b40', tongue:'#bc796a', leather:'#583f38', stitch:'#b8885d', clothShade:'#203644' };
-export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; headPitch?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; swallow?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet }
+export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; headPitch?:number; jawHinge?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; swallow?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet }
 const fogPalette=new Map<string,string>();
 function distantColor(color:string){
     if(!fogPalette.has(color)){
@@ -217,7 +217,8 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     }
     // Hinged lower jaw, teeth and palate. The eye keeps a readable 1px pupil.
     skull=(pose.headPitch??0)!==0;
-    const jaw = pose.jaw * 13;
+    const jaw = pose.jawHinge===undefined?pose.jaw*13:0;
+    const lowerJaw=(xx:number,yy:number):Point=>dinosaurJawPoint([xx,yy],neck,pose.jawHinge??0);
     poly([[26,neck-11],[47,neck-16],[66,neck-10],[70,neck+3],[61,neck+9],[30,neck+8]],P.ink);
     poly([[29,neck-9],[48,neck-13],[64,neck-8],[66,neck+2],[59,neck+5],[31,neck+5]],P.hide);
     poly([[31,neck-8],[48,neck-11],[62,neck-7],[57,neck-5],[38,neck-4]],P.light);
@@ -225,21 +226,21 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     poly([[33,neck-1],[38,neck-3],[40,neck],[38,neck+3],[34,neck+3]],P.scute);
     line(43,neck+3,59,neck+2,P.light);line(32,neck-7,40,neck-9,P.cream);
     for(const [sx,sy] of [[43,-10],[57,-7],[60,-2],[45,0],[33,4]]){rect(sx,neck+sy,3,1,P.shade);rect(sx,neck+sy-1,2,1,P.light);}
-    poly([[30,neck+6],[65,neck+5],[61,neck+17+jaw],[37,neck+15+jaw],[27,neck+10]],P.ink);
-    poly([[32,neck+8],[62,neck+7],[59,neck+12+jaw],[38,neck+11+jaw]],P.mouth);
-    poly([[36,neck+11+jaw*.4],[55,neck+11+jaw*.7],[59,neck+13+jaw],[39,neck+12+jaw]],P.tongue);
-    poly([[29,neck+10],[37,neck+12+jaw],[60,neck+14+jaw],[59,neck+16+jaw],[37,neck+14+jaw]],P.hide);
-    line(37,neck+14+jaw,57,neck+15+jaw,P.cream);
+    poly([[30,neck+6],[65,neck+5],lowerJaw(61,neck+17+jaw),lowerJaw(37,neck+15+jaw),[27,neck+10]],P.ink);
+    poly([[32,neck+8],[62,neck+7],lowerJaw(59,neck+12+jaw),lowerJaw(38,neck+11+jaw)],P.mouth);
+    poly([lowerJaw(36,neck+11+jaw*.4),lowerJaw(55,neck+11+jaw*.7),lowerJaw(59,neck+13+jaw),lowerJaw(39,neck+12+jaw)],P.tongue);
+    poly([[29,neck+10],lowerJaw(37,neck+12+jaw),lowerJaw(60,neck+14+jaw),lowerJaw(59,neck+16+jaw),lowerJaw(37,neck+14+jaw)],P.hide);
+    line(...lowerJaw(37,neck+14+jaw),...lowerJaw(57,neck+15+jaw),P.cream);
     line(32,neck+7,63,neck+6,P.rust);
-    const mouth=headPoint([DEBRIS_GRIP_X,neck+10+pose.jaw*6]);
+    const mouth=dinosaurMouthPoint(neck,pose.jaw,pose.headPitch,pose.jawHinge);
     if(pose.heldDebris)drawDebrisPiece(c,x+d*mouth[0],y+mouth[1],pose.heldDebris,1/AFTERMATH_SCALE);
     if(pose.carriedBystander)drawCarriedBystander(c,pose.carriedBystander,
         x+d*mouth[0],y+mouth[1],1/AFTERMATH_SCALE);
     for(const [tx,length] of [[36,3],[41,5],[47,4],[53,5],[59,3]]){
         poly([[tx,neck+6],[tx+3,neck+6],[tx+1,neck+6+length]],P.ivory);
         if((pose.gore??0)>.2)poly([[tx,neck+6+length-2],[tx+2,neck+6+length-2],[tx+1,neck+6+length]],'#9e3237');
-        if(jaw>3){
-            poly([[tx+1,neck+13+jaw],[tx+3,neck+13+jaw],[tx+2,neck+10+jaw]],P.light);
+        if(jaw>3||(pose.jawHinge??0)>.09){
+            poly([lowerJaw(tx+1,neck+13+jaw),lowerJaw(tx+3,neck+13+jaw),lowerJaw(tx+2,neck+10+jaw)],P.light);
             if((pose.gore??0)>.2)rect(tx+1,neck+10+jaw,2,2,'#8f292f');
         }
     }

@@ -2,6 +2,42 @@
 
 Revisão de 19/10/2026, integrada ao encontro nativo `/?encounter=hipotetico`.
 
+## Revisão da orquestração e das articulações
+
+Revisão 12, sobre a ampliação `c469795` do usuário. As variantes adicionais e
+seus desenhos foram preservados. O polimento de articulação usa as duas
+cadências encobertas; não amplia o conteúdo gráfico das demais variantes.
+
+| Área lida | Correção ou continuidade |
+| --- | --- |
+| Relógio da boca | `forage.age` é atualizado antes de amostrar tronco, mandíbula e efeitos; remove a diferença de um quadro. |
+| Alvos persistentes | `EscapeEntry.settledAt` registra a primeira observação no relógio local. Espera de 180 passos, queda concluída e velocidade residual baixa antes da elegibilidade. O relógio da rua pode estar parado. |
+| Reserva de ator | `available()` é compartilhado pela seleção e pelo início. Atores removidos, já usados, fugidos ou capturados ficam excluídos. A posição e o enquadramento são conferidos após caminhar. Falha de início retorna à recuperação sem incrementar o contador. |
+| Estado da rua | A ativação do pátio deixa de converter personagens vivos compartilhados em atingidos. A seleção percorre o cadastro finito, sem depender dos índices fixos 0, 1, 4, 2 e 3. |
+| Ritmo entre cenas | Reserva compartilhada por perseguição e alimentação: duas outras performances e a duração prevista mais 120 passos. Os intervalos próprios de cada sistema continuam valendo. |
+| Repertório | Depois de duas ações ruidosas, tenta uma investigação elegível antes da prioridade por ausência. Cadências de erguer/sacudir usam duas variações, em vez do módulo três que podia repetir a mesma animação. |
+| Eventos ambientais | A intenção é derivada do destino atual da caminhada/rotação, sem reutilizar uma reserva antiga. Preparação e resposta a ruídos, pegada, esforço e soltura protegem seus momentos principais. |
+| Torre, bandos e transições | Prioridade e tolerância de enquadramento da torre mantidas; bandos existentes e peças soltas continuam sua física. Não foram alterados os roteiros da torre, do helicóptero ou as colisões de Feka. |
+
+`dinosaurJawPoint` acrescenta uma articulação opcional para a mandíbula,
+ativada apenas pelas cadências encobertas. `dinosaurMouthPoint` fornece o
+mesmo centro da boca ao desenho e aos efeitos; poses sem `jawHinge` mantêm o
+cálculo anterior. A cabeça responde com atraso de três passos, cavaleiro e
+rédeas com seis, cauda com nove. A antecipação da abertura começa antes e a
+postura retorna ao valor de repouso antes da próxima atividade.
+
+O comando de autoria aceita `--occluded`, que escolhe as duas cadências para
+o material visual sem alterar sua seleção no jogo. `forage-score.mp4` reúne
+quatro composições de seis segundos a 60 fps. A prancha usa enquadramentos
+centrados no ator. `forage-score-study.json` registra poses, apoios, alvos,
+relógio de estabilização e reservas da composição.
+
+Revisão estática dos módulos e inspeção dos quadros nativos, inclusive com
+movimento reduzido. O material mantém Feka parado e não inclui áudio ou
+combate em primeiro plano. Não foi feita uma simulação de longa duração nem
+uma avaliação de gameplay. Publicação apenas com build Vite, sem suíte de
+testes, typecheck ou revisão de navegador, conforme instrução do projeto.
+
 ## Refinamento do movimento e da poeira
 
 Revisão 11: a cabeça recebe uma rotação rígida no alto do pescoço. O desenho,

@@ -11,7 +11,7 @@ import {AFTERMATH_YARDS} from '../src/adventure/hipotetico/HypotheticalAftermath
 import {SCENIC_STARTS} from '../src/adventure/hipotetico/HypotheticalDevastation';
 import {pixelText} from '../src/graphics/BitmapFont';
 
-const [directory,canvasModule]=process.argv.slice(2),out=resolve(directory);
+const [directory,canvasModule,mode]=process.argv.slice(2),out=resolve(directory);
 mkdirSync(join(out,'frames'),{recursive:true});
 const {createCanvas}=await import(pathToFileURL(resolve(canvasModule)).href);
 const clean:Array<()=>void>=[],h=sceneLifecycleBrowser({after:f=>clean.push(f as ()=>void)}),create=h.document.createElement;
@@ -25,8 +25,8 @@ const scenes=['portaria','cais','arsenal','bastiao'].map((name,i)=>{
 const screen=createCanvas(320,180),c=screen.getContext('2d');c.imageSmoothingEnabled=false;
 const film=createCanvas(640,408),fc=film.getContext('2d');fc.imageSmoothingEnabled=false;
 const board=createCanvas(1920,816),bc=board.getContext('2d');bc.imageSmoothingEnabled=false;
-const detail=createCanvas(1920,736),dc=detail.getContext('2d');dc.imageSmoothingEnabled=false;
-bc.fillStyle='#102630';bc.fillRect(0,0,1920,816);dc.fillStyle='#102630';dc.fillRect(0,0,1920,736);
+const detail=createCanvas(1920,816),dc=detail.getContext('2d');dc.imageSmoothingEnabled=false;
+bc.fillStyle='#102630';bc.fillRect(0,0,1920,816);dc.fillStyle='#102630';dc.fillRect(0,0,1920,816);
 const clips:object[]=[],poses:object[]=[],cues:object[]=[],captures:object[]=[];
 try{
     for(let step=0;step<8400;step++){
@@ -37,6 +37,8 @@ try{
             s.model.update(1000/60,s.player,2);
             const f=a.yard?.forage;
             if(!f)continue;
+            // Author the two occluded gestures without changing runtime choice.
+            if(mode==='--occluded'&&a.phase==='forage'&&f.age===0)f.variant=i%2;
             if(s.start<0&&a.phase==='forage'&&f.age===1){
                 s.start=a.tick;mkdirSync(join(out,'frames',s.name),{recursive:true});
                 clips.push({yard:s.name,variant:f.variant,start:a.tick,story:s.model.backdrop.tick});
@@ -68,8 +70,9 @@ try{
                 const file=s.name+'-'+shot.label.toLowerCase()+'.png';writeFileSync(join(out,file),screen.toBuffer('image/png'));
                 const x=shots.indexOf(shot)*320,y=i*204;
                 bc.drawImage(screen,x,y+24);pixelText(bc,s.name.toUpperCase()+' / '+shot.label,x+7,y+8,'#dfba7d');
-                dc.drawImage(screen,116,44,160,80,x,i*184+24,320,160);
-                pixelText(dc,s.name.toUpperCase()+' / '+shot.label,x+7,i*184+8,'#dfba7d');
+                const detailX=Math.max(0,Math.min(160,Math.round(a.x-a.cameraFor(s.player.x)-80)));
+                dc.drawImage(screen,detailX,32,160,90,x,i*204+24,320,180);
+                pixelText(dc,s.name.toUpperCase()+' / '+shot.label,x+7,i*204+8,'#dfba7d');
                 captures.push({file,yard:s.name,frame,age:f.age,phase:a.phase});
                 if(shot.label==='OCLUSAO'||shot.label==='PARTIR-TRONCO'||shot.label==='PERNAS-NA-BOCA'||shot.label==='ARRANCAR-COLUNA'){
                     drawHypotheticalBackground(c,s.model,a.cameraFor(s.player.x),64,true);
@@ -81,7 +84,9 @@ try{
                 poses.push({yard:s.name,frame,phase:a.phase,actorX:a.x,
                     age:f.age,variant:f.variant,pose,jaw:a.jawAnchor,cover:f.coverAt(a.tick),
                     feetWorld:pose.feet?.map(p=>[a.x+p[0]*.6875,p[1]*.6875]),
-                    target:f.targetX,contactX:f.contactX,contactTick:f.contactTick,landingTick:f.landingTick,
+                    target:f.targetX,selected:f.selected,settledAt:f.entry.settledAt,
+                    nextSceneAt:a.yard.nextSceneAt,nextScenePerformance:a.yard.nextScenePerformance,
+                    contactX:f.contactX,contactTick:f.contactTick,landingTick:f.landingTick,
                     removedAt:f.entry.removedAt,person:{...f.entry.person}});
             }
         }
@@ -89,7 +94,7 @@ try{
     writeFileSync(join(out,'storyboard.png'),board.toBuffer('image/png'));
     writeFileSync(join(out,'detail-board.png'),detail.toBuffer('image/png'));
     writeFileSync(join(out,'art-study.json'),JSON.stringify({kind:'directed native art footage',gameplayTest:false,
-        heldPlayers:true,foregroundCombat:false,audio:false,fps:60,
+        heldPlayers:true,foregroundCombat:false,audio:false,fps:60,cadences:mode==='--occluded'?'directed occluded gestures':'director selection',
         frames:scenes.map(s=>({yard:s.name,frames:s.frames})),clips,captures,cues,poses},null,2));
     console.log(JSON.stringify({output:out,frames:scenes.map(s=>({yard:s.name,frames:s.frames})),clips}));
 }finally{for(const f of clean.reverse())f();}

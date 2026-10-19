@@ -68,6 +68,19 @@ export function dinosaurHeadPoint(point:Point,neck:number,pitch=0):Point {
     return [29+dx*c-dy*s,neck+6+dx*s+dy*c];
 }
 
+/** Optional rigid mandible: rotate the lower lip about the jaw joint instead
+ * of stretching its texture vertically. Existing poses keep their old rig. */
+export function dinosaurJawPoint(point:Point,neck:number,angle=0):Point {
+    if(angle===0)return point;
+    const dx=point[0]-29,dy=point[1]-neck-7,c=Math.cos(angle),s=Math.sin(angle);
+    return [29+dx*c-dy*s,neck+7+dx*s+dy*c];
+}
+export function dinosaurMouthPoint(neck:number,jaw:number,pitch=0,hinge?:number):Point {
+    if(hinge===undefined)return dinosaurHeadPoint([56,neck+10+jaw*6],neck,pitch);
+    const lower=dinosaurJawPoint([56,neck+14],neck,hinge);
+    return dinosaurHeadPoint([(56+lower[0])/2,(neck+6+lower[1])/2],neck,pitch);
+}
+
 /** A long planted stance followed by a shorter airborne return; feet do not slide sinusoidally. */
 export function dinosaurFoot(gait: number, offset: number, stride: number, tuck: number): Point {
     const t = ((gait / (Math.PI * 2) + offset) % 1 + 1) % 1;

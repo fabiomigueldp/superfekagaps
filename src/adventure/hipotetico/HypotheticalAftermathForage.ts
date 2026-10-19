@@ -1,6 +1,6 @@
 import type {Bystander} from './HypotheticalBackdrop';
 import type {CarriedBystander} from './HypotheticalBystanders';
-import {smoothMotion,dinosaurHeadPoint} from './HypotheticalMotion';
+import {smoothMotion,dinosaurHeadPoint,dinosaurMouthPoint} from './HypotheticalMotion';
 import {AFTERMATH_SCALE,DEBRIS_GRIP_X} from './HypotheticalAftermathHandling';
 import type {AftermathEscape} from './HypotheticalAftermathEscape';
 
@@ -89,17 +89,20 @@ export class AftermathForage {
         if(this.lastGoreTick>=0)return .85;
         return 0;
     }
-    candidate(tick:number,performed:number,visible:(x:number,margin:number)=>boolean){
+    available(index:number,tick:number,visible:(x:number,margin:number)=>boolean){
+        const e=this.escape.entries[index];
+        if(!e||e.person.hitAt===null||e.person.escaped||e.person.foraged||e.person.capturedAt!==undefined
+            ||!e.completed||e.removedAt>=0||e.settledAt<0||tick-e.settledAt<180
+            ||Math.abs(e.hitVelocity)>.05||Math.abs(e.person.velocity)>.05)return false;
+        const target=e.person.x+12,stance=target-DEBRIS_GRIP_X*AFTERMATH_SCALE;
+        return visible(target,32)&&visible(stance,56);
+    }
+    candidate(tick:number,performed:number,visible:(x:number,margin:number)=>boolean,actorX=this.escape.origin+222){
         if(this.active||this.escape.active||tick<this.nextAt||performed<this.nextPerformance)return -1;
-        // Prioritize freshly killed fugitives once settled, then already-fallen street casualties.
-        const order=[0,1,4,2,3];
-        for(const i of order){
-            const e=this.escape.entries[i];
-            if(!e||e.person.hitAt===null||e.person.escaped||!e.completed||e.removedAt>=0||e.kind!=='fallen'&&tick-e.person.hitAt<180)continue;
-            const target=e.person.x+12,stance=target-DEBRIS_GRIP_X*AFTERMATH_SCALE;
-            if(visible(target,32)&&visible(stance,56))return i;
-        }
-        return -1;
+        return this.escape.entries.map((entry,index)=>({entry,index}))
+            .filter(({index})=>this.available(index,tick,visible))
+            .sort((a,b)=>Number(a.entry.kind==='fallen')-Number(b.entry.kind==='fallen')
+                ||Math.abs(a.entry.person.x-actorX)-Math.abs(b.entry.person.x-actorX)||a.index-b.index)[0]?.index??-1;
     }
     prepare(index:number){
         this.selected=index;
@@ -112,13 +115,15 @@ export class AftermathForage {
         }
         this.targetX=this.entry.person.x+12;this.stance=this.targetX-DEBRIS_GRIP_X*AFTERMATH_SCALE;
     }
-    begin(tick:number,performed:number){
-        if(!this.entry||this.entry.removedAt>=0)return;
+    begin(tick:number,performed:number,visible:(x:number,margin:number)=>boolean=()=>true){
+        if(this.active||this.escape.active||!this.available(this.selected,tick,visible)
+            ||Math.abs(this.entry.person.x+12-this.targetX)>3)return false;
         this.begunAt=tick;this.age=0;this.active=true;this.completed=false;
         this.cancelledAt=-1;this.contactTick=-1;this.contactX=this.targetX;this.landingTick=-1;
         this.jawX=this.targetX;this.jawY=-8;this.events=[];
         this.feedCount++;
         this.nextAt=tick+540;this.nextPerformance=performed+2;
+        return true;
     }
     private addSpray(tick:number,dx:number,dy:number,strength:number,x=this.jawX,y=this.jawY){
         this.sprays.push({x,y,dx,dy,born:tick,strength,seed:this.sprays.length+this.age});
@@ -524,21 +529,22 @@ export class AftermathForage {
     }
     body(breath:number,reduced:boolean){
         if(this.explicit)return this.explicitBody(breath,reduced);
-        const m=this.motion(),r=this.motion(this.age-5),tailMotion=this.motion(this.age-8);
+        const m=this.motion(),head=this.motion(this.age-3),r=this.motion(this.age-6),tailMotion=this.motion(this.age-9);
         const bow=m.support*.52+m.sniff*.12-m.listen*.07;
         const compression=m.support*2.4+m.settle*.65-m.release*.35;
-        const jaw=.08+pulse(this.age,66+this.offset,15,92+this.offset,112+this.offset)*.24+m.shift*.06;
+        const jaw=.12-m.attention*.04+pulse(this.age,62+this.offset,19,92+this.offset,116+this.offset)*.22+head.shift*.06;
+        const jawHinge=jaw*.38;
         const desiredY=-8+m.settle*.8+m.shift*.55;
-        const headPitch=m.lower*.15+m.sniff*.07-m.listen*.08-m.release*.09+m.clear*.035;
-        const mouth=dinosaurHeadPoint([DEBRIS_GRIP_X,10+jaw*6],0,headPitch);
+        const headPitch=m.lower*.15+head.sniff*.07-head.listen*.08-head.release*.09+head.clear*.035;
+        const mouth=dinosaurMouthPoint(0,jaw,headPitch,jawHinge);
         const aligned=desiredY/AFTERMATH_SCALE+59-bow*25-breath-compression-mouth[1];
-        return {bow,compression,jaw,headPitch,swallow:0,
+        return {bow,compression,jaw,headPitch,jawHinge,swallow:0,
             // The skull meets a fixed ground point; the trunk, knees and neck
             // share the descent rather than stretching only the neck.
             neckDrop:aligned*m.lower+m.sniff*5-m.listen*5+m.clear*3,
             tail:-tailMotion.support*.14-m.listen*.035+tailMotion.release*.025+m.clear*.055,
             riderDrop:r.support*1.8+r.settle*.5-r.release*.4,riderLean:-r.support*2-r.listen*2.4-r.clear*1.4+r.release*1.2,
-            rein:Math.max(m.lower*.8,m.attention*.45,r.listen*.65),
+            rein:Math.max(r.lower*.8,r.attention*.45,r.listen*.65),
             lookBack:r.listen*.7+r.finish*.28,aim:-.12+m.lower*.3+m.finish*.12,
             focus:Math.max(m.lower,m.attention,m.listen),eyeClose:Math.max(m.sniff*.65,m.settle*.2),
             cloth:reduced?0:Math.abs(r.clear)*1.4+m.settle*.5,

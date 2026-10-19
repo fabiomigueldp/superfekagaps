@@ -1,4 +1,4 @@
-import { smoothMotion, riderBend, dinosaurFootAnchor, dinosaurHeadPoint } from './HypotheticalMotion';
+import { smoothMotion, riderBend, dinosaurFootAnchor, dinosaurMouthPoint } from './HypotheticalMotion';
 import { scenicDistrict, SCENIC_STARTS } from './HypotheticalDevastation';
 import { SIEGE_SECTORS, SIEGE_WIDTH } from './HypotheticalSiege';
 import type { Bystander } from './HypotheticalBackdrop';
@@ -40,6 +40,7 @@ export interface AftermathYard {
     flock:AftermathFlock;
     escape:AftermathEscape;
     forage:AftermathForage;
+    nextSceneAt:number;nextScenePerformance:number;
 }
 const pulse = (age:number, rise:number, hold:number, end:number) =>
     smoothMotion(age/rise) * (1-smoothMotion((age-hold)/(end-hold)));
@@ -66,7 +67,7 @@ export class HypotheticalAftermath {
                 damage:0, shiftedAt:-1, brokenAt:-1, birdsAt:-1, runnerAt:-1,birdsFlights:0,birdsReturn:1250+district*73,roarAt:-1,
                 environment:new AftermathEnvironment(district),
                 flock:new AftermathFlock(yard.origin,district),
-                escape,forage:new AftermathForage(escape,district),
+                escape,forage:new AftermathForage(escape,district),nextSceneAt:0,nextScenePerformance:0,
                 props:AFTERMATH_PROPS.map(p=>createAftermathProp(p.material)),
                 people:[0,1].map(i => ({
                     x:yard.origin+290-i*6, originX:yard.origin+290-i*6, shelter:yard.origin+(district===3?342:354),
@@ -111,6 +112,11 @@ export class HypotheticalAftermath {
     get yard(){ return this.yards[this.district]; }
     get origin(){ return AFTERMATH_YARDS[this.district]?.origin ?? 0; }
     get stride(){ return Math.min(1, Math.abs(this.velocity)/1.05); }
+    private get pendingDestination(){
+        if(this.phase==='roam')return this.roamThen;
+        if(this.phase==='orient')return this.orientThen==='roam'?this.roamThen:this.orientThen;
+        return undefined;
+    }
     /** Keep the opening landmark in view while leaving at least 48 native
      * pixels ahead of Feka. Both the director and the game camera use this. */
     cameraFor(playerX:number){
@@ -140,6 +146,19 @@ export class HypotheticalAftermath {
         }
     }
     private enter(phase:Activity){
+        if(phase==='pursuit'||phase==='forage'){
+            // Commit the reserved actor only after walking and orienting. A
+            // changed camera or consumed actor must never strand this phase.
+            const visible=(x:number,margin:number)=>this.inView(x,margin);
+            const started=phase==='pursuit'
+                ?this.yard.escape.begin(this.tick,this.x,this.performances+1,visible)
+                :this.yard.forage.begin(this.tick,this.performances+1,visible);
+            if(!started){this.roamThen='perform';this.enter('recover');return;}
+            this.performances++;
+            const duration=phase==='pursuit'?this.yard.escape.duration:this.yard.forage.duration;
+            this.yard.nextSceneAt=this.tick+duration+120;
+            this.yard.nextScenePerformance=this.performances+2;
+        }
         if(phase==='perform'||phase==='forage'){
             const p=this.pose(false);
             this.feetFrom=p.feet??[
@@ -153,13 +172,11 @@ export class HypotheticalAftermath {
         if(phase==='tower-search')this.tower.search.begin();
         if(phase==='pursuit'){
             this.action='fire';this.targetProp=-1;this.reply=null;this.birdTracking=false;
-            this.yard.escape.begin(this.tick,this.x,++this.performances);
             this.recent=[...this.recent,'fire' as AftermathAction].slice(-3);
             this.lastPerformed.fire=this.performances;
         }
         if(phase==='forage'){
             this.action='sift';this.targetProp=-1;this.reply=null;this.birdTracking=false;
-            this.yard.forage.begin(this.tick,++this.performances);
             this.recent=[...this.recent,'sift' as AftermathAction].slice(-3);
             this.lastPerformed.sift=this.performances;
         }
@@ -168,8 +185,9 @@ export class HypotheticalAftermath {
             this.lastPerformed[this.action]=++this.performances;
             // Keep a second appearance of an action from repeating its exact
             // cadence/gesture, even when the weighted repertoire revisits it.
-            const cadences=this.action==='fire'?4:this.action==='bellow'?2:3;
-            if(this.lastVariant[this.action]===this.variant%cadences)this.variant=(this.variant+1)%24;
+            const cadences=this.action==='fire'?4:['bellow','haul','shake'].includes(this.action)?2
+                :['stomp','rake','flush-fire'].includes(this.action)?3:1;
+            if(cadences>1&&this.lastVariant[this.action]===this.variant%cadences)this.variant=(this.variant+1)%24;
             this.lastVariant[this.action]=this.variant%cadences;
             this.birdTarget=-1;this.birdTracking=false;
             if(isHandling(this.action)&&this.targetProp>=0){
@@ -228,7 +246,7 @@ export class HypotheticalAftermath {
         return true;
     }
     private planForage(){
-        const s=this.yard.forage,index=s.candidate(this.tick,this.performances,(x,margin)=>this.inView(x,margin));
+        const s=this.yard.forage,index=s.candidate(this.tick,this.performances,(x,margin)=>this.inView(x,margin),this.x);
         if(index<0)return false;
         s.prepare(index);this.targetProp=-1;this.roamThen='forage';this.destination=s.stance;this.planView=this.viewX;
         const distance=Math.abs(this.destination-this.x);
@@ -241,8 +259,10 @@ export class HypotheticalAftermath {
         // The landmark and its discovery are the opening of this yard's
         // secondary score, never a lottery after other activities finish.
         if(this.planTower())return;
-        if(this.planEscape())return;
-        if(this.planForage())return;
+        if(this.tick>=this.yard.nextSceneAt&&this.performances>=this.yard.nextScenePerformance){
+            if(this.planEscape())return;
+            if(this.planForage())return;
+        }
         const invitation=this.yard.environment.invitationFor(prop=>this.inView(this.origin+AFTERMATH_PROPS[prop].offset,36));
         if(invitation&&this.tick-this.lastNoticed>480){
             invitation.noticed=true;this.lastNoticed=this.tick;
@@ -465,7 +485,7 @@ export class HypotheticalAftermath {
     get jawAnchor(){
         const p=this.pose(false);
         const neck=-59+p.bow*25+p.breath+p.neckDrop+p.compression;
-        const mouth=dinosaurHeadPoint([DEBRIS_GRIP_X,neck+10+p.jaw*6],neck,p.headPitch);
+        const mouth=dinosaurMouthPoint(neck,p.jaw,p.headPitch,p.jawHinge);
         return {x:this.x+this.facing*mouth[0]*AFTERMATH_SCALE,y:p.lift+mouth[1]*AFTERMATH_SCALE};
     }
     get heldDebris():HeldDebris|undefined {
@@ -496,6 +516,9 @@ export class HypotheticalAftermath {
             if(e.done)this.enter('recover');
         }else if(this.phase==='forage'){
             const s=this.yard.forage;
+            // Sample this frame before locating the mouth; events and rendered
+            // geometry must not use two different ages of the same motion.
+            s.age=this.tick-s.begunAt;
             this.x=this.fromX+s.rootShift;
             const mouth=this.jawAnchor;
             s.update(this.tick,mouth.x,mouth.y);
@@ -600,19 +623,22 @@ export class HypotheticalAftermath {
         this.exhales=this.exhales.filter(p=>this.tick-p.born<28).slice(-6);
         const regular=this.active&&this.district===scenicDistrict(storyTick)
             &&(this.district!==3||this.tower.search.done)&&!['tower','tower-await','tower-search','pursuit','forage'].includes(this.phase)
-            &&!(['pursuit','forage'].includes(this.roamThen)&&['roam','orient'].includes(this.phase));
+            &&!['pursuit','forage'].includes(this.pendingDestination??'');
         const timing=aftermathActionTiming(this.action,this.variant);
-        const closeToImpact=this.phase==='perform'&&([...timing.beats,...timing.shots].some(t=>Math.abs(t-this.age)<20)
+        const handling=isHandling(this.action)?handlingTiming(this.action):null;
+        const accents=handling?[handling.grip,handling.yield,handling.release,...(this.action==='shake'?SHAKE_BEATS:[])]:timing.beats;
+        const closeToImpact=this.phase==='perform'&&([...accents,...timing.shots].some(t=>Math.abs(t-this.age)<20)
             ||this.action==='flush-fire'&&this.age>=24&&this.age<=timing.shots[timing.shots.length-1]+18);
         const noticing=this.phase==='notice'||this.phase==='orient'&&this.orientThen==='notice';
-        const reserved=noticing?this.reaction?.prop??-1:this.phase==='perform'||isHandling(this.action)&&this.roamThen==='perform'&&['roam','orient'].includes(this.phase)
+        const ambientAllowed=regular&&!closeToImpact&&!noticing;
+        const reserved=noticing?this.reaction?.prop??-1:this.phase==='perform'||isHandling(this.action)&&this.pendingDestination==='perform'
             ?this.targetProp:-1;
         for(const [district,yard] of this.yards.entries()){
             yard.escape.update(this.tick);
             if(district!==this.district||this.phase!=='forage')yard.forage.stepGore(this.tick);
             if(district===scenicDistrict(storyTick)&&this.phase==='pursuit'&&this.inView(yard.escape.entry?.from??-1000,0))
                 this.events.push(...yard.escape.events);
-            yard.flock.update(this.tick,regular&&district===this.district&&!closeToImpact,this.viewX);
+            yard.flock.update(this.tick,ambientAllowed&&district===this.district,this.viewX);
             if(district===this.district&&this.tick-this.lastFlutter>10&&yard.flock.takeoffs.some(x=>this.inView(x,8))){
                 this.events.push('distant-flutter');this.lastFlutter=this.tick;
             }
@@ -620,7 +646,7 @@ export class HypotheticalAftermath {
                 this.contact('step',p.x,.16,p.y,'stone');
                 yard.environment.disturb(p.x-AFTERMATH_YARDS[district].origin,this.tick,.18);
             }
-            const event=yard.environment.update(this.tick,yard.props,regular&&district===this.district&&!closeToImpact,
+            const event=yard.environment.update(this.tick,yard.props,ambientAllowed&&district===this.district,
                 prop=>this.inView(AFTERMATH_YARDS[district].origin+AFTERMATH_PROPS[prop].offset,34),
                 reserved);
             if(event){
@@ -670,9 +696,6 @@ export class HypotheticalAftermath {
         if(!this.active){
             const startX=district===3?Math.min(yard.origin+216,storyX):storyX;
             if(storyTick-SCENIC_STARTS[district]<yard.start || !visible(startX,-24)&&!(district===3&&visible(BASTION_TOWER.x,-64)))return;
-            for(const e of this.yard.escape.entries)if(e.kind==='fallen'&&e.person.hitAt===null){
-                e.person.hitAt=-400;e.person.stoppedAt=-400;e.person.fleeing=false;
-            }
             this.active=true; this.x=startX; this.velocity=0; this.facing=1; this.travel=0; this.lastStep=0;
             this.enter('approach');
             if(district===3){this.plan();return;}
@@ -883,7 +906,7 @@ export class HypotheticalAftermath {
             pivot:turn||orienting?Math.sin(Math.PI*turnProgress)*.98:0,
             bow,
             lift:bodyLift, breath, compression,
-            neckDrop,jaw,headPitch:0,
+            neckDrop,jaw,headPitch:0,jawHinge:undefined as number|undefined,
             tail:search*-.09+strike*.12-tailWind*.35+tailStrike*.95-heave*.18+effort*.08-shake*.12+(reaction?.tail??0)+(reduced?0:Math.sin(this.tick/29)*.025+tailCheck*.12),
             tuck, brace:Math.max(probe*.35,(stamp?landing*.6:strike*.6),ram*.65,crush*.7,firing*.5,effort*.8,heave*.6,reaction?.brace??0,turn||orienting?.42:0),
             riderDrop, riderLean,

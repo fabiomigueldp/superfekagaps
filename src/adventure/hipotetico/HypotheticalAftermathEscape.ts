@@ -5,7 +5,7 @@ import {smoothMotion} from './HypotheticalMotion';
 export type EscapeKind='rubble'|'hatch'|'fallen';
 export interface EscapeEntry {
     kind:EscapeKind; from:number; exit:number; stance:number; person:Bystander;
-    begunAt:number; completed:boolean; removedAt:number; hitVelocity:number; marks:Array<{x:number;y:number}>;
+    begunAt:number; completed:boolean; removedAt:number; settledAt:number; hitVelocity:number; marks:Array<{x:number;y:number}>;
 }
 export const ESCAPE_TIMINGS={
     rubble:{peek:22,run:64,chase:82,runTime:132,shots:[112,117,122,148,153,158,178,183],duration:260},
@@ -33,7 +33,7 @@ export class AftermathEscape {
                 hitAt:null,color:(district+i)%4,distance:0,velocity:0,alertAt:Number.MAX_SAFE_INTEGER,
                 speed:1,district,clothes:'star-shirt',stoppedAt:null,threatenedAt:null,startledAt:null,
                 reactionTimes:[],appearance:20+district*2+i,depth:-4,exitAtShelter:true};
-            return {kind,from,exit,stance:from-78,person,begunAt:-1,completed:false,removedAt:-1,hitVelocity:0,marks:[]};
+            return {kind,from,exit,stance:from-78,person,begunAt:-1,completed:false,removedAt:-1,settledAt:-1,hitVelocity:0,marks:[]};
         });
         const streetCasualties=streetPeople.filter(p=>p.district===district&&!p.exitAtShelter&&p.originX>=origin+160&&p.originX<=origin+280);
         const fallen=([194,226] as const).map((offset,i)=>{
@@ -44,7 +44,7 @@ export class AftermathEscape {
                 speed:1,district,clothes:i===0||(district%2===1)?'star-shirt':'workcoat',
                 stoppedAt:-400,threatenedAt:null,startledAt:null,
                 reactionTimes:[],appearance:28+district*2+i,depth:i===0?-3:-4,exitAtShelter:false};
-            return {kind:'fallen' as const,from,exit,stance:from-78,person,begunAt:0,completed:true,removedAt:-1,hitVelocity:0,marks:[]};
+            return {kind:'fallen' as const,from,exit,stance:from-78,person,begunAt:0,completed:true,removedAt:-1,settledAt:-1,hitVelocity:0,marks:[]};
         });
         const extraFrom=origin+206,extraExit=origin+(district===3?338:354);
         const extra:EscapeEntry={
@@ -53,7 +53,7 @@ export class AftermathEscape {
                 hitAt:null,color:(district+1)%4,distance:0,velocity:0,alertAt:Number.MAX_SAFE_INTEGER,
                 speed:1,district,clothes:'star-shirt',stoppedAt:null,threatenedAt:null,startledAt:null,
                 reactionTimes:[],appearance:36+district,depth:-4,exitAtShelter:true},
-            begunAt:-1,completed:false,removedAt:-1,hitVelocity:0,marks:[],
+            begunAt:-1,completed:false,removedAt:-1,settledAt:-1,hitVelocity:0,marks:[],
         };
         this.entries=[...live,...fallen,extra];
     }
@@ -62,22 +62,27 @@ export class AftermathEscape {
     get duration(){return this.endingAt||this.timing.duration;}
     get done(){return !this.active&&this.selected>=0&&this.entry.completed;}
     get aimTarget(){return this.aim;}
+    available(index:number,visible:(x:number,margin:number)=>boolean){
+        const e=this.entries[index];
+        return !!e&&e.kind!=='fallen'&&e.begunAt<0&&e.removedAt<0&&!e.person.foraged
+            &&e.person.hitAt===null&&!e.person.escaped&&e.person.capturedAt===undefined
+            &&visible(e.from,34)&&visible(e.exit,28)&&visible(e.stance,32);
+    }
     candidate(tick:number,performed:number,visible:(x:number,margin:number)=>boolean){
         if(this.active||tick<this.nextAt||performed<this.nextPerformance)return -1;
-        const order=this.district%2?[1,0,4]:[0,1,4];
-        return order.find(i=>{
-            const e=this.entries[i];
-            return e.kind!=='fallen'&&e.begunAt<0&&visible(e.from,34)&&visible(e.exit,28)&&visible(e.stance,32);
-        })??-1;
+        const order=this.entries.map((_,i)=>i);
+        if(this.district%2)[order[0],order[1]]=[order[1],order[0]];
+        return order.find(i=>this.available(i,visible))??-1;
     }
     prepare(index:number){this.selected=index;}
-    begin(tick:number,actorX:number,performed:number){
-        const e=this.entry;if(!e||e.begunAt>=0)return;
+    begin(tick:number,actorX:number,performed:number,visible:(x:number,margin:number)=>boolean=()=>true){
+        const e=this.entry;if(this.active||!this.available(this.selected,visible))return false;
         e.begunAt=tick;this.tick=tick;this.age=0;this.active=true;this.endingAt=this.timing.duration;
         this.actorX=actorX;this.velocity=0;this.aim={x:e.from,y:-15};
         e.person.stoppedAt=tick-12;e.person.alertAt=tick+this.timing.run-8;
         e.person.threatenedAt=tick+this.timing.peek+4;
         this.nextAt=tick+960;this.nextPerformance=performed+4;
+        return true;
     }
     opening(e:EscapeEntry){
         if(e.begunAt<0||e.kind==='fallen')return 0;
@@ -90,9 +95,15 @@ export class AftermathEscape {
         this.tick=tick;this.events=[];
         this.dust=this.dust.filter(p=>tick-p.born<80);
         for(const [index,e] of this.entries.entries()){
-            if(e.begunAt<0||e.removedAt>=0)continue;
+            if(e.begunAt<0||e.removedAt>=0||e.person.foraged)continue;
             const age=tick-e.begunAt,t=ESCAPE_TIMINGS[e.kind],p=e.person;
-            if(e.kind==='fallen'){e.from=p.x;e.stance=p.x-78;continue;}
+            // Street actors use the story clock; record availability on this
+            // local clock instead of subtracting incomparable timestamps.
+            if(p.hitAt!==null&&e.settledAt<0)e.settledAt=tick;
+            if(e.kind==='fallen'){
+                if(p.hitAt!==null)p.velocity=0;
+                e.from=p.x;e.stance=p.x-78;continue;
+            }
             const previous=p.x;p.velocity=0;
             if(p.hitAt!==null){
                 // A little of the run survives the hit, then the shared fall
