@@ -4,6 +4,9 @@ import { dinosaurFootAnchor, dinosaurTail, hypotheticalMotion, hypotheticalState
 import { HypotheticalBackdrop } from './HypotheticalBackdrop';
 import { ARENA_COLUMNS, CHASE_ATTACKS, CHASE_EXIT, CHASE_WIDTH, CHASE_GAPS, CHASE_BREAKS,CHASE_COUNTERS,type ChaseVolley,type ChaseStrike } from './HypotheticalLayout';
 import {HypotheticalChaseCounterplay} from './HypotheticalChaseCounterplay';
+import {HypotheticalChaseSetpieces,type ChaseScenicCue} from './HypotheticalChaseSetpieces';
+import {launcherGeometry,type LauncherPose} from './HypotheticalTower';
+import {CHASE_PORTICO} from './HypotheticalLayout';
 import { HypotheticalSiege, SIEGE_WIDTH, SIEGE_SECTORS } from './HypotheticalSiege';
 import {chaseDeckSpans,chaseMaterialAt,chaseTerraceFall,chaseRuinAt,CHASE_WATER_Y} from './HypotheticalChaseDetails';
 import { RIFLE_BURSTS, RIFLE_SPEED, type GunImpact } from './HypotheticalGunfire';
@@ -21,7 +24,7 @@ export interface ChaseContact { kind:'caught'|'shot'|'wave'; x:number; y:number;
 export interface Dust { x: number; y: number; born: number; kind: 'step' | 'stone' | 'hit' | 'shell' | 'clasp' | 'skid'; direction?: number }
 export interface FallingMark { x: number; born: number }
 export interface BulletImpact extends GunImpact {}
-export type FightEvent = HelicopterCue | ChaseSound | 'warning' | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-debris' | 'distant-thud' | 'distant-roar' | 'distant-flutter' | 'distant-soft-hit' | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
+export type FightEvent = HelicopterCue | ChaseSound | ChaseScenicCue | 'warning' | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-debris' | 'distant-thud' | 'distant-roar' | 'distant-flutter' | 'distant-soft-hit' | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
 export const HYPOTHETICAL = Object.freeze({ floor: 224, chaseEnd: CHASE_EXIT, health: 9, step: 1000 / 60, warning: 54, recovery: 156 });
 const rifleBursts = RIFLE_BURSTS;
 const patterns: readonly (readonly HypotheticalAttack[])[] = [
@@ -63,6 +66,7 @@ export class HypotheticalModel {
     impacts: BulletImpact[] = []; readonly backdrop: HypotheticalBackdrop;
     readonly route: HypotheticalSiege;
     readonly counters:HypotheticalChaseCounterplay;
+    readonly course:HypotheticalChaseSetpieces;
     private readonly backdropOffset: number;
     private arrivalWait=0;
     armed = [0, 0]; snared = false; muzzle = 0; destroyed = 0; backgroundX = -70; backgroundStamp = 0;
@@ -81,7 +85,7 @@ export class HypotheticalModel {
     pursuitStep=0;pursuitCount=1;
     private pursuitVolley:ChaseVolley=CHASE_ATTACKS[0];
     private pursuitNext:ChaseVolley|null=null;
-    terraceDebris:Array<{x:number;y:number;width:number;born:number}>=[];
+    terraceDebris:Array<{x:number;y:number;width:number;born:number;fallen?:boolean}>=[];
     bridgeDebris:Array<{x:number;born:number;material:number}>=[];
     chaseBreaks:number[]=CHASE_BREAKS.map(()=>-1);
     chaseAlerts:number[]=CHASE_BREAKS.map(()=>-1);
@@ -90,6 +94,7 @@ export class HypotheticalModel {
     constructor(readonly act: HypotheticalAct = 'chase', health: number = HYPOTHETICAL.health, cleared = 0, readonly chaseStart=0, readonly arrivalSeen=false, previousBackdrop?:HypotheticalBackdrop) {
         this.route = new HypotheticalSiege(cleared);
         this.counters=new HypotheticalChaseCounterplay(chaseStart);
+        this.course=new HypotheticalChaseSetpieces(chaseStart);
         this.backdrop = previousBackdrop??new HypotheticalBackdrop(act === 'siege');
         this.backdropOffset = previousBackdrop?.tick??(act === 'siege' ? (this.route.cleared?SCENIC_STARTS[Math.min(SCENIC_STARTS.length-1,this.route.cleared)]:arrivalSeen?ARRIVAL.release:0) : 0);
         // A checkpoint preserves the ruined districts and advances the distant rider
@@ -136,6 +141,13 @@ export class HypotheticalModel {
     get pivot(){return this.pivotAge>=12?0:Math.sin(Math.PI*this.pivotAge/12);}
     get won() { return this.state === 'won'; }
     get rifleShoulder() { const m=hypotheticalMotion(this);return {x:this.x+this.facing*(7-m.recoil+m.tuck*10+riderBend(14,m.riderLean)),y:this.y+m.saddle+m.riderDrop-14}; }
+    get chaseLauncher():LauncherPose|undefined {
+        if(this.act!=='chase')return undefined;
+        const p=this.course.launcher;
+        if(!p)return {draw:0,rifleLower:0,reach:0,aim:-.12,recoil:0,fired:this.course.launchAt!==-1};
+        const m=hypotheticalMotion(this),g=launcherGeometry({bow:this.bow,...m},{...p,aim:0});
+        return {...p,aim:Math.atan2(CHASE_PORTICO.targetY-this.y-g.y,CHASE_PORTICO.targetX-this.x-g.x)};
+    }
     get rifleAngle() { const s=this.rifleShoulder;return Math.atan2(this.targetY-s.y,Math.max(1,(this.targetX-s.x)*this.facing)); }
     get aim() { const a=this.rifleAngle,s=this.rifleShoulder;return {x:s.x+this.facing*31*Math.cos(a),y:s.y+31*Math.sin(a)}; }
     get weaponAngle(){
@@ -147,6 +159,16 @@ export class HypotheticalModel {
     get hint(): string { return `${this.chaining?`${this.chainStep+1}/${this.chainLength}: `:''}${this.actionHint}`; }
     private get actionHint(): string {
         if (this.won) return 'HIPOTESE DERRUBADA! ENTER: REJOGAR';
+        // The chase HUD remains free of instruction labels; these descriptions
+        // reach the existing off-screen accessibility status.
+        if(this.act==='chase'){
+            const course=this.course;
+            if(course.leaping)return course.airborne?'O DINOSSAURO SALTOU. CONTINUE PELAS PASSARELAS':'ELE SE PREPARA PARA SALTAR';
+            if(course.floodFront)return 'FRENTE DE AGUA! SALTE A CRISTA OU USE A PASSARELA';
+            if(course.floodWarningAt!==-1&&course.floodAge<0)return 'O RESERVATORIO ESTA SOB PRESSAO';
+            if(course.porticoAge>=0&&course.impactAge<0)return 'FOGUETE CONTRA O PORTICO. PASSARELA DE MANUTENCAO ADIANTE';
+            if(course.impactAge>=0&&course.impactAge<120)return 'O PORTICO CEDEU. APOIOS BAIXOS E PASSARELA SUPERIOR';
+        }
         if (this.act === 'chase') return this.tick < 110 ? 'CORRA: SHIFT + DIREITA. PULE OS VAOS'
             :['tell','attack'].includes(this.state)?this.pursuitKind==='high'?'TIRO ALTO! SIGA POR BAIXO'
             :this.pursuitKind==='low'?this.pursuitStep?'MIRA BAIXA AGORA! SALTE A RAJADA':'RAJADA BAIXA! SALTE QUANDO ELA CHEGAR':'INVESTIDA! SALTE A ONDA DE DESTROCOS'
@@ -375,6 +397,7 @@ export class HypotheticalModel {
         if(this.attack!=='leap'){const oldTravel=this.travel;this.travel+=Math.abs(this.velocity);this.footstep(oldTravel);}
     }
     private chase(player: Rect) {
+        this.course.update(this.tick,player,this.x);
         if (this.tick < (this.chaseStart?18:60)) return;
         this.counters.update(this.tick,player,this.body,this.chaseCover);
         if(this.counters.releasedThisTick>=0)this.emit('chase-cable');
@@ -399,19 +422,35 @@ export class HypotheticalModel {
         }
         // Converge smoothly on a visible pursuit distance, without teleporting.
         // At Feka's 3.5px run speed the gap settles at 110px, inside the camera.
-        const surge=this.pursuitKind==='ram'&&this.state==='attack'?(this.age<20?.8:this.age<52?-.45:0):0;
-        const speed = clamp(3.5 + (player.x - this.x - 110) * .025+surge, 2.25, 6)*this.counters.speedScale(this.tick);
+        const surge=this.pursuitKind==='ram'&&this.state==='attack'?(this.age<20?1.15:this.age<52?-.6:0):0;
+        const credit=this.counters.escapeCredit(this.tick);
+        const speed = clamp(3.5 + (player.x - this.x - 110-credit*56) * .025+surge, 2.25, credit>0?4.8:6)
+            *this.counters.speedScale(this.tick)*this.course.movementScale;
         // Catch up and keep pressure after the helmet absorbs the first hit.
         // The pursuer must never run harmlessly through a stationary Feka.
-        const movement = Math.min(speed, Math.max(0, player.x + 8 - this.x));
+        const leapX=this.course.leapPosition;
+        const movement = this.course.leapLanded?this.course.leapTo-this.x:leapX!==null?leapX-this.x:
+            Math.min(speed, Math.max(0, player.x + 8 - this.x));
         const oldTravel=this.travel;this.x += movement; this.travel += movement;this.velocity=movement;
+        this.y=HYPOTHETICAL.floor-this.course.leapHeight;
+        if(this.course.needsLaunch){
+            const pose=this.chaseLauncher!;
+            const g=launcherGeometry({bow:this.bow,...hypotheticalMotion(this)},pose);
+            this.course.ignite({x:this.x+g.mouth[0],y:this.y+g.mouth[1],backX:this.x+g.exhaust[0],backY:this.y+g.exhaust[1]});
+        }
+        this.events.push(...this.course.events);
+        if(this.course.leapLanded)this.particle('stone',this.x,HYPOTHETICAL.floor);
         // A moving pursuer commits to a forward angle, not a world point it can
         // overtake halfway through the burst. The whole tell remains on screen.
         this.targetX=this.x+240;this.targetY=this.pursuitKind==='high'?this.rifleShoulder.y-4:HYPOTHETICAL.floor-12;
-        this.footstep(oldTravel);
+        if(!this.course.airborne)this.footstep(oldTravel);
         const body=this.body;
         this.frameHazards.push(body);
         this.chaseThreats.set(body,{kind:'caught',x:this.x,y:this.y-36,direction:this.facing});
+        for(const hazard of this.course.hazards){
+            this.frameHazards.push(hazard);
+            this.chaseThreats.set(hazard,{kind:'wave',x:hazard.x,y:hazard.y,direction:1});
+        }
         for(const [i,site]of CHASE_BREAKS.entries())if(this.chaseAlerts[i]===-1&&this.x+128>=site.x){
             this.chaseAlerts[i]=this.tick;
             this.emit(site.kind==='sluice'?'distant-leak':site.kind==='pier'?'distant-creak':'distant-chain');
@@ -426,7 +465,11 @@ export class HypotheticalModel {
         // Delayed cues expire before they can spill into the next landing.
         while(CHASE_ATTACKS[this.pursuitIndex]&&player.x>CHASE_ATTACKS[this.pursuitIndex].until)this.pursuitIndex++;
         const cue=CHASE_ATTACKS[this.pursuitIndex];
-        if (this.state === 'rest' && this.age >= 18 && this.counters.reaction(this.tick).weight===0&&cue&&player.x>=cue.x&&player.x-this.x<180) {
+        const reserved=this.course.reservesAttack(player.x);
+        if(reserved&&(this.state==='tell'||this.state==='attack')){
+            this.pursuitNext=null;this.enter('rest');this.attack='rifle';this.muzzle=0;
+        }
+        if (!reserved&&this.state === 'rest' && this.age >= 18 && this.counters.reaction(this.tick).weight===0&&cue&&player.x>=cue.x&&player.x-this.x<180) {
             this.pursuitStep=0;this.pursuitCount=cue.followup?2:1;this.pursuitNext=cue.followup??null;this.pursuitIndex++;
             this.preparePursuit(cue);
         } else if (this.state === 'tell' && this.age >= this.warningTicks) this.enter('attack');
@@ -438,7 +481,7 @@ export class HypotheticalModel {
                 this.shoot(m.x,m.y,m.x+Math.cos(a)*200,m.y+Math.sin(a)*200,this.pursuitKind==='high'?6.6:6.8);
             }
             if (this.age >= this.pursuitVolley.duration) {
-                if(this.pursuitNext&&player.x<4136){
+                if(this.pursuitNext&&player.x<CHASE_EXIT-216){
                     const next=this.pursuitNext;this.pursuitNext=null;this.pursuitStep++;
                     this.preparePursuit(next);
                 }else{this.pursuitNext=null;this.enter('rest');this.attack='rifle';}

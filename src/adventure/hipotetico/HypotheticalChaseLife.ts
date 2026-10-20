@@ -1,8 +1,21 @@
 /** Quiet actions on the far quay use the same clock as the pursuit. */
-export const CHASE_QUAYS = Array.from({length:12},(_,i)=>({
-    x:i*400, kind:(['quay','cargo','water','port'] as const)[Math.floor(i/3)],
-    worker:[0,1,3,4,7,9,10].includes(i), birds:[0,2,4,6,10].includes(i),
+import {CHASE_WIDTH,CHASE_BREAKS,chaseDistrictAt} from './HypotheticalLayout';
+export const CHASE_QUAYS = Array.from({length:Math.ceil(CHASE_WIDTH/400)+1},(_,i)=>({
+    x:i*400, kind:(['quay','cargo','port','water','cargo','port'] as const)[chaseDistrictAt(i*400)],
+    worker:i%3!==2, birds:i%4===0||i%5===2,
 }));
+export function chaseFrontageHeight(index:number){
+    const kind=CHASE_QUAYS[index].kind;
+    return kind==='quay'?51+index%2*14:kind==='cargo'?48+index%2*7:kind==='water'?52:[65,78,58][index%3];
+}
+export function chaseWaterBreak(index:number){
+    const x=CHASE_QUAYS[index].x;
+    let nearest=3,distance=Infinity;
+    for(const [i,s]of CHASE_BREAKS.entries())if(s.kind==='sluice'&&Math.abs(s.x-x)<distance){
+        nearest=i;distance=Math.abs(s.x-x);
+    }
+    return nearest;
+}
 const unit=(n:number)=>Math.max(0,Math.min(1,n));
 const ease=(n:number)=>{const t=unit(n);return t*t*(3-2*t);};
 

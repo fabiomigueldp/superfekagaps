@@ -1,6 +1,6 @@
 import {box,oval,pixelLine,polygon} from '../WorldPainting';
 import type {HypotheticalModel} from './HypotheticalModel';
-import {CHASE_QUAYS,chaseQuayX,chaseQuaySection,chaseQuayReaction} from './HypotheticalChaseLife';
+import {CHASE_QUAYS,chaseQuayX,chaseQuaySection,chaseQuayReaction,chaseFrontageHeight} from './HypotheticalChaseLife';
 
 const Q={street:'#9ba694',paving:'#a9ad96',joint:'#8a9c8e',shadow:'#7e9488',
     face:'#7c9289',light:'#a2ac95',seam:'#6f8c85',wet:'#638b83',water:'#537f80'};
@@ -67,7 +67,7 @@ export function drawChaseQuayGround(c:CanvasRenderingContext2D,cx:number,cy:numb
  * pasted over water. Draw before the facade and its inhabitants. */
 export function drawChaseFrontage(c:CanvasRenderingContext2D,index:number,x:number,base:number){
     const site=CHASE_QUAYS[index];
-    const height=site.kind==='quay'?51+index%2*14:site.kind==='cargo'?48+index%2*7:site.kind==='water'?52:[65,78,58][index-9];
+    const height=chaseFrontageHeight(index);
     const right=site.kind==='port'?68:site.kind==='quay'?69:72;
     polygon(c,[[x+right,base-height],[x+right+7,base-height+5],[x+right+7,base-2],[x+right,base]],'#7d9487');
     pixelLine(c,x+right+6,base-height+7,x+right+6,base-3,'#8d9f8d');

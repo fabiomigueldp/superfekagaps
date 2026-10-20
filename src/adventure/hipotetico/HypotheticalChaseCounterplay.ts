@@ -57,6 +57,11 @@ export class HypotheticalChaseCounterplay {
         return age>=0&&age<42?{age,weight:1-smoothMotion(age/42)}:{age:Infinity,weight:0};
     }
     speedScale(tick:number){return 1-this.reaction(tick).weight*.68;}
+    /** Reward earned separation through the next decision, then recover smoothly. */
+    escapeCredit(tick:number){
+        let age=Infinity;for(const state of this.loads)if(state.struck>=0)age=Math.min(age,tick-state.struck);
+        return age<0||age>=174?0:1-smoothMotion((age-78)/96);
+    }
     hint(tick:number){
         if(this.reaction(tick).weight>0)return 'CARGA ACERTOU! APROVEITE A FREADA';
         for(const state of this.loads){

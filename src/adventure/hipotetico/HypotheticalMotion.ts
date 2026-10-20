@@ -21,6 +21,12 @@ export function hypotheticalMotion(b: HypotheticalModel): DinosaurMotion {
         motion.riderLean+=performance.riderLean;
         motion.tail+=performance.tail;
         motion.saddle+=performance.compression;
+        const event=b.course.bodyMotion;
+        motion.compression+=event.compression;motion.saddle+=event.compression;
+        motion.neckDrop+=event.neckDrop;motion.riderDrop+=event.riderDrop;
+        motion.riderLean+=event.riderLean;motion.tail+=event.tail;
+        motion.tuck=Math.max(motion.tuck,event.tuck);
+        motion.stride*=event.strideScale;motion.rein*=event.rein;
     }
     return motion;
 }

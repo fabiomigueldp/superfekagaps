@@ -2,7 +2,7 @@ import { STAGES } from '../campaign';
 import { TileType } from '../../constants';
 import type { AdventureStage } from '../types';
 import type { HypotheticalAct } from './HypotheticalModel';
-import { ARENA_BALCONIES, CHASE_GAPS, CHASE_STEPS, CHASE_TERRACES, CHASE_WIDTH, CHASE_CHECKPOINT } from './HypotheticalLayout';
+import { ARENA_BALCONIES, CHASE_GAPS, CHASE_STEPS, CHASE_TERRACES, CHASE_WIDTH, CHASE_CHECKPOINTS } from './HypotheticalLayout';
 import { SIEGE_SECTORS, SIEGE_WIDTH, SIEGE_LINKS, SIEGE_APPROACH, SIEGE_SIDE_ROUTES, SIEGE_CARGO_LIFT, siegeGarrison } from './HypotheticalSiege';
 import {ARRIVAL} from './HypotheticalArrival';
 
@@ -19,7 +19,7 @@ export function hypotheticalStage(act: HypotheticalAct): AdventureStage {
     s.level.goalPosition = { x: s.level.width - 2, y: 14 }; s.level.isBossLevel = false;
     s.foes = []; s.exits = []; s.checkpoints = []; s.dialogues = []; s.pickups = []; s.mechanisms = []; s.landmarks = []; s.route = [];
     if (act === 'chase') {
-        // Lower route plus four optional loading/scaffold routes.
+        // Running road, maintenance route and optional loading/scaffold routes.
         for (const col of CHASE_STEPS) s.level.tiles[13][col] = TileType.GROUND;
         for (const [from,to] of CHASE_GAPS) for(let col=from;col<to;col++) for(let y=14;y<18;y++) s.level.tiles[y][col]=TileType.EMPTY;
         s.mechanisms=CHASE_TERRACES.map(p=>({...p}));
@@ -34,7 +34,8 @@ export function hypotheticalStage(act: HypotheticalAct): AdventureStage {
             for(const [j,t] of [.15,.5,.85].entries())s.pickups.push({id:`hipotetico:span:${i}:${j}`,kind:'coin',x:from*16+(to-from)*16*t,y:174-Math.sin(t*Math.PI)*18});
         for(const [i,p] of CHASE_TERRACES.entries())if(i>=3)
             s.pickups.push({id:`hipotetico:terrace:${i+1}`,kind:'coin',x:p.x+p.width/2,y:p.y-26});
-        s.pickups.push({id:'hipotetico:mid:helmet',kind:'helmet',x:CHASE_CHECKPOINT+32,y:193});
+        for(const [i,x]of CHASE_CHECKPOINTS.entries())
+            s.pickups.push({id:`hipotetico:checkpoint:${i}:helmet`,kind:'helmet',x:x+32,y:193});
     } else if (act === 'siege') {
         s.mechanisms.push({id:'arrival-forecourt',kind:'target',x:ARRIVAL.firstGateX,y:ARRIVAL.gateY,width:12,height:ARRIVAL.gateHeight,gated:true});
         s.mechanisms.push({id:'arrival-gate',kind:'target',x:ARRIVAL.gateX,y:ARRIVAL.gateY,width:12,height:ARRIVAL.gateHeight,gated:true});

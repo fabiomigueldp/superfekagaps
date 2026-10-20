@@ -781,18 +781,19 @@ export class WorldGame {
                 this.audio.sfx('warning');
             if (enemy.phase === 'recoil' && phase !== 'recoil') this.audio.sfx('throw');
             const contact = enemy.contact(p, previous, falling, pound);
+            const contactPoint = enemy.contactPoint;
             if (contact === 'hurt')
-                this.hurt(enemy.x + enemy.width / 2);
+                this.hurt(contactPoint.x);
             else if (contact === 'bounce' || contact === 'kill') {
-                this.bounce(enemy.y);
+                this.bounce(contactPoint.y);
                 if (contact === 'bounce' && enemy.phase === 'stunned') {
                     this.audio.sfx('break');
-                    this.particle(enemy.x, enemy.y, '#eec478', 7);
+                    this.particle(contactPoint.x, contactPoint.y, '#eec478', 7);
                 }
                 else if (contact === 'bounce')
-                    this.combatFeedback('blockedStomp', this.player.getCenter().x, enemy.y);
+                    this.combatFeedback('blockedStomp', this.player.getCenter().x, contactPoint.y);
                 if (contact === 'kill') {
-                    this.particle(enemy.x, enemy.y, '#ee9c83');
+                    this.particle(contactPoint.x, contactPoint.y, '#ee9c83');
                     this.audio.sfx('hit');
                 }
             }

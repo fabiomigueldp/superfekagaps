@@ -4,7 +4,7 @@ import { HypotheticalGuard } from './HypotheticalGuards';
 import { HypotheticalVanguard } from './HypotheticalVanguard';
 import {drawBastionEdgeCue} from './HypotheticalGuardCues';
 import type { HypotheticalBackdrop } from './HypotheticalBackdrop';
-import type { WorldLevel, WorldObjects } from '../WorldPhysics';
+import { WorldObjects,type WorldLevel } from '../WorldPhysics';
 import type { Rect,CameraData } from '../../types';
 import { TileType } from '../../constants';
 import type { AdventureStage } from '../types';
@@ -20,7 +20,9 @@ import { HypotheticalAudio } from './HypotheticalAudio';
 import {chaseCollapsedEdge,CHASE_WATER_Y} from './HypotheticalChaseDetails';
 import {CHASE_CAPTURE,HypotheticalChaseDefeat,drawChasePlayerSplash} from './HypotheticalChaseDefeat';
 import {CHASE_STRIKE_REACH,chasePerformance} from './HypotheticalChasePerformance';
-import { CHASE_WIDTH, CHASE_CHECKPOINT, CHASE_DISTRICTS } from './HypotheticalLayout';
+import { CHASE_WIDTH, CHASE_CHECKPOINTS, CHASE_DISTRICTS,CHASE_FALLEN_DECKS,CHASE_PATROLS,chaseDistrictAt } from './HypotheticalLayout';
+import {HypotheticalChasePatrol} from './HypotheticalChasePatrol';
+import {drawChasePatrol} from './HypotheticalChasePatrolArt';
 import {ARRIVAL,arrivalFade,arrivalDeployment,arrivalLookAhead} from './HypotheticalArrival';
 import {arrivalStoryTime,HELICOPTER_SEQUENCE} from './HypotheticalHelicopterTiming';
 
@@ -44,7 +46,7 @@ export class HypotheticalEncounter extends BossEncounter {
         const cleared = this.model.route.cleared;
         // Use the same live decks for feet, cover and drawing. Destroyed decks
         // leave this list on the next native step, just like their collision.
-        if(this.model.act==='chase')this.model.chaseCover=o.bodies.filter(b=>b.id.startsWith('chase-terrace-'))
+        if(this.model.act==='chase')this.model.chaseCover=o.bodies.filter(b=>b.id.startsWith('chase-terrace-')||b.id.startsWith('chase-fallen-'))
             .map(({x,y,width,height})=>({x,y,width,height}));
         if(this.model.act==='siege')this.livingGuards=this.garrison.filter(e=>!e.dead&&e.wave===cleared+1).length;
         this.model.update(dt,p,this.livingGuards);this.sync();
@@ -63,9 +65,14 @@ export class HypotheticalEncounter extends BossEncounter {
         if(this.model.nextAct||this.model.won)o.barrels=[];
         if(this.model.act==='chase'){
             const edge=Math.min(level.data.width,chaseCollapsedEdge(this.model.x)/16);
+            for(const [i,d]of CHASE_FALLEN_DECKS.entries()){
+                if(this.model.course.fallenDeck(i).ready&&d.x>=edge*16&&!o.get(d.id)){
+                    o.bodies.push(...new WorldObjects([{id:d.id,kind:'support',x:d.x,y:d.y,width:d.width,height:d.height}]).bodies);
+                }
+            }
             while(this.collapsedColumns<edge){
                 if(level.data.tiles[14][this.collapsedColumns]&&this.model.tick>1){
-                    this.model.bridgeDebris.push({x:this.collapsedColumns*16,born:this.model.tick,material:Math.min(3,Math.floor(this.collapsedColumns*16/1120))});
+                    this.model.bridgeDebris.push({x:this.collapsedColumns*16,born:this.model.tick,material:chaseDistrictAt(this.collapsedColumns*16)});
                     if(this.model.bridgeDebris.length>18)this.model.bridgeDebris.shift();
                 }
                 for(let row=13;row<level.data.height;row++)level.data.tiles[row][this.collapsedColumns]=TileType.EMPTY;
@@ -76,9 +83,11 @@ export class HypotheticalEncounter extends BossEncounter {
             for(let i=o.bodies.length-1;i>=0;i--){
                 const body=o.bodies[i];
                 const struck=this.model.x+CHASE_STRIKE_REACH>=body.x+5&&p.x>=body.x+body.width+10;
-                if(body.id.startsWith('chase-terrace-')&&(body.x<edge*16||struck)){
+                if((body.id.startsWith('chase-terrace-')&&(body.x<edge*16||struck))||
+                    body.id.startsWith('chase-fallen-')&&body.x<edge*16){
                     if(this.model.tick>1){
-                        this.model.terraceDebris.push({x:body.x,y:body.y,width:body.width,born:this.model.tick});
+                        this.model.terraceDebris.push({x:body.x,y:body.y,width:body.width,born:this.model.tick,
+                            fallen:body.id.startsWith('chase-fallen-')});
                         if(this.model.terraceDebris.length>4)this.model.terraceDebris.shift();
                     }
                     o.bodies.splice(i,1);
@@ -102,6 +111,7 @@ export class HypotheticalGame extends WorldGame {
     private retryHealth:number=HYPOTHETICAL.health;
     private siegeCheckpoint=0;
     private chaseCheckpoint=0;
+    private chaseLead=0;
     private transitionTicks=0;
     private arrivalSeen=false;
     private attemptDeaths=0;
@@ -135,6 +145,7 @@ export class HypotheticalGame extends WorldGame {
             this.art.objects=(c,o,cx,cy)=>drawHypotheticalObjects(c,o,this.scenicFight,cx,cy,this.renderer.reducedMotion);
             this.art.boss=(c,_b,cx,cy)=>drawHypotheticalCombat(c,this.scenicFight,cx,cy,this.renderer.reducedMotion,this.chaseDefeat?.poseAt(this.defeatElapsed,this.renderer.reducedMotion));
             this.art.foe=(c,e,cx,cy)=>{
+                if(e instanceof HypotheticalChasePatrol){drawChasePatrol(c,e,cx,cy,this.renderer.reducedMotion);return;}
                 const deployment=this.act==='siege'?arrivalDeployment(this.fight.arrivalTime,this.fight.arrivalSkipped):1;
                 if(deployment===0)return;
                 if(deployment<1){
@@ -235,6 +246,10 @@ export class HypotheticalGame extends WorldGame {
         if(this.act==='chase'&&this.chaseCheckpoint)stage.level.playerSpawn.x=this.chaseCheckpoint/16;
         super.load(stage.id,false,stage);
         this.encounter=new HypotheticalEncounter(this.act,this.retryHealth,this.siegeCheckpoint,this.chaseCheckpoint,this.arrivalSeen,backdrop);this.boss=this.encounter;
+        if(this.act==='chase'){
+            this.foes=CHASE_PATROLS.filter(p=>p.x>=this.chaseCheckpoint)
+                .map(p=>new HypotheticalChasePatrol(p,()=>this.fight.x));
+        }
         if(this.act==='siege'){
             this.foes=SIEGE_SECTORS.flatMap((s,i)=>i<this.siegeCheckpoint?[]:siegeGarrison(i).map(spec=>
                 spec.id.endsWith(':vanguard')
@@ -253,6 +268,7 @@ export class HypotheticalGame extends WorldGame {
             }
         }
         this.player.data.hasHelmet=true;this.player.data.isGrounded=true;this.player.data.respawnRevealTimer=0;
+        this.chaseLead=0;
         this.camera.x=this.act==='siege'?clamp(this.player.data.position.x-132,0,SIEGE_WIDTH-320)
             :this.act==='chase'?clamp(this.player.data.position.x-150,0,CHASE_WIDTH-320):0;this.camera.y=64;this.transitionTicks=0;
         this.input.reset();
@@ -328,13 +344,21 @@ export class HypotheticalGame extends WorldGame {
         }
         if(!wasWon)this.totalTicks+=steps;
         if(this.fight.health===6||this.fight.health===3)this.retryHealth=this.fight.health;
-        if(this.act==='chase'&&!this.chaseCheckpoint&&this.player.data.position.x>=CHASE_CHECKPOINT){this.chaseCheckpoint=CHASE_CHECKPOINT;this.audio.sfx('checkpoint');}
+        if(this.act==='chase'){
+            for(const checkpoint of CHASE_CHECKPOINTS)if(checkpoint>this.chaseCheckpoint&&this.player.data.position.x>=checkpoint){
+                this.chaseCheckpoint=checkpoint;this.audio.sfx('checkpoint');
+            }
+            for(const e of this.foes)if(e instanceof HypotheticalChasePatrol&&Math.abs(e.x-this.player.data.position.x)<320)
+                for(const cue of e.cues)this.weaponAudio.play(cue);
+        }
         if(this.act==='siege'&&this.fight.route.cleared>this.siegeCheckpoint){
             this.siegeCheckpoint=this.fight.route.cleared;this.audio.sfx('checkpoint');
         }else if(this.act==='siege'&&this.fight.route.releasedThisTick)this.audio.sfx('switch');
         for(const event of this.fight.events){
             if(event==='shot'||event==='impact'||event==='splash'||event==='collapse-water'||event==='debris-land'||event==='reload'||event==='distant-shot'||event==='distant-hit'||event==='distant-debris'||event==='distant-thud'||event==='distant-roar'||event==='distant-flutter'||event==='distant-soft-hit'||event==='distant-wood'||event==='distant-stone'||event==='distant-metal'||event==='distant-creak'||event==='distant-chain'||event==='distant-leak'||event==='distant-snort'||event==='distant-grit'||event==='distant-launch'||event==='distant-rocket'||event==='distant-blast'||event==='distant-bell'||event==='distant-rotor'||event==='distant-engine-fail'||event==='distant-crash')this.weaponAudio.play(event);
             if(event==='chase-wood'||event==='chase-metal'||event==='chase-cable')this.weaponAudio.play(event);
+            if(event==='chase-launch'||event==='chase-rocket'||event==='chase-blast')this.weaponAudio.play(event);
+            if(event==='chase-blast')this.camera.shakeTimer=Math.max(this.camera.shakeTimer,75);
             if(event==='step'){
                 if(this.act==='chase')this.weaponAudio.play('chase-step');
                 else if(this.fight.tick%3===0)this.audio.sfx('land');
@@ -349,10 +373,11 @@ export class HypotheticalGame extends WorldGame {
         }
         if(this.fight.nextAct){this.transitionTicks+=steps;if(this.transitionTicks>=60)this.nextAct();}
         if(this.act==='chase'){
-            // An 18px look-back keeps the contact and falling beam in view.
-            // The offset is bounded; input and world time never stop.
-            const look=this.renderer.reducedMotion?0:chasePerformance(this.fight).framing;
-            this.camera.x=clamp(this.player.data.position.x-150-look,0,CHASE_WIDTH-320);
+            const desired=this.fight.course.cameraLead(this.player.data.position.x);
+            this.chaseLead+=(desired-this.chaseLead)*(1-Math.exp(-dt/130));
+            // A forward decision has priority over a rear destruction flourish.
+            const look=this.renderer.reducedMotion?0:chasePerformance(this.fight).framing*(1-Math.min(1,this.chaseLead/18));
+            this.camera.x=clamp(this.player.data.position.x-150+this.chaseLead-look,0,CHASE_WIDTH-320);
         }
         else if(this.act==='siege')this.camera.x=clamp(this.fight.backdrop.aftermath.cameraFor(this.player.data.position.x)
             +arrivalLookAhead(this.fight.arrivalTime,this.fight.arrivalSkipped),0,SIEGE_WIDTH-320);
@@ -388,9 +413,9 @@ export class HypotheticalGame extends WorldGame {
         const showHint=this.act!=='chase'||this.player.data.isDead;
         workshopPanel(c,0,0,320,showHint?31:16,false,true);
         pixelText(c,'FLAVIO HIPOTETICO',7,5,WORKSHOP_UI.paper);
-        const district=Math.min(3,Math.floor(this.player.data.position.x/1120));
-        pixelText(c,this.act==='chase'?`${district+1}/4 ${CHASE_DISTRICTS[district].name}`:this.act==='siege'&&!b.arrival.ready?'CHEGADA AO ARSENAL':this.act==='siege'?`${b.route.entered+1}/${SIEGE_SECTORS.length} ${b.route.currentSector.name}`:`FASE ${b.phaseNumber}/3`,121,5,WORKSHOP_UI.light);
-        if(this.act==='chase')for(let i=0;i<4;i++){c.fillStyle=i<=district?'#dfad56':'#435969';c.fillRect(244+i*6,6,4,5);}
+        const district=chaseDistrictAt(this.player.data.position.x);
+        pixelText(c,this.act==='chase'?`${district+1}/${CHASE_DISTRICTS.length} ${CHASE_DISTRICTS[district].name}`:this.act==='siege'&&!b.arrival.ready?'CHEGADA AO ARSENAL':this.act==='siege'?`${b.route.entered+1}/${SIEGE_SECTORS.length} ${b.route.currentSector.name}`:`FASE ${b.phaseNumber}/3`,121,5,WORKSHOP_UI.light);
+        if(this.act==='chase')for(let i=0;i<CHASE_DISTRICTS.length;i++){c.fillStyle=i<=district?'#dfad56':'#435969';c.fillRect(244+i*6,6,4,5);}
         if(this.act==='siege'&&b.arrival.ready){
             const i=b.route.entered,total=SIEGE_SECTORS[i].guards.length,left=b.route.remaining[i];
             pixelText(c,`${left}/${total}`,251,5,left?'#edc586':'#99d6bd');

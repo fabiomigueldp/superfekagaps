@@ -1,6 +1,6 @@
 import {box,oval,pixelLine,polygon} from '../WorldPainting';
 import type {HypotheticalModel} from './HypotheticalModel';
-import {CHASE_QUAYS,chaseQuayReaction,chaseWindAt,chaseCartAt,chasePumpAt} from './HypotheticalChaseLife';
+import {CHASE_QUAYS,chaseQuayReaction,chaseWindAt,chaseCartAt,chasePumpAt,chaseFrontageHeight} from './HypotheticalChaseLife';
 import {drawScenicShadow} from './HypotheticalSceneShadow';
 
 const P={ink:'#607d78',shade:'#7b9183',stone:'#a1ac95',edge:'#b5b69b',wood:'#9a967b',
@@ -10,7 +10,7 @@ const P={ink:'#607d78',shade:'#7b9183',stone:'#a1ac95',edge:'#b5b69b',wood:'#9a9
  * quay. Muted silhouettes leave the route and the pursuer as the focal plane. */
 export function drawChaseHarbor(c:CanvasRenderingContext2D,cx:number,cy:number,tick:number,reduced:boolean){
     const base=110+(64-cy)*.2;
-    for(const [i,worldX] of [80,1450,2850,4230].entries()){
+    for(const [i,worldX] of [80,1450,2850,4230,5580,7010,8070].entries()){
         const x=96+(worldX-cx)*.11;if(x<-115||x>345)continue;
         const wind=chaseWindAt(tick,worldX,reduced),height=35+i%2*13;
         // The jib, diagonal brace and rope share the same mast attachment.
@@ -180,7 +180,7 @@ export function drawChaseDressing(c:CanvasRenderingContext2D,b:HypotheticalModel
         pixelLine(c,x+10,top+28,x+22,top+28,'#97a68f');pixelLine(c,x+52,top+28,x+65,top+28,'#97a68f');
         for(const dx of [13,58]){box(c,x+dx,top+31,5,1,'#b4b89e');box(c,x+dx+4,top+32,1,4,'#95a58f');}
     }else{
-        const top=base-[65,78,58][index-9];
+        const top=base-chaseFrontageHeight(index);
         const pole=x+64;
         pixelLine(c,pole,top+1,pole,top-24,P.ink,2);box(c,pole-1,top-26,3,2,P.edge);
         // A fixed hoist and a flexible outer edge; never a flashing gameplay cue.

@@ -1,4 +1,4 @@
-import { CHASE_GAPS, CHASE_WIDTH } from './HypotheticalLayout';
+import { CHASE_GAPS, CHASE_WIDTH, CHASE_DISTRICTS,chaseDistrictAt } from './HypotheticalLayout';
 import {chaseStructureTiming,type ChaseStructureKind} from './HypotheticalChasePerformance';
 import {chaseSuspensionAt} from './HypotheticalChaseSuspension';
 
@@ -9,7 +9,7 @@ const unit = (v: number) => Math.max(0, Math.min(1, v));
 const ease = (v: number) => { const t = unit(v); return t * t * (3 - 2 * t); };
 
 export function chaseMaterialAt(x: number): ChaseMaterial {
-    return x >= 3360 ? 'iron' : x >= 1120 && x < 2240 ? 'timber' : 'stone';
+    return CHASE_DISTRICTS[chaseDistrictAt(x)].material;
 }
 
 export function chaseCollapsedEdge(pursuerX: number) {

@@ -1,9 +1,10 @@
 import {box,oval,pixelLine,polygon,type Point} from '../WorldPainting';
 import {pixelText} from '../../graphics/BitmapFont';
 import type {HypotheticalModel,Shot} from './HypotheticalModel';
-import {CHASE_BREAKS,CHASE_CHECKPOINT,CHASE_DISTRICTS} from './HypotheticalLayout';
+import {CHASE_BREAKS,CHASE_CHECKPOINTS,CHASE_DISTRICTS} from './HypotheticalLayout';
 import {chaseRuinAt,chaseDebrisAt,chaseMaterialAt,chaseTerraceFeet,chaseTerraceFall,chaseSplashAt,CHASE_DECK_Y,CHASE_WATER_Y,type ChaseMaterial,type ChaseTerrace} from './HypotheticalChaseDetails';
 import {drawChaseStructureEffects,drawChaseLandingDust,drawChaseApproachEffects} from './HypotheticalChaseImpactArt';
+import {drawChaseCargoDeck} from './HypotheticalChaseSetpieceArt';
 
 const materials = {
     stone: {dark:'#586e72',mid:'#8b9990',light:'#b8b499',grain:'#77877f'},
@@ -171,13 +172,14 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
         box(c,x,base-55,4,55,'#577773');box(c,x-7,base-55,80,17,'#4f6a70');
         box(c,x-6,base-54,78,1,'#aab397');pixelText(c,d.name,x-2,base-50,'#c8c3a2');
     }
-    const x=CHASE_CHECKPOINT-cx;
-    if(x>-80&&x<360){
+    for(const checkpoint of CHASE_CHECKPOINTS){
+        const x=checkpoint-cx;if(x<=-80||x>=360)continue;
         box(c,x-10,base-68,5,68,'#566f70');box(c,x-14,base-71,16,5,'#b7ad8a');
         box(c,x-12,base-65,12,16,'#344e58');box(c,x-10,base-63,8,10,'#91d3bb');
         pixelLine(c,x-8,base-59,x-6,base-57,'#e1e6ba');pixelLine(c,x-6,base-57,x-3,base-61,'#e1e6ba');
-        box(c,x-13,base-46,66,11,'#405e62');pixelText(c,'COMPORTAS',x-10,base-44,'#c8c3a2');
-        box(c,x-13,base-32,44,11,'#405e62');pixelText(c,'RETOMA',x-10,base-30,'#b4d1b7');
+        // A fixed lamp and stitched pennant identify a refuge without an instruction sign.
+        polygon(c,[[x-7,base-45],[x+17,base-42],[x+11,base-35],[x-7,base-37]],'#799c85');
+        pixelLine(c,x-6,base-44,x+13,base-42,'#c6c8a5');
     }
 }
 
@@ -222,11 +224,12 @@ export function drawChaseCollapse(c:CanvasRenderingContext2D,b:HypotheticalModel
         const age=b.tick-p.born,x=p.x-cx;if(x+p.width<-25||x>340)continue;
         const fall=chaseTerraceFall(p,age),material=chaseMaterialAt(p.x);
         c.save();c.beginPath();c.rect(x-90,p.y-cy-4,p.width+120,water-(p.y-cy)+4);c.clip();
-        drawChaseTerrace(c,p,cx,cy,age);
+        if(p.fallen)drawChaseCargoDeck(c,x,p.y-cy+fall.drop,p.width,fall.turn,true);
+        else drawChaseTerrace(c,p,cx,cy,age);
         c.restore();
         waterContact(c,x+fall.contactX,water,fall.splashAge,true,reduced);
         // Long supports disturb the water quietly before the much heavier cap arrives.
-        if(age>3&&fall.splashAge<0)for(const foot of chaseTerraceFeet(p)){
+        if(!p.fallen&&age>3&&fall.splashAge<0)for(const foot of chaseTerraceFeet(p)){
             const fy=p.y+fall.drop+foot.u*Math.sin(fall.turn)+foot.v*Math.cos(fall.turn);
             if(fy>=CHASE_WATER_Y)pixelLine(c,x+foot.u-4,water,x+foot.u+3,water,'#6a9e99');
         }

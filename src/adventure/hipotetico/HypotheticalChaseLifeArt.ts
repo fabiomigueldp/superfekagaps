@@ -1,6 +1,6 @@
 import {box,oval,pixelLine,polygon} from '../WorldPainting';
 import type {HypotheticalModel} from './HypotheticalModel';
-import {CHASE_QUAYS,CHASE_SHORE,chaseQuayX,chaseQuaySection,chaseWorkerAt,chaseBirdAt,chaseQuayReaction,chaseOutflowAt,chaseOarAt,chaseWindAt,chaseWorkAt,chaseDoorAt} from './HypotheticalChaseLife';
+import {CHASE_QUAYS,CHASE_SHORE,chaseQuayX,chaseQuaySection,chaseWorkerAt,chaseBirdAt,chaseQuayReaction,chaseOutflowAt,chaseOarAt,chaseWindAt,chaseWorkAt,chaseDoorAt,chaseFrontageHeight,chaseWaterBreak} from './HypotheticalChaseLife';
 import {drawScenicShadow} from './HypotheticalSceneShadow';
 
 const P={shade:'#607e7b',dark:'#597471',stone:'#9ca797',light:'#b8b79d',wood:'#9c9278',seam:'#7b8878',water:'#79aaa2'};
@@ -64,7 +64,7 @@ export function drawChaseIndustry(c:CanvasRenderingContext2D,b:HypotheticalModel
         const turn=age<0?0:Math.min(1,Math.max(0,(age-8)/34))*Math.PI*.7;
         oval(c,x+74,base-26,13,13,P.dark);oval(c,x+76,base-24,9,9,'#b1b49a');
         for(let j=0;j<3;j++){const a=turn+j*Math.PI*2/3;pixelLine(c,x+80,base-20,x+80+Math.cos(a)*4,base-20+Math.sin(a)*4,P.shade);}
-        const slot=index===8?4:3,at=b.chaseBreaks[slot],breakAge=at===-1?-1:b.tick-at;
+        const at=b.chaseBreaks[chaseWaterBreak(index)],breakAge=at===-1?-1:b.tick-at;
         const flow=chaseOutflowAt(age,breakAge),waterY=base+CHASE_SHORE.water,outletY=base+CHASE_SHORE.outlet,waterTime=time+index*17;
         const width=2+Math.round(flow.flow*2);
         polygon(c,[[x+93,outletY],[x+93+width,outletY],[x+94+width,waterY],[x+92,waterY]],'#7faea4');
@@ -82,7 +82,7 @@ export function drawChaseIndustry(c:CanvasRenderingContext2D,b:HypotheticalModel
             box(c,x+95+dir*t*.6,waterY-Math.sin(t/18*Math.PI)*4*flow.surge,1,2,'#a8c1a8');
         }
     }else if(site.kind==='port'){
-        const height=[65,78,58][index-9],top=base-height;
+        const height=chaseFrontageHeight(index),top=base-height;
         box(c,x+12,top,56,height,'#8b9d91');box(c,x+16,top+3,48,height-3,'#a7ad96');
         box(c,x+9,top-4,62,5,P.shade);box(c,x+11,top-4,58,2,P.light);
         for(const dx of [17,60]){box(c,x+dx,top+4,3,height-4,'#b9b79a');for(let y=top+12;y<base;y+=12)box(c,x+dx,y,3,1,'#7c9587');}
@@ -193,7 +193,7 @@ export function drawChaseQuayLife(c:CanvasRenderingContext2D,b:HypotheticalModel
         for(let j=0;j<3;j++){
             const bird=chaseBirdAt(age,j);if(!bird.visible)continue;
             const rx=19+j*10,roof=site.kind==='cargo'?base-54-index%2*7+3-(rx<35?rx/35:(75-rx)/40)*13:
-                base-(site.kind==='port'?[65,78,58][index-9]+7:site.kind==='water'?60:63+index%2*14);
+                base-(site.kind==='port'?chaseFrontageHeight(index)+7:site.kind==='water'?60:63+index%2*14);
             const bx=x+19+j*10+bird.x,by=roof-bird.y+bird.crouch;
             const peck=age<0&&!reduced?Math.max(0,Math.sin(b.tick/31+j*2+index)-.65)*4:0;
             box(c,bx,by,4,2,'#aeb9a4');box(c,bx+3+peck*.4,by-1+peck,2,2,'#bec3ab');
@@ -212,7 +212,7 @@ export function drawChaseQuayLife(c:CanvasRenderingContext2D,b:HypotheticalModel
 /** Oars, hull pitch and the wake share a stroke; boats stay behind the playable bridge. */
 export function drawChaseSkiffs(c:CanvasRenderingContext2D,b:HypotheticalModel,cx:number,cy:number,reduced:boolean){
     const section=chaseQuaySection(cy);
-    for(const [i,anchor]of [340,1540,2740,3940].entries()){
+    for(const [i,anchor]of [340,1540,2740,3940,5140,6340,7540,8440].entries()){
         const oar=chaseOarAt(b.tick,i,reduced),{stroke}=oar,drift=reduced?0:b.tick*.025;
         const x=chaseQuayX(anchor,cx)+drift,y=section.boat-6+oar.bob;
         if(x<-60||x>345)continue;

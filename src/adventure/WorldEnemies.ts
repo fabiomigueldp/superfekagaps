@@ -209,6 +209,8 @@ export class WorldFoe implements Rect {
             return { x: this.facing < 0 ? this.x - 8 : this.x + this.width - 2, y: this.y + 10, width: 10, height: 8 };
         return null;
     }
+    /** The struck surface can belong to an enemy's carried or released object. */
+    get contactPoint() { return {x:this.x+this.width/2,y:this.y}; }
     contact(player: Rect, previous: Rect, falling: boolean, pound: boolean): 'none' | 'hurt' | 'bounce' | 'kill' {
         if (this.dead)
             return 'none';

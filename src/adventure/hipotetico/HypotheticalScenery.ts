@@ -6,7 +6,7 @@ import { SIEGE_SECTORS, SIEGE_WIDTH, SIEGE_UNLOCK_TICKS, SIEGE_LOCK_TICKS } from
 import { DESTRUCTION_SITES, ruinAge, rubbleApproach } from './HypotheticalDevastation';
 import { backdropBaseline } from './HypotheticalBackdrop';
 import {drawChaseLandmarks,drawChaseTerrace} from './HypotheticalChaseArt';
-import {chaseCollapsedEdge} from './HypotheticalChaseDetails';
+import {chaseCollapsedEdge,chaseMaterialAt} from './HypotheticalChaseDetails';
 import {CHASE_QUAYS,chaseQuayX,chaseQuayBase,chaseWindAt} from './HypotheticalChaseLife';
 import {drawChaseIndustry,drawChaseQuayLife,drawChaseSkiffs} from './HypotheticalChaseLifeArt';
 import {drawChaseQuayGround,drawChaseFrontage,drawChaseShoreWater} from './HypotheticalChaseQuayArt';
@@ -546,9 +546,8 @@ export function drawHypotheticalMasonry(c: CanvasRenderingContext2D, level: Worl
         if(!solid(col,row))continue;
         const x=col*16-cx,y=row*16-cy;
         if(b.act==='chase'&&row===13){timberStep(c,x,y,col);continue;}
-        if(b.act==='chase'&&row===14&&col>=70&&col<140){chaseDeckTile(c,x,y,col,false);continue;}
-        if(b.act==='chase'&&row===14&&col>=210){
-            chaseDeckTile(c,x,y,col,true);continue;
+        if(b.act==='chase'&&row===14&&chaseMaterialAt(col*16)!=='stone'){
+            chaseDeckTile(c,x,y,col,chaseMaterialAt(col*16)==='iron');continue;
         }
         box(c,x,y,16,16,S.stoneShade);
         const seam=mod(col+Math.floor(row/2),2)===0;
@@ -770,6 +769,7 @@ export function drawHypotheticalFittings(c: CanvasRenderingContext2D, o: WorldOb
     }
     for(const p of o.bodies){
         if(p.x>cx+350||p.x+p.width<cx-30)continue;
+        if(p.id.startsWith('chase-fallen-'))continue;
         if(b.act==='siege'&&drawSiegeRouteBody(c,p,cx,cy))continue;
         if(p.kind==='support'){
             if(p.id.startsWith('siege-'))siegeDeck(c,p,cx,cy);
