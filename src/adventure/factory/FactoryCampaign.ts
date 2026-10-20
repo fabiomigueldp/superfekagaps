@@ -1,4 +1,5 @@
 import type { CameraData } from '../../types';
+import { touchControlsEnabled } from '../../engine/TouchMode';
 import { SalonEntryTransition, canApproachSalon, salonEntryPlayer, drawSalonEntryCue, drawSalonEntryDoor, drawSalonEntryShade, salonEntryButtonPosition, type SalonEntryStep } from './SalonEntryTransition';
 import { WorldGame } from '../WorldGame';
 import { DisposalScope } from '../../engine/DisposalScope';
@@ -24,7 +25,7 @@ export class FactoryCampaign extends WorldGame {
             if (this.stage.id === FACTORY_SALON.stage) {
                 drawFactorySalon(args[0], args[2], args[3], this.store.save.seen.includes(FACTORY_SALON.victory));
                 if (this.entry?.frame.phase === 'outgoing') drawSalonEntryDoor(args[0], args[2], args[3], this.entry.frame);
-                else if (this.canEnter) drawSalonEntryCue(args[0], args[2], args[3], navigator.maxTouchPoints > 0);
+                else if (this.canEnter) drawSalonEntryCue(args[0], args[2], args[3], touchControlsEnabled());
             }
             objects(...args);
         };

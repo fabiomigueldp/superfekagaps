@@ -2,6 +2,7 @@ import { ALL_DELICIA_STAGES, DELICIA_ENDING, DELICIA_LORE, DELICIA_STAGES, delic
 import { DeliciaStore, completeDeliciaStage, deliciaUnlocked, awardDeliciaMedals, DELICIA_MEDALS } from './DeliciaProgress';
 import { DeliciaSimulation, type DeliciaInput } from './DeliciaSimulation';
 import { DeliciaAudio } from './DeliciaAudio';
+import { touchControlsEnabled } from '../../engine/TouchMode';
 import { DeliciaArt } from './DeliciaArt';
 import { DELICIA_STEP } from './DeliciaNative';
 import { DELICIA_MAP_IMAGE, DELICIA_MAP_METADATA } from './DeliciaIsland';
@@ -47,7 +48,7 @@ export class DeliciaApp {
     private readonly pointerOwners=new Set<number>();
     private windowFocused=typeof document.hasFocus!=='function'||document.hasFocus();
     constructor(host:HTMLElement=document.body, private readonly options:DeliciaAppOptions={}){
-        if(navigator.maxTouchPoints>0)this.root.classList.add('dl-has-touch');
+        this.root.classList.toggle('dl-has-touch',touchControlsEnabled());
         let storage:Storage|null=null;try{storage=localStorage;}catch{}this.store=options.store??new DeliciaStore(storage);this.mapSelection=this.store.save.selected;
         this.canvas.width=960;this.canvas.height=540;this.canvas.tabIndex=0;this.canvas.setAttribute('aria-label','Feka na ilha da Delícia. Setas movem, Espaço pula, Shift corre, S dá sentada, J lança sementes, Q rebate e E abre válvulas.');
         this.status.setAttribute('role','status');this.status.setAttribute('aria-live','polite');
@@ -159,6 +160,10 @@ export class DeliciaApp {
     private disarmGamepad():void{this.gamepad.reset();}
     private pollGamepad():void {
         if(this.disposed)return;
+        const touchVisible=touchControlsEnabled();
+        if(this.root.classList.contains('dl-has-touch')!==touchVisible){
+            this.root.classList.toggle('dl-has-touch',touchVisible);this.resetInput();
+        }
         if(this.controlsHelp.isOpen){
             const command=this.gamepad.menu(this.controlsHelp.canControl()?'delicia:controls':null);
             if(command)this.controlsHelp.control(command);return;

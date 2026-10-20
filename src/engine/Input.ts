@@ -3,6 +3,7 @@
 import { InputState } from '../types';
 import { DisposalScope } from './DisposalScope';
 import { controlCode, keyAction, type ControlAction } from './ControlPreferences';
+import { touchControlsEnabled } from './TouchMode';
 
 export type InputAction = 'left' | 'right' | 'jump' | 'run' | 'down';
 type HeldAction = InputAction;
@@ -71,7 +72,7 @@ export class Input {
   private konamiIndex = 0;
   private konamiJustTriggered = false;
 
-  constructor(canvas?: HTMLCanvasElement) {
+  constructor(canvas?: HTMLCanvasElement, private readonly legacyTouchMenus = true) {
     try {
       // Capture gameplay keys before page widgets can stop bubbling.
       this.lifetime.listen(window, 'keydown', (event) => this.handleKeyDown(event), true);
@@ -79,6 +80,7 @@ export class Input {
       this.lifetime.listen(window, 'blur', () => this.reset());
       this.lifetime.listen(window, 'pagehide', () => this.reset());
       this.lifetime.listen(window, 'feka-controls-change', () => this.reset());
+      this.lifetime.listen(window, 'gamepadconnected', () => this.reset());
       // Modern rotation events belong to ScreenOrientation, not window. Keep
       // the legacy event only as a fallback so one rotation does not reset twice.
       const orientation = window.screen?.orientation;
@@ -228,6 +230,10 @@ export class Input {
   private handleTouch(event: TouchEvent, phase: 'touchstart' | 'touchmove' | 'touchend' | 'touchcancel'): void {
     const cancelled = phase === 'touchcancel';
     if (this.canvasTouchSuspensions.size) return;
+    // World menus already hit-test pointer coordinates. Never turn their touch
+    // event into a second confirmation/pause after the pointer handler runs.
+    if (!this.legacyTouchMenus && this.menuMode) return;
+    if (!touchControlsEnabled() && phase === 'touchstart') return;
     event.preventDefault();
     const canvas = event.currentTarget as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
@@ -261,14 +267,14 @@ export class Input {
       const y = (touch.clientY - rect.top) / rect.height;
       if (x < 0 || x > 1 || y < 0 || y > 1) continue;
       let action: HeldAction | 'menu' | undefined;
-      if (this.menuMode) action = 'menu';
+      if (this.menuMode && this.legacyTouchMenus) action = 'menu';
       else if (y > 0.7) {
         if (x < 0.15) action = 'left';
         else if (x < 0.3) action = 'right';
         else if (x > 0.85) action = 'jump';
         else if (x > 0.7) action = 'run';
         else if (x > 0.44 && x < 0.56) action = 'down';
-      } else if (y < 0.2 && x > 0.4 && x < 0.6) action = 'menu';
+      } else if (this.legacyTouchMenus && y < 0.2 && x > 0.4 && x < 0.6) action = 'menu';
       if (action) owners.set(touch.identifier ?? i, action);
     }
     this.activeCanvasTouches = new Set([...activeIds].filter((id): id is number => typeof id === 'number'));

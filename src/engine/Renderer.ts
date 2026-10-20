@@ -13,6 +13,7 @@ import { TilePainter } from '../graphics/TilePainter';
 import { BackgroundScene } from '../graphics/BackgroundScene';
 import { GameUI } from '../graphics/GameUI';
 import { drawTouchButtons } from '../graphics/touchControls';
+import { touchControlsEnabled } from './TouchMode';
 import { pixelText, panel, textWidth, wrapText, fitText } from '../graphics/BitmapFont';
 import { MINION_FRAMES, MINION_SQUASH, BOSS_FRAMES, YASMIN_FRAMES, COIN_FRAMES, FANTA_SPRITE, PROJECTILE_FRAMES, SPRITE_PALETTE } from '../graphics/sprites';
 
@@ -45,7 +46,7 @@ export class Renderer {
   private editorLink:HTMLElement|null;
   private debug=false;
   private zoom=1;
-  private touch=false;
+  private get touch():boolean {return touchControlsEnabled();}
   private touchControlsVisible=true;
   private interpolationMs=0;
   // Read the live preference without adding a listener, timer or render loop.
@@ -63,7 +64,6 @@ export class Renderer {
     this.worldCanvas.width=GAME_WIDTH;this.worldCanvas.height=GAME_HEIGHT;
     this.worldCtx=this.worldCanvas.getContext('2d')!;this.offscreenCtx=this.worldCtx;
     this.editorLink=document.getElementById('open-editor');
-    this.touch=navigator.maxTouchPoints>0;
     this.debug=location.hash.includes('debug');
     this.resize();window.addEventListener('resize',this.onResize);
     (window as unknown as {renderer:Renderer}).renderer=this;
@@ -96,7 +96,8 @@ export class Renderer {
     if(this.impacts.length>32)this.impacts.shift();
   }
   private resize():void {
-    const cssScale=Math.max(1,Math.floor(Math.min(window.innerWidth/GAME_WIDTH,window.innerHeight/GAME_HEIGHT)));
+    const available=Math.min(window.innerWidth/GAME_WIDTH,window.innerHeight/GAME_HEIGHT);
+    const cssScale=document.fullscreenElement?available:available<1?available:Math.floor(available);
     const physicalScale=Math.max(1,Math.round(cssScale*(window.devicePixelRatio||1)));
     this.canvas.style.width=GAME_WIDTH*cssScale+'px';
     this.canvas.style.height=GAME_HEIGHT*cssScale+'px';

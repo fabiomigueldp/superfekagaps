@@ -1,4 +1,5 @@
 import { Renderer } from '../../engine/Renderer';
+import { touchControlsEnabled } from '../../engine/TouchMode';
 import { panel, pixelText, fitText, wrapText } from '../../graphics/BitmapFont';
 import { ART } from '../../graphics/palette';
 import { drawTouchButtons, WORLD_TOUCH_BUTTONS, type TouchButton } from '../../graphics/touchControls';
@@ -102,7 +103,7 @@ export class DeliciaPresentation {
             panel(c, 12, y, 296, 12 + lines.length * 10, '#202d43', '#aac1cd');
             lines.forEach((line, i) => pixelText(c, line, 24, y + 7 + i * 10, ART.goldLight));
         }
-        if (options.playing && navigator.maxTouchPoints > 0) drawTouchButtons(c, DELICIA_TOUCH_BUTTONS);
+        if (options.playing && touchControlsEnabled()) drawTouchButtons(c, DELICIA_TOUCH_BUTTONS);
         renderer.present();
     }
 

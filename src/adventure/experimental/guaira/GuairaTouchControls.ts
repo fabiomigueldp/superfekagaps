@@ -1,5 +1,6 @@
 import { Input, type InputAction, type InputActionSource } from '../../../engine/Input';
 import { decorateGuairaTouchAction } from './GuairaTouchAction';
+import { touchControlsEnabled } from '../../../engine/TouchMode';
 
 const ACTIONS: ReadonlyArray<readonly [InputAction, string, string, string]> = [
     ['left', '←', '', 'Andar para a esquerda'], ['right', '→', '', 'Andar para a direita'],
@@ -100,8 +101,7 @@ export class GuairaTouchControls {
     /** Call from the entry's existing state reflection; this schedules no work. */
     sync(): void {
         if (this.closed) return;
-        const visible = typeof PointerEvent !== 'undefined' &&
-            ((typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) || !!this.coarse?.matches);
+        const visible = typeof PointerEvent !== 'undefined' && touchControlsEnabled();
         const changed = this.root.hidden === visible;
         if (!visible || !this.options.isPlaying()) this.cancelAll();
         if (visible && !this.restoreCanvas) this.restoreCanvas = this.options.input.suspendCanvasTouchControls();

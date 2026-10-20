@@ -1,4 +1,5 @@
 import { importProgressFile, progressImportMessage } from './ProgressImport';
+import { touchControlsEnabled } from '../engine/TouchMode';
 import { JournalAccessibility } from './JournalAccessibility';
 import { WorldResultAccessibility, clearResultReceipt, endingResultReceipt } from './WorldResultAccessibility';
 import { campaignJournal } from './CampaignJournal';
@@ -124,7 +125,7 @@ export class WorldGame {
     private dialogueTime = 0;
     private comment: Dialogue | null = null;
     private commentTimer = 0;
-    private touch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0;
+    private get touch(): boolean { return touchControlsEnabled(); }
     private clearTimer = 0;
     private hitStop = 0;
     private hitStopInput: Pick<InputState, 'jumpPressed' | 'jumpReleased' | 'downPressed'> | null = null;
@@ -165,7 +166,7 @@ export class WorldGame {
                 });
                 this.addCleanup(() => this.controlsHelp?.dispose());
             }
-            this.input = new Input(canvas);
+            this.input = new Input(canvas, false);
             this.addCleanup(() => this.input.dispose());
             document.title = ephemeral ? 'Super Feka Gaps World · Estúdio' : 'Super Feka Gaps World';
             let storage: Storage | null = null;
@@ -204,9 +205,12 @@ export class WorldGame {
                 if (this.controlsHelp?.isOpen) return;
                 this.audio.unlock();
                 const r = canvas.getBoundingClientRect();
+                this.input.setMenuMode(this.state !== 'playing');
                 if (this.state === 'playing') {
-                    if ((e.clientY - r.top) * 180 / r.height < 23)
+                    if ((e.clientY - r.top) * 180 / r.height < 23) {
                         this.pause();
+                        this.input.setMenuMode(true);
+                    }
                     return;
                 }
                 const x = (e.clientX - r.left) * 320 / r.width, y = (e.clientY - r.top) * 180 / r.height;
