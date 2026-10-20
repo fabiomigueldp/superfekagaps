@@ -88,7 +88,7 @@ export class ControlSettings {
     private refreshActions(): void {
         const pad = this.pad(), old = this.action.value;
         const actions: (ControlAction | 'confirm' | 'back')[] = [...CONTROL_ACTIONS.filter(a =>
-            (pad || a !== 'up') && (!pad || a !== 'mute') && (this.extraActions || !['seed', 'parry'].includes(a)))];
+            (pad || a !== 'up') && (!pad || a !== 'mute') && (this.extraActions || !['seed', 'parry', 'interact'].includes(a)))];
         if (pad) actions.push('confirm', 'back');
         this.action.replaceChildren(...actions.map(a => option(a, CONTROL_LABELS[a])));
         if (actions.includes(old as ControlAction)) this.action.value = old;

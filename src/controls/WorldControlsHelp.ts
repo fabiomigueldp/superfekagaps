@@ -50,7 +50,7 @@ export class WorldControlsHelp {
             const content = this.content; content.className = 'world-controls-content'; content.tabIndex = 0;
             content.setAttribute('role', 'region'); content.setAttribute('aria-label', contentOptions.regionLabel ?? 'Controles da aventura World');
             const list = document.createElement('dl');
-            const actions: ControlAction[] = ['left', 'right', 'jump', 'run', 'down', 'interact', 'pause', 'guide', 'mute'];
+            const actions: ControlAction[] = ['left', 'right', 'jump', 'run', 'down', 'pause', 'guide', 'mute'];
             if (contentOptions.extraActions) actions.splice(5, 0, 'seed', 'parry');
             for (const action of actions) {
                 const term = document.createElement('dt'), description = document.createElement('dd');
