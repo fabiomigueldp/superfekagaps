@@ -97,7 +97,8 @@ export class Renderer {
   }
   private resize():void {
     const available=Math.min(window.innerWidth/GAME_WIDTH,window.innerHeight/GAME_HEIGHT);
-    const cssScale=document.fullscreenElement?available:available<1?available:Math.floor(available);
+    const fullscreen=!!document.fullscreenElement||document.documentElement.dataset.embeddedFullscreen==='true';
+    const cssScale=fullscreen?available:available<1?available:Math.floor(available);
     const physicalScale=Math.max(1,Math.round(cssScale*(window.devicePixelRatio||1)));
     this.canvas.style.width=GAME_WIDTH*cssScale+'px';
     this.canvas.style.height=GAME_HEIGHT*cssScale+'px';
