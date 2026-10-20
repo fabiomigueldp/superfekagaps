@@ -1,5 +1,5 @@
 import {box,pixelLine,polygon} from '../WorldPainting';
-import {chaseFragmentAt,CHASE_DECK_Y,CHASE_WATER_Y,chaseMaterialAt} from './HypotheticalChaseDetails';
+import {chaseFragmentAt,CHASE_DECK_Y,CHASE_WATER_Y,chaseMaterialAt,type ChaseMaterial} from './HypotheticalChaseDetails';
 import {chaseStructureTiming,type ChaseStructureKind} from './HypotheticalChasePerformance';
 
 /** These effects occupy the struck structure's plane, behind the dinosaur.
@@ -48,6 +48,19 @@ export function drawChaseStructureEffects(c:CanvasRenderingContext2D,x:number,ba
             }
         }
     }
+}
+
+/** Landing particles follow the first touching corner, never the old support. */
+export function drawChaseLandingDust(c:CanvasRenderingContext2D,x:number,base:number,age:number,material:ChaseMaterial,reduced:boolean){
+    if(age<0||age>=27)return;
+    const light=material==='timber'?'#b3a187':'#a4b2a1',grain=material==='timber'?'#6e7264':'#59767a';
+    c.save();c.globalAlpha*=1-age/27;
+    for(let j=0;j<(reduced?2:6);j++){
+        const dir=j%2?1:-1,speed=.35+Math.floor(j/2)*.35,t=Math.min(age,16);
+        const xx=x+dir*t*speed,dy=Math.max(0,(.85+j%3*.13)*t-.075*t*t);
+        box(c,xx,base-2-dy,j%2?2:3,1,j%2?light:grain);
+    }
+    c.restore();
 }
 
 /** Weight is read at the same sole contact that emits the footstep sound. */

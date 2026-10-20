@@ -3,7 +3,7 @@ import {pixelText} from '../../graphics/BitmapFont';
 import type {HypotheticalModel,Shot} from './HypotheticalModel';
 import {CHASE_BREAKS,CHASE_CHECKPOINT,CHASE_DISTRICTS} from './HypotheticalLayout';
 import {chaseRuinAt,chaseDebrisAt,chaseMaterialAt,chaseTerraceFeet,chaseTerraceFall,chaseSplashAt,CHASE_DECK_Y,CHASE_WATER_Y,type ChaseMaterial,type ChaseTerrace} from './HypotheticalChaseDetails';
-import {drawChaseStructureEffects} from './HypotheticalChaseImpactArt';
+import {drawChaseStructureEffects,drawChaseLandingDust} from './HypotheticalChaseImpactArt';
 
 const materials = {
     stone: {dark:'#586e72',mid:'#8b9990',light:'#b8b499',grain:'#77877f'},
@@ -33,11 +33,23 @@ function beam(c:CanvasRenderingContext2D,x:number,y:number,length:number,angle:n
     }
 }
 
-function pallet(c:CanvasRenderingContext2D,x:number,y:number){
-    box(c,x-2,y+14,27,4,'#536b68');box(c,x-1,y+14,25,1,'#aaa388');
-    box(c,x,y,23,14,'#766f61');box(c,x+2,y+2,19,10,'#9d8d70');
-    for(const dx of [3,17]){box(c,x+dx,y,3,14,'#596f6a');box(c,x+dx,y+2,2,1,'#b2ad8c');}
-    pixelLine(c,x+7,y+3,x+14,y+3,'#c0aa82');pixelLine(c,x+7,y+8,x+13,y+9,'#7e7b65');
+function pallet(c:CanvasRenderingContext2D,x:number,y:number,angle:number,groundAge:number){
+    const a=(u:number,v:number):Point=>[x+u*Math.cos(angle)-v*Math.sin(angle),y+u*Math.sin(angle)+v*Math.cos(angle)];
+    const rect=(u:number,v:number,w:number,h:number,color:string)=>polygon(c,[a(u,v),a(u+w,v),a(u+w,v+h),a(u,v+h)],color);
+    const line=(u:number,v:number,uu:number,vv:number,color:string,width=1)=>pixelLine(c,...a(u,v),...a(uu,vv),color,width);
+    rect(-13,14,27,4,'#536b68');line(-12,14,12,14,'#aaa388');
+    rect(-11,0,23,14,'#766f61');rect(-9,2,19,10,'#9d8d70');
+    for(const u of [-8,6]){rect(u,0,3,14,'#596f6a');rect(u,2,2,1,'#b2ad8c');rect(u+1,10,1,1,'#c6b38d');}
+    for(const v of [5,9])line(-5,v,5,v,'#807961');
+    line(-4,3,3,3,'#c0aa82');line(-4,7,1,7,'#bba17b');
+    for(const u of [-10,8]){rect(u,15,3,2,'#3e5c5c');line(u,15,u+2,15,'#aaa388');}
+    // The shipping panel and its sling stay on the same rigid crate throughout.
+    rect(-3,4,5,4,'#b7ae8e');line(-2,5,0,5,'#656e60');line(-1,5,-1,7,'#656e60');
+    line(-8,0,0,-5,'#a7ac91');line(0,-5,8,0,'#a7ac91');rect(-1,-6,2,2,'#c4b28b');
+    if(groundAge>=0){
+        const spread=Math.min(1,groundAge/10)*2;
+        line(-5,4,-1-spread,8,'#596957');line(1+spread,8,7,4,'#c0aa82');
+    }
 }
 
 /** World-anchored buildings retain their joinery while joints fail in succession. */
@@ -76,7 +88,7 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
                 pixelLine(c,x+dx,base-24,x+dx+3,base-19,p.light);
             }
         }
-        const bx=x-26+(broken?pose.beamX+(reduced?0:pose.recoil):0),by=base-height+(broken?pose.beamDrop:0),turn=broken?pose.beamTurn:0;
+        const bx=x-26+(broken?pose.beamX:0),by=base-height+(broken?pose.beamDrop:0),turn=broken?pose.beamTurn:0;
         beam(c,bx,by,66,turn,mat,6);
         for(const [j,dx]of [-25,33].entries()){
             const part=j?pose.rightBrace:pose.leftBrace;
@@ -84,28 +96,17 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
                 broken?part.turn:-Math.PI/2+(j?-1:1)*.66,mat,3);
         }
         if(site.kind==='crane'){
-            const sway=reduced?0:Math.sin((broken?Math.min(b.tick,at+pose.score.release):b.tick)/36+i)*1.8;
-            const loadX=x+2+sway,loadY=base-48+(broken?pose.loadDrop:0);
+            const load=pose.suspended!,loadX=x+load.x,loadY=base+load.y;
             const pulleyX=bx+37*Math.cos(turn),pulleyY=by+37*Math.sin(turn);
             oval(c,pulleyX-4,pulleyY-4,9,9,p.dark);oval(c,pulleyX-2,pulleyY-2,5,5,p.light);
-            if(age<pose.score.release){
-                pixelLine(c,pulleyX,pulleyY+3,loadX+11,loadY-5,p.dark);
-                pixelLine(c,loadX+11,loadY-5,loadX+3,loadY,'#a7ac91');
-                pixelLine(c,loadX+11,loadY-5,loadX+19,loadY,'#a7ac91');
-            }else{
-                const ropeX=bx+36*Math.cos(turn),ropeY=by+36*Math.sin(turn);
-                pixelLine(c,ropeX,ropeY,ropeX+4+sway,ropeY+13,p.dark);
-                pixelLine(c,ropeX+4+sway,ropeY+13,ropeX+1+sway,ropeY+18,p.light);
-            }
-            pallet(c,loadX,loadY);
-            if(broken&&age>pose.loadContact){
-                const t=Math.min(18,age-pose.loadContact),spread=Math.sin(t/36*Math.PI)*3;
-                pixelLine(c,loadX+3,loadY+4,loadX+10-spread,loadY+7,p.dark);
-                pixelLine(c,loadX+10+spread,loadY+7,loadX+20,loadY+4,p.light);
-            }
+            const tip:Point=load.released?[pulleyX+Math.sin(load.cableAngle)*22,pulleyY+3+Math.cos(load.cableAngle)*22]:
+                [loadX+Math.sin(load.turn)*5,loadY-Math.cos(load.turn)*5];
+            pixelLine(c,pulleyX,pulleyY+3,...tip,p.dark,2);pixelLine(c,pulleyX+1,pulleyY+3,tip[0]+1,tip[1],p.light);
+            c.save();c.globalAlpha*=.2*Math.max(0,1+load.y/80);oval(c,loadX-14,base-2,28,3,p.dark);c.restore();
+            pallet(c,loadX,loadY,load.turn,load.groundAge);
         }else if(site.kind==='sluice'){
             const drop=broken?pose.panelDrop:0,lean=broken?pose.panelTurn:0;
-            const px=x-17+(broken?pose.beamX*.35:0),py=base-height+9+drop;
+            const px=x-17+(broken?pose.panelX:0),py=base-height+9+drop;
             const a=(u:number,v:number):Point=>[px+u*Math.cos(lean)-v*Math.sin(lean),py+u*Math.sin(lean)+v*Math.cos(lean)];
             polygon(c,[a(0,0),a(46,0),a(46,29),a(0,29)],p.dark);
             polygon(c,[a(2,2),a(44,2),a(44,26),a(2,26)],p.mid);
@@ -119,23 +120,28 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
             }
         }
         if(site.kind==='gantry'){
-            const part=pose.sign,loose=broken&&age>=pose.score.release;
-            const sx=x-6+(loose?part.x:0),sy=base-height+9+(loose?part.drop:0),angle=loose?part.turn:0;
+            const part=pose.suspended!;
+            const sx=x+part.x,sy=base+part.y,angle=part.turn;
             const a=(u:number,v:number):Point=>[sx+u*Math.cos(angle)-v*Math.sin(angle),sy+u*Math.sin(angle)+v*Math.cos(angle)];
-            if(!loose)for(const u of [3,19])pixelLine(c,bx+(20+u)*Math.cos(turn),by+(20+u)*Math.sin(turn)+3,...a(u,0),p.light);
-            polygon(c,[a(0,0),a(22,0),a(22,10),a(0,10)],p.dark);
-            polygon(c,[a(2,1),a(20,1),a(20,8),a(2,8)],'#a8a58b');
-            pixelLine(c,...a(7,3),...a(12,5),p.dark,2);pixelLine(c,...a(12,5),...a(7,7),p.dark,2);
+            for(const u of [-8,8]){
+                const root:Point=[bx+(31+u)*Math.cos(turn)-3*Math.sin(turn),by+(31+u)*Math.sin(turn)+3*Math.cos(turn)];
+                const tip:Point=part.released?[root[0]+Math.sin(part.cableAngle)*6,root[1]+Math.cos(part.cableAngle)*6]:a(u,0);
+                pixelLine(c,...root,...tip,p.light);box(c,root[0],root[1],1,1,p.dark);
+            }
+            polygon(c,[a(-11,0),a(11,0),a(11,10),a(-11,10)],p.dark);
+            polygon(c,[a(-9,1),a(9,1),a(9,8),a(-9,8)],'#a8a58b');
+            pixelLine(c,...a(-4,3),...a(1,5),p.dark,2);pixelLine(c,...a(1,5),...a(-4,7),p.dark,2);
+            for(const u of [-8,8])pixelLine(c,...a(u,1),...a(u,2),p.light);
         }
         if(!broken&&pressure>.2){
             pixelLine(c,x-25,base-25,x-22,base-20,p.light);pixelLine(c,x+35,base-28,x+33,base-22,p.light);
             if(!reduced&&pressure>.65){const t=(b.tick+i)%12;box(c,x-22+t*.4,base-19+t*.6,1,2,p.light);}
         }
-        if(broken&&age>15){
-            const grow=Math.min(1,(age-15)/20);
-            polygon(c,[[x-27,base],[x-18,base-7*grow],[x-4,base-3*grow],[x+3,base-9*grow],[x+22,base],[x+42,base]],p.dark);
-            pixelLine(c,x-18,base-6*grow,x-7,base-2*grow,p.light);
-            if(age>27)beam(c,x-9,base-4,25,-.12,mat,3);
+        // The aftermath consists of the pieces that actually detached. Keep
+        // only the exposed socket scars here; no mound or extra beam appears.
+        if(broken)for(const [j,dx]of [-25,33].entries())if(age>=(j?pose.score.right:pose.score.left)){
+            pixelLine(c,x+dx-1,base-24,x+dx+2,base-20,p.dark,2);
+            pixelLine(c,x+dx+2,base-21,x+dx+5,base-23,p.light);
         }
         c.restore();
         drawChaseStructureEffects(c,x,base,age,site.kind,reduced);
@@ -145,13 +151,12 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
                 box(c,x+dx,base+dy-2,age<31?5:2,2,j%2?'#a6ae96':'#8a9d8e');
             }
         }
-        // A second, low burst belongs to contact with the bank, not to the initial fracture.
-        if(broken&&pose.groundAge>=0&&pose.groundAge<25){
-            const t=pose.groundAge,spread=2+t*.8;
-            for(let j=0;j<(reduced?2:6);j++){
-                const xx=x+9+(j-2)*spread*.55,dy=Math.max(0,(1.2+j%2*.3)*t-.085*t*t);
-                box(c,xx,base-2-dy,j%2?2:3,1,j%2?p.light:p.grain);
-            }
+        // Each burst starts at the actual touching corner, including loads
+        // that have travelled horizontally away from the original support.
+        if(broken){
+            drawChaseLandingDust(c,x+pose.beamContactX,base,pose.groundAge,mat,reduced);
+            if(pose.suspended)drawChaseLandingDust(c,x+pose.suspended.contactX,base,pose.suspended.groundAge,mat,reduced);
+            if(site.kind==='sluice')drawChaseLandingDust(c,x+pose.panelContactX,base,age-pose.panelContact,mat,reduced);
         }
     }
     for(const [i,d]of CHASE_DISTRICTS.entries())if(i&&i!==2){

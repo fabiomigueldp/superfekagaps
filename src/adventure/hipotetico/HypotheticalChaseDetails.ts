@@ -1,5 +1,6 @@
 import { CHASE_GAPS, CHASE_WIDTH } from './HypotheticalLayout';
 import {chaseStructureTiming,type ChaseStructureKind} from './HypotheticalChasePerformance';
+import {chaseSuspensionAt} from './HypotheticalChaseSuspension';
 
 export const CHASE_DECK_Y = 224;
 export const CHASE_WATER_Y = 240;
@@ -28,32 +29,33 @@ export function chaseDeckSpans(pursuerX: number) {
     return spans;
 }
 
-/** Contact hold, two failing joints, then a detached beam and a bouncing load. */
+/** Contact hold, failing joints and rigid pieces share one structural clock. */
 export function chaseRuinAt(age: number,height=78,kind:ChaseStructureKind='crane') {
     const score=chaseStructureTiming(kind),t=Math.max(0,age-score.left),rt=Math.max(0,age-score.right);
     const push=kind==='pier'?2.6:kind==='crane'?2.5:kind==='sluice'?1.35:1.8;
-    const beam=landedPiece(age,score.beam,height,66,4,score.gravity,score.turn,score.turnTime,0,push);
+    const recoil=(at:number)=>at>=0&&at<score.beam?Math.sin(at/score.beam*Math.PI)*1.1:0;
+    const beamAt=(at:number)=>landedPiece(at,score.beam,height,66,4,score.gravity,score.turn,score.turnTime,0,push);
+    const beam=beamAt(age);
     const panel=landedPiece(age,score.panel,height-9,46,29,kind==='sluice'?.08:.07,kind==='sluice'?.4:.65,36);
-    const preload=score.gravity*Math.max(0,score.release-score.beam)**2;
-    const loadTime=Math.max(0,age-score.release),loadLand=Math.sqrt((31-preload)/.09),after=Math.max(0,loadTime-loadLand);
+    const suspended=kind==='crane'||kind==='gantry'?chaseSuspensionAt(kind,age,height,at=>{
+        const b=beamAt(at);return{x:-26+b.x+recoil(at),y:-height+b.drop,turn:b.turn};
+    }):null;
     const leftTurn=ease(t/29)*1.45,rightTurn=ease(rt/33)*1.4;
     return {
         score,
         leftTurn,rightTurn,
         postDrop:Math.min(t*t*.035,22-3.5*Math.sin(leftTurn)),
         rightPostDrop:Math.min(rt*rt*.035,22-3.5*Math.sin(rightTurn)),
-        beamX: beam.x,
+        beamX: beam.x+recoil(age),
         beamDrop: beam.drop,
         beamTurn: beam.turn,
         beamContact:beam.contact,
+        beamContactX:beam.contactX-26,
         groundAge:age-beam.contact,
-        panelDrop:panel.drop,panelTurn:panel.turn,panelContact:panel.contact,
+        panelX:panel.x,panelDrop:panel.drop,panelTurn:panel.turn,panelContact:panel.contact,panelContactX:panel.contactX-17,
         leftBrace:landedPiece(age,score.left,height-29,30,2,.065,.22,32,-Math.PI/2+.66),
         rightBrace:landedPiece(age,score.right,height-29,30,2,.065,-Math.PI+.15,32,-Math.PI/2-.66),
-        sign:landedPiece(age,score.release,height-9,22,10,.07,.95,31,0,2.4),
-        loadDrop:age<score.release?beam.drop:Math.min(31,preload+loadTime*loadTime*.09)-(after<12?Math.sin(after/12*Math.PI)*2:0),
-        loadContact:score.release+loadLand,
-        recoil:age>=0&&age<score.beam?Math.sin(age*1.7)*(1-age/score.beam)*1.5:0,
+        suspended,
         dust: age > 8 && age < 60 ? Math.sin(unit((age - 8) / 52) * Math.PI) : 0,
     };
 }
@@ -70,12 +72,13 @@ function landedPiece(age:number,delay:number,height:number,length:number,depth:n
         for(let i=0;i<18;i++){const m=(lo+hi)/2;if(gravity*m*m+bottom(rotation(m))<height)lo=m;else hi=m;}
         fallTime=(lo+hi)/2;contacts.set(key,fallTime);
     }
-    const contact=fallTime+delay,t=Math.max(0,age-delay),land=Math.max(0,age-contact);
-    if(age<contact)return{x:t*drift,drop:t*t*gravity,turn:rotation(t),contact};
+    const contact=fallTime+delay,t=Math.max(0,age-delay),land=Math.max(0,age-contact),atContact=rotation(fallTime);
+    const contactX=fallTime*drift+(Math.sin(atContact)>=0?length:0)*Math.cos(atContact)-depth*Math.sign(Math.cos(atContact))*Math.sin(atContact);
+    if(age<contact)return{x:t*drift,drop:t*t*gravity,turn:rotation(t),contact,contactX};
     const rest=maxTurn<-Math.PI/2?-Math.PI+.025:.025;
     const turn=rotation(contact-delay)*(1-ease(land/23))+rest*ease(land/23);
     const bounce=land<12?Math.sin(land/12*Math.PI)*2.1:0;
-    return{x:fallTime*drift+(3+drift*8)*ease(land/28),drop:height-bottom(turn)-bounce,turn,contact};
+    return{x:fallTime*drift+(3+drift*8)*ease(land/28),drop:height-bottom(turn)-bounce,turn,contact,contactX};
 }
 
 /** Small fragments inherit an impulse from the struck joint, land once and

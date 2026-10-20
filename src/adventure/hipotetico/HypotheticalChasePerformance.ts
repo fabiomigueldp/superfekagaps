@@ -2,6 +2,7 @@ import {CHASE_BREAKS} from './HypotheticalLayout';
 
 export type ChaseStructureKind=(typeof CHASE_BREAKS)[number]['kind'];
 export type ChaseSound='chase-step'|'chase-wood'|'chase-metal'|'chase-cable';
+export interface ChaseGesture {armSwing:number;armFold:number;reinSag:number;reinFlutter:number}
 export const CHASE_STRIKE_REACH=56;
 const unit=(n:number)=>Math.max(0,Math.min(1,n));
 const ease=(n:number)=>{const t=unit(n);return t*t*(3-2*t);};
@@ -44,7 +45,15 @@ export function chasePerformance(b:Pursuer,reduced=false){
     // gait; the ribcage and seated hips absorb the landing above them.
     const weight=reduced?0:(1-Math.cos(phase*2))*.7*moving;
     const effort=(prepare*1.4+hit*2.1-follow*.8)*strength;
+    const tension=unit(prepare*.8+hit*.9);
+    const gesture:ChaseGesture={
+        armSwing:reduced?0:Math.sin(phase-.45)*.16*moving*(1-prepare*.75),
+        armFold:unit(prepare*.55+hit*.8+follow*.2),
+        reinSag:(2.7+(reduced?0:Math.sin(phase-.4)*.35*moving))*(1-tension),
+        reinFlutter:reduced?0:Math.sin(phase*2-.8)*.5*moving*(1-tension),
+    };
     return {site,kind,prepare,hit,follow,settle,framing,
+        gesture,
         compression:weight+effort,
         neckDrop:(prepare*3.8+hit*4.3-follow*2.4)*strength+(reduced?0:Math.sin(phase*2-.6)*.65*moving),
         headPitch:(prepare*.075-hit*.08+follow*.055)*strength+(reduced?0:Math.sin(phase-.5)*.016*moving),

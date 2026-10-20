@@ -1,6 +1,6 @@
 import { drawGunMuzzle, drawGunTracer, drawGunImpact, drawGunCasing } from './HypotheticalGunfire';
 import {drawChaseCollapse,drawChaseWave} from './HypotheticalChaseArt';
-import {chasePerformance} from './HypotheticalChasePerformance';
+import {chasePerformance,type ChaseGesture} from './HypotheticalChasePerformance';
 import {drawChaseFootfall} from './HypotheticalChaseImpactArt';
 import { box, oval, pixelLine, polygon, type Point } from '../WorldPainting';
 import { pixelText } from '../../graphics/BitmapFont';
@@ -29,7 +29,7 @@ const P = { ink: '#172c36', deep: '#263f3d', shade: '#556047', hide: '#92845a', 
     suit: '#304659', lapel: '#607487', skin: '#c58d68', face: '#edbc8e', hair: '#3c3034',
     brass: '#d3a75c', mint: '#99e0cf', hot: '#ffb267', scute:'#6e7953', skinLight:'#f7d2a6',
     mouth:'#593b40', tongue:'#bc796a', leather:'#583f38', stitch:'#b8885d', clothShade:'#203644' };
-export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; headPitch?:number; jawHinge?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; swallow?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet }
+export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; headPitch?:number; jawHinge?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; swallow?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet; chaseGesture?:ChaseGesture }
 const fogPalette=new Map<string,string>();
 function distantColor(color:string){
     if(!fogPalette.has(color)){
@@ -156,6 +156,21 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
         const length=Math.max(.01,Math.hypot(b[0]-a[0],b[1]-a[1])),nx=(b[1]-a[1])/length,ny=(a[0]-b[0])/length;
         poly([[a[0]+nx*ra,a[1]+ny*ra],[b[0]+nx*rb,b[1]+ny*rb],[b[0]-nx*rb,b[1]-ny*rb],[a[0]-nx*ra,a[1]-ny*ra]],color);
     };
+    const forelimb=(rear:boolean)=>{
+        const g=pose.chaseGesture!;
+        const swing=g.armSwing*(rear?-1:1),upper=1.04+swing+g.armFold*.45,lower=-.24+swing*.3-g.armFold*.85;
+        const shoulder:Point=[rear?23:27,body+(rear?4:-2)];
+        const elbow:Point=[shoulder[0]+Math.cos(upper)*10,shoulder[1]+Math.sin(upper)*10];
+        const wrist:Point=[elbow[0]+Math.cos(lower)*10,elbow[1]+Math.sin(lower)*10];
+        bone(shoulder,elbow,3,2.5,P.ink);bone(elbow,wrist,2.5,1.7,P.ink);
+        bone(shoulder,elbow,1.7,1.3,rear?P.shade:P.light);bone(elbow,wrist,1.5,.8,rear?P.shade:P.hide);
+        ell(elbow[0]-1,elbow[1]-1,3,3,rear?P.deep:P.scute);
+        for(let claw=0;claw<2;claw++){
+            const curl=lower+.9+claw*.3+g.armFold*.3,ox=wrist[0]-claw*2,oy=wrist[1]+claw;
+            line(ox,oy,ox+Math.cos(curl)*4,oy+Math.sin(curl)*4,P.ink,2);
+            line(ox,oy,ox+Math.cos(curl)*3,oy+Math.sin(curl)*3,rear?P.light:P.ivory);
+        }
+    };
     const leg = (rear:boolean) => {
         const {hip,knee,hock,foot}=dinosaurLeg(body,pose.gait,rear,(1-bow)*pose.stride,pose.tuck,pose.brace,pose.feet?.[rear?0:1]);
         const shade=rear?P.deep:P.shade,hide=rear?P.shade:P.hide;
@@ -193,6 +208,7 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
         line(tx,ty-3,tx+3,ty+2-i*.4,P.scute,2);rect(tx-1,ty-3,2,1,P.light);
     }
     leg(true);
+    if(pose.chaseGesture)forelimb(true);
     ell(-31,body-13,65,42,P.ink); ell(-28,body-11,59,37,pose.flash ? P.cream : P.hide);
     ell(-21,body-9,45,19,P.light); ell(-22,body+5,49,19,P.shade);
     poly([[-26,body-1],[-20,body-8],[-9,body-10],[-5,body-6],[-14,body-2],[-19,body+8],[-25,body+11]],'#a7966c');
@@ -261,8 +277,11 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     line(44,neck-10,49,neck-9,P.scute,2);line(49,neck-9,55,neck-8+(pose.focus??0),P.shade,2);
     rect(62,neck-4,3,2,P.ink);rect(61,neck-5,3,1,P.light);
     skull=false;
-    line(27,body-2,32,body+8,P.ink,5);line(29,body-2,33,body+7,P.light,2);
-    line(33,body+7,42,body+5,P.hide,3);line(40,body+5,44,body+9,P.ivory);
+    if(pose.chaseGesture)forelimb(false);
+    else{
+        line(27,body-2,32,body+8,P.ink,5);line(29,body-2,33,body+7,P.light,2);
+        line(33,body+7,42,body+5,P.hide,3);line(40,body+5,44,body+9,P.ivory);
+    }
     leg(false);
     // Leather girth, riveted saddle and the breakable brass fasteners.
     const saddle = -64 + bow*39 + pose.compression;
@@ -374,7 +393,20 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     const grip=gp(18-pose.reload*6,3+pose.reload*9),rein=pose.rein??0;
     const hand:Point=[grip[0]*(1-rein)+(14-r)*rein,grip[1]*(1-rein)+(rider-2)*rein];
     const elbow:Point=[16-r-rein*8+riderBend(12,lean),rider-12+pose.reload*5];
-    if(rein>.05){const loop=headPoint([28,neck+4]);line(...hand,...loop,P.ink,2);line(...hand,...loop,P.rust);line(...loop,...buckle,P.rust);}
+    if(rein>.05){
+        const loop=headPoint([28,neck+4]),g=pose.chaseGesture;
+        // Slack belongs to the cord between the actual grip and bridle. It
+        // tightens during anticipation, then relaxes as the rider recovers.
+        if(g){
+            const points:Point[]=Array.from({length:7},(_,i)=>{
+                const t=i/6,s=Math.sin(t*Math.PI);
+                return[hand[0]+(loop[0]-hand[0])*t+g.reinFlutter*s,hand[1]+(loop[1]-hand[1])*t+g.reinSag*s];
+            });
+            for(let i=1;i<points.length;i++)line(...points[i-1],...points[i],P.ink,2);
+            for(let i=1;i<points.length;i++)line(...points[i-1],...points[i],P.rust);
+        }else{line(...hand,...loop,P.ink,2);line(...hand,...loop,P.rust);}
+        line(...loop,...buckle,P.rust);
+    }
     line(6-r+riderBend(20,lean),rider-20,...elbow,P.suit,5);line(...elbow,...hand,P.suit,4);ell(hand[0]-1,hand[1]-2,5,4,P.face);
     line(...gp(6,4),...gp(7,6),P.face,2);
     }
@@ -388,16 +420,17 @@ export function dinosaurPose(b: HypotheticalModel, cx: number, cy: number, reduc
     const m=hypotheticalMotion(b);
     const pursuit=b.act==='chase'?chasePerformance(b,reduced):null;
     const activeTail=b.attack==='tail'&&['tell','attack'].includes(b.state);
-    const focus=b.state==='tell'?smoothMotion(b.age/b.warningTicks):b.state==='attack'?1:0;
+    const focus=Math.max(b.state==='tell'?smoothMotion(b.age/b.warningTicks):b.state==='attack'?1:0,pursuit?.prepare??0);
     return { x: b.x-cx, y:b.y-cy, facing:b.visualFacing, pivot:b.pivot, gait:b.travel/11,
-        ...m, breath:reduced?0:Math.sin(b.tick/13)*.6, bow:b.bow,
+        ...m, breath:reduced||pursuit?0:Math.sin(b.tick/13)*.6, bow:b.bow,
         tail:reduced||activeTail||pursuit?m.tail:m.tail+(1-b.bow)*(Math.sin(b.tick/22)*.025-m.tuck*.08),
         headPitch:pursuit?.headPitch,jawHinge:pursuit?Math.min(.4,pursuit.jawHinge+m.jaw*.32):undefined,
         aim:b.weaponAngle,
         armor:b.health,heat:b.heat,cloth:reduced?0:Math.min(5,Math.abs(b.motionSpeed)*.7)+Math.sin(b.travel/11-.8)*m.stride*.9+Math.sin(b.tick/9)*.25+(pursuit?.cloth??0),
-        focus,eyeClose:!reduced&&b.state==='rest'&&b.tick%137<4?1:0,
+        chaseGesture:pursuit?.gesture,
+        focus,eyeClose:(pursuit?.hit??0)>.9||!reduced&&b.state==='rest'&&b.tick%137<4?1:0,
         voice:b.state==='roar'?Math.max(0,Math.sin(b.age/9))*(1-smoothMotion((b.age-75)/30)):0,
-        blink:b.state==='rest'&&b.tick%160<4,daze:reduced?0:b.age/14,
+        blink:(pursuit?.hit??0)>.92||b.state==='rest'&&b.tick%160<4,daze:reduced?0:b.age/14,
         flash:b.state==='hurt'&&b.age<12, defeated:b.won };
 }
 

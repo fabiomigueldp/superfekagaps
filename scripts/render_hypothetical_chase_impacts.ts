@@ -10,7 +10,8 @@ import {WorldLevel} from '../src/adventure/WorldPhysics';
 import {drawHypotheticalBackground,drawHypotheticalTerrain,drawHypotheticalCombat,drawHypotheticalDinosaur,dinosaurPose} from '../src/adventure/hipotetico/HypotheticalArt';
 import {CHASE_BREAKS} from '../src/adventure/hipotetico/HypotheticalLayout';
 import {CHASE_STRIKE_REACH,chasePerformance} from '../src/adventure/hipotetico/HypotheticalChasePerformance';
-import {chaseCollapsedEdge} from '../src/adventure/hipotetico/HypotheticalChaseDetails';
+import {chaseCollapsedEdge,chaseRuinAt} from '../src/adventure/hipotetico/HypotheticalChaseDetails';
+import {drawChaseLandmarks} from '../src/adventure/hipotetico/HypotheticalChaseArt';
 import {pixelText} from '../src/graphics/BitmapFont';
 import {dinosaurFootAnchor} from '../src/adventure/hipotetico/HypotheticalMotion';
 
@@ -22,8 +23,10 @@ h.document.createElement=((tag:string)=>tag==='canvas'?createCanvas(1,1):create(
 const screen=createCanvas(320,180),c=screen.getContext('2d');c.imageSmoothingEnabled=false;
 const film=createCanvas(960,588),fc=film.getContext('2d');fc.imageSmoothingEnabled=false;
 const board=createCanvas(1280,816),bc=board.getContext('2d');bc.imageSmoothingEnabled=false;
-const poses=createCanvas(1280,408),pc=poses.getContext('2d');pc.imageSmoothingEnabled=false;
-bc.fillStyle=pc.fillStyle='#122830';bc.fillRect(0,0,1280,816);pc.fillRect(0,0,1280,408);
+const poses=createCanvas(1440,408),pc=poses.getContext('2d');pc.imageSmoothingEnabled=false;
+const joints=createCanvas(1792,528),jc=joints.getContext('2d');jc.imageSmoothingEnabled=false;
+jc.fillStyle='#122830';jc.fillRect(0,0,1792,528);
+bc.fillStyle=pc.fillStyle='#122830';bc.fillRect(0,0,1280,816);pc.fillRect(0,0,1440,408);
 const scenes=[{index:0,name:'madeira'},{index:1,name:'guindaste'},{index:3,name:'comporta'},{index:5,name:'portico'}];
 let movieFrame=0;
 const records:object[]=[];
@@ -69,11 +72,11 @@ try{
                 pixelText(bc,scene.name.toUpperCase()+' / '+['PREPARAR','CONTATO','QUEDA','PASSAGEM'][column],x+7,y+8,'#e2c28b');
                 records.push({file,age,cameraX:cx,bossX:b.x});
                 if(row===1){
-                    pc.fillStyle='#263f48';pc.fillRect(column*320,28,320,360);
+                    pc.fillStyle='#263f48';pc.fillRect(column*360,28,360,360);
                     const pose=dinosaurPose(b,b.x-150,64);
                     const sprite=createCanvas(320,180),sc=sprite.getContext('2d');sc.imageSmoothingEnabled=false;
-                    drawHypotheticalDinosaur(sc,pose);pc.drawImage(sprite,60,24,160,150,column*320,48,320,300);
-                    pixelText(pc,['ANTECIPACAO','IMPACTO','REACAO','RETOMADA'][column],column*320+8,12,'#e2c28b',2);
+                    drawHypotheticalDinosaur(sc,pose);pc.drawImage(sprite,52,24,180,150,column*360,48,360,300);
+                    pixelText(pc,['ANTECIPACAO','IMPACTO','REACAO','RETOMADA'][column],column*360+8,12,'#e2c28b',2);
                 }
                 if(column===1){paint(true);writeFileSync(join(out,scene.name+'-reduced.png'),screen.toBuffer('image/png'));}
             }
@@ -93,8 +96,37 @@ try{
         pixelText(fc,'ESTUDO DE POSE EM MOVIMENTO / SEM COMBATE',14,34,'#afc1b5');
         writeFileSync(join(out,'frames',String(movieFrame++).padStart(5,'0')+'.png'),film.toBuffer('image/png'));
     }
+    // Isolated structural plates reveal attachments that the running actor
+    // intentionally occludes in the complete scene. Timelines are directed.
+    for(const [row,index]of [1,5].entries()){
+        const site=CHASE_BREAKS[index],b=new HypotheticalModel('chase'),height=site.kind==='crane'?78:69;
+        const ruin=chaseRuinAt(0,height,site.kind),s=ruin.suspended!,name=row===0?'guindaste':'portico';
+        const ages=[ruin.score.release-1,ruin.score.release,Math.ceil(s.contact),Math.ceil(s.contact)+30];
+        for(let frame=0;frame<120;frame++){
+            const age=frame-24;b.tick=720+frame;b.x=site.x-CHASE_STRIKE_REACH+age*3.5;
+            b.chaseBreaks=CHASE_BREAKS.map((_,i)=>i<index?-1000:i===index&&age>=0?744:-1);
+            c.fillStyle='#263f48';c.fillRect(0,0,320,180);
+            c.fillStyle='#365b60';c.fillRect(0,158,320,22);c.fillStyle='#78998c';c.fillRect(0,157,320,1);
+            drawChaseLandmarks(c,b,site.x-55,64,false);
+            const column=ages.indexOf(age);
+            if(column>=0){
+                const file=name+'-junta-'+column+'.png';writeFileSync(join(out,file),screen.toBuffer('image/png'));
+                jc.drawImage(screen,0,64,224,112,column*448,row*264+32,448,224);
+                pixelText(jc,name.toUpperCase()+' / '+['LIGADA','RUPTURA','CONTATO','REPOUSO'][column],column*448+10,row*264+10,'#e2c28b',2);
+                records.push({file,age,detail:true,contact:s.contact});
+            }
+            if(!stills&&frame%2===0){
+                fc.fillStyle='#122830';fc.fillRect(0,0,960,588);fc.drawImage(screen,0,48,960,540);
+                pixelText(fc,name.toUpperCase()+' / SUSPENSAO - RUPTURA - INERCIA - CONTATO',14,11,'#e2c28b',2);
+                pixelText(fc,'ESTUDO ISOLADO DA ESTRUTURA / SEM PERSONAGEM OU COMBATE',14,34,'#afc1b5');
+                writeFileSync(join(out,'frames',String(movieFrame++).padStart(5,'0')+'.png'),film.toBuffer('image/png'));
+            }
+        }
+        console.log('Composed suspension '+name);
+    }
     writeFileSync(join(out,'chase-impacts.png'),board.toBuffer('image/png'));
     writeFileSync(join(out,'rider-motion.png'),poses.toBuffer('image/png'));
+    writeFileSync(join(out,'suspension-motion.png'),joints.toBuffer('image/png'));
     writeFileSync(join(out,'art-study.json'),JSON.stringify({kind:'directed native chase animation',fps:30,frames:movieFrame,
         gameplay:false,browser:false,audio:false,records,
         scope:'Authored positions, fracture ages and terrain masks; native motion, destruction, geometry, particles and framing. No gameplay validation.'},null,2));

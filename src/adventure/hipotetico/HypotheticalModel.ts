@@ -372,7 +372,7 @@ export class HypotheticalModel {
             const at=this.chaseBreaks[i];if(at<0)continue;
             const age=this.tick-at,pose=chaseRuinAt(age,site.kind==='crane'?78:site.kind==='sluice'?58:69,site.kind),contact=pose.beamContact;
             if(age>=contact&&age-1<contact)this.emit('debris-land');
-            const secondary=site.kind==='crane'?pose.loadContact:site.kind==='sluice'?pose.panelContact:site.kind==='gantry'?pose.sign.contact:-1;
+            const secondary=site.kind==='sluice'?pose.panelContact:pose.suspended?.contact??-1;
             if(secondary>=0&&age>=secondary&&age-1<secondary)this.emit(site.kind==='crane'?'chase-wood':'chase-metal');
             if(site.kind==='crane'&&age===chaseStructureTiming(site.kind).release)this.emit('chase-cable');
         }
