@@ -33,7 +33,7 @@ const P = { ink: '#172c36', deep: '#263f3d', shade: '#556047', hide: '#92845a', 
     suit: '#304659', lapel: '#607487', skin: '#c58d68', face: '#edbc8e', hair: '#3c3034',
     brass: '#d3a75c', mint: '#99e0cf', hot: '#ffb267', scute:'#6e7953', skinLight:'#f7d2a6',
     mouth:'#593b40', tongue:'#bc796a', leather:'#583f38', stitch:'#b8885d', clothShade:'#203644' };
-export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; headPitch?:number; jawHinge?:number; riderDrop?:number; riderLean?:number; riderHeadTilt?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; swallow?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet; chaseGesture?:ChaseGesture; capturedHero?:HeldHero; captureApproach?:CapturedHeroPose; captureDetail?:number }
+export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; headPitch?:number; jawHinge?:number; riderDrop?:number; riderLean?:number; riderHeadTilt?:number; tailTip?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; swallow?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet; chaseGesture?:ChaseGesture; capturedHero?:HeldHero; captureApproach?:CapturedHeroPose; captureDetail?:number }
 const fogPalette=new Map<string,string>();
 function distantColor(color:string){
     if(!fogPalette.has(color)){
@@ -208,7 +208,7 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
             poly([[toe,fy-5],[toe+3,fy-4],[toe+4,fy-2],[toe,fy-2]],rear?P.light:P.ivory);
         }
     };
-    const [root, bend, tip] = dinosaurTail(body-bob,pose.tail);
+    const [root, bend, tip] = dinosaurTail(body-bob,pose.tail,pose.tailTip);
     // The same tapered distal section supplies the collision samples.
     poly([[root[0]+4,root[1]-12],[bend[0],bend[1]-7],[tip[0]-3,tip[1]-2],[tip[0],tip[1]+4],[bend[0],bend[1]+6],[root[0]+6,root[1]+9]],P.ink);
     poly([[root[0]+2,root[1]-8],[bend[0],bend[1]-4],[tip[0]+1,tip[1]],[bend[0],bend[1]+3],[root[0]+4,root[1]+5]],P.hide);
@@ -472,9 +472,10 @@ export function dinosaurPose(b: HypotheticalModel, cx: number, cy: number, reduc
     return { x: b.x-cx, y:b.y-cy, facing:b.visualFacing, pivot:b.pivot, gait:b.travel/11,
         ...m, breath:reduced||pursuit?0:Math.sin(b.tick/13)*.6, bow:b.bow,
         tail:reduced||activeTail||pursuit?m.tail:m.tail+(1-b.bow)*(Math.sin(b.tick/22)*.025-m.tuck*.08),
+        tailTip:pursuit?m.tail+pursuit.tailTip-pursuit.tail:undefined,
         headPitch:pursuit?pursuit.headPitch+course!.headPitch:undefined,jawHinge:pursuit?Math.min(.4,pursuit.jawHinge+m.jaw*.32):undefined,
         feet:pursuit?b.course.feet(b.travel/11,(1-b.bow)*m.stride,b.x):undefined,
-        riderHeadTilt:course?.headTilt,
+        riderHeadTilt:pursuit?pursuit.headTilt+course!.headTilt:undefined,
         aim:b.weaponAngle,
         armor:b.health,heat:b.heat,cloth:reduced?0:Math.min(5,Math.abs(b.motionSpeed)*.7)+Math.sin(b.travel/11-.8)*m.stride*.9+Math.sin(b.tick/9)*.25+(pursuit?.cloth??0),
         chaseGesture:pursuit?{...pursuit.gesture,armFold:Math.max(pursuit.gesture.armFold,course!.tuck*.65),

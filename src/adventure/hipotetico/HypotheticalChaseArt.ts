@@ -5,6 +5,7 @@ import {CHASE_BREAKS,CHASE_CHECKPOINTS,CHASE_DISTRICTS} from './HypotheticalLayo
 import {chaseRuinAt,chaseDebrisAt,chaseMaterialAt,chaseTerraceFeet,chaseTerraceFall,chaseSplashAt,CHASE_DECK_Y,CHASE_WATER_Y,type ChaseMaterial,type ChaseTerrace} from './HypotheticalChaseDetails';
 import {drawChaseStructureEffects,drawChaseLandingDust,drawChaseApproachEffects} from './HypotheticalChaseImpactArt';
 import {drawChaseCargoDeck} from './HypotheticalChaseSetpieceArt';
+import {CHASE_FIRST_SUPPORT,chaseStrikeX} from './HypotheticalChasePerformance';
 
 const materials = {
     stone: {dark:'#586e72',mid:'#8b9990',light:'#b8b499',grain:'#77877f'},
@@ -65,11 +66,11 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
         const x=site.x-cx;if(x<-160||x>410)continue;
         const at=b.chaseBreaks[i],age=at===-1?-1:b.tick-at,broken=age>=0;
         const alert=b.chaseAlerts[i],approach=alert===-1?-1:b.tick-alert;
-        const pressure=Math.max(0,Math.min(1,(b.x+96-site.x)/40));
+        const pressure=Math.max(0,Math.min(1,(b.x+96-chaseStrikeX(site))/40));
         const metal=site.kind==='gantry'||site.kind==='sluice',mat:ChaseMaterial=metal?'iron':'timber',p=materials[mat];
         const height=site.kind==='crane'?78:site.kind==='sluice'?58:69,pose=chaseRuinAt(age,height,site.kind);
         // Footings descend into the near bank; pale playable edges belong to the deck below.
-        for(const dx of [-25,33]){
+        for(const dx of [CHASE_FIRST_SUPPORT-2,33]){
             // These separate quay piles remain visible when the foreground deck tears away.
             box(c,x+dx-3,base-2,10,CHASE_WATER_Y-cy-base+2,'#4e7476');
             box(c,x+dx-2,base,2,CHASE_WATER_Y-cy-base,'#82978b');
@@ -86,8 +87,10 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
             box(c,x+39,base-4,9,4,p.light);box(c,x+38,base-29,3,5,p.mid);
         }
         c.save();c.beginPath();c.rect(x-64,base-height-9,260,height+10);c.clip();
-        for(const [j,dx]of [-25,33].entries()){
-            if(!broken)beam(c,x+dx+2,base-6,height-6,-Math.PI/2,mat);
+        for(const [j,dx]of [CHASE_FIRST_SUPPORT-2,33].entries()){
+            // Each post stays whole until its own joint yields. A contact with
+            // the first support cannot pre-cut the far side of the assembly.
+            if(!broken||age<(j?pose.score.right:pose.score.left))beam(c,x+dx+2,base-6,height-6,-Math.PI/2,mat);
             else{
                 beam(c,x+dx+2,base-6,16,-Math.PI/2,mat);
                 const turn=j?pose.rightTurn:pose.leftTurn;
@@ -95,10 +98,11 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
                 pixelLine(c,x+dx,base-24,x+dx+3,base-19,p.light);
             }
         }
-        const tremor=reduced||approach<0||broken?0:Math.sin(approach*.7)*Math.exp(-approach/25)*.8;
-        const bx=x-26+(broken?pose.beamX:tremor),by=base-height+(broken?pose.beamDrop:0),turn=broken?pose.beamTurn:0;
+        // The beam and its suspended load use the same rigid pose. A separate
+        // camera-time tremor would slide the pulley away from the cable.
+        const bx=x-26+pose.beamX,by=base-height+pose.beamDrop,turn=pose.beamTurn;
         beam(c,bx,by,66,turn,mat,6);
-        for(const [j,dx]of [-25,33].entries()){
+        for(const [j,dx]of [CHASE_FIRST_SUPPORT-2,33].entries()){
             const part=j?pose.rightBrace:pose.leftBrace;
             beam(c,x+dx+2+(broken?part.x:0),base-height+29+(broken?part.drop:0),30,
                 broken?part.turn:-Math.PI/2+(j?-1:1)*.66,mat,3);
@@ -142,11 +146,17 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
             for(const u of [-8,8])pixelLine(c,...a(u,1),...a(u,2),p.light);
         }
         if(!broken&&pressure>.2){
-            pixelLine(c,x-25,base-25,x-22,base-20,p.light);pixelLine(c,x+35,base-28,x+33,base-22,p.light);
+            // Strain lives at the binding, with a fine split progressing into
+            // the grain. It does not flash a whole structure or the escape path.
+            const split=Math.floor(pressure*7),joint=x+CHASE_FIRST_SUPPORT;
+            pixelLine(c,joint-2,base-27,joint+1,base-24,p.dark);
+            pixelLine(c,joint+1,base-24,joint,base-24+split,p.dark);
+            pixelLine(c,joint+2,base-25,joint+2,base-22+split*.5,p.light);
+            if(metal){box(c,joint-3,base-28,7,2,p.dark);box(c,joint-2,base-28,1,1,p.light);}
         }
         // The aftermath consists of the pieces that actually detached. Keep
         // only the exposed socket scars here; no mound or extra beam appears.
-        if(broken)for(const [j,dx]of [-25,33].entries())if(age>=(j?pose.score.right:pose.score.left)){
+        if(broken)for(const [j,dx]of [CHASE_FIRST_SUPPORT-2,33].entries())if(age>=(j?pose.score.right:pose.score.left)){
             pixelLine(c,x+dx-1,base-24,x+dx+2,base-20,p.dark,2);
             pixelLine(c,x+dx+2,base-21,x+dx+5,base-23,p.light);
         }

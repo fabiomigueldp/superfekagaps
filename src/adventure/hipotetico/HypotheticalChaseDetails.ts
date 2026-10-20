@@ -78,7 +78,12 @@ function landedPiece(age:number,delay:number,height:number,length:number,depth:n
     const rest=maxTurn<-Math.PI/2?-Math.PI+.025:.025;
     const turn=rotation(contact-delay)*(1-ease(land/23))+rest*ease(land/23);
     const bounce=land<12?Math.sin(land/12*Math.PI)*2.1:0;
-    return{x:fallTime*drift+(3+drift*8)*ease(land/28),drop:height-bottom(turn)-bounce,turn,contact,contactX};
+    // Rotate around the touching corner, not around the airborne origin.
+    // Keep its identity throughout the tip; a short residual slide dissipates
+    // the horizontal impulse without dragging the whole beam across the bank.
+    const u=Math.sin(atContact)>=0?length:0,v=depth*Math.sign(Math.cos(atContact));
+    const cornerX=u*Math.cos(turn)-v*Math.sin(turn),slide=(1.5+drift*4)*ease(land/24);
+    return{x:contactX-cornerX+slide,drop:height-bottom(turn)-bounce,turn,contact,contactX};
 }
 
 /** Small fragments inherit an impulse from the struck joint, land once and

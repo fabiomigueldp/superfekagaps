@@ -17,6 +17,7 @@ import {hypotheticalMotion,smoothMotion,dinosaurFootAnchor} from '../src/adventu
 import {CHASE_BREAKS,CHASE_FALLEN_DECKS,CHASE_LEAP,CHASE_PATROLS,CHASE_PORTICO} from '../src/adventure/hipotetico/HypotheticalLayout';
 import {CHASE_QUAYS} from '../src/adventure/hipotetico/HypotheticalChaseLife';
 import {chaseCollapsedEdge} from '../src/adventure/hipotetico/HypotheticalChaseDetails';
+import {CHASE_STRIKE_REACH,chaseStrikeX} from '../src/adventure/hipotetico/HypotheticalChasePerformance';
 import {pixelText} from '../src/graphics/BitmapFont';
 
 const [destination,canvasModule,frameDestination]=process.argv.slice(2);
@@ -46,8 +47,8 @@ function paint(s:Scene,cx:number,patrol?:HypotheticalChasePatrol,reduced=false){
     for(const [i,d]of CHASE_FALLEN_DECKS.entries())if(b.course.fallenDeck(i).ready&&d.x>=edge*16)
         objects.bodies.push(...new WorldObjects([{...d,kind:'support'}]).bodies);
     level.bodies=objects.bodies;
-    b.chaseBreaks=CHASE_BREAKS.map(site=>site.x>b.x+56?-1:b.tick-Math.floor((b.x+56-site.x)/3.5));
-    b.chaseAlerts=CHASE_BREAKS.map(site=>site.x>b.x+128?-1:b.tick-Math.floor((b.x+128-site.x)/3.5));
+    b.chaseBreaks=CHASE_BREAKS.map(site=>chaseStrikeX(site)>b.x+CHASE_STRIKE_REACH?-1:b.tick-Math.floor((b.x+CHASE_STRIKE_REACH-chaseStrikeX(site))/3.5));
+    b.chaseAlerts=CHASE_BREAKS.map(site=>chaseStrikeX(site)>b.x+128?-1:b.tick-Math.floor((b.x+128-chaseStrikeX(site))/3.5));
     b.chaseReactions=CHASE_QUAYS.map(site=>site.x>b.x+210?-1:b.tick-Math.floor((b.x+210-site.x)/3.5));
     drawHypotheticalBackground(c,b,cx,64,reduced);drawHypotheticalTerrain(c,level,b,cx,64);
     drawHypotheticalObjects(c,objects,b,cx,64,reduced);

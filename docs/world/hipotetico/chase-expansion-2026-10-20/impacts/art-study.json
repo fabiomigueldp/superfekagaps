@@ -1,0 +1,180 @@
+{
+  "kind": "directed native chase animation",
+  "fps": 30,
+  "frames": 495,
+  "revision": "support-contact-3",
+  "gameplay": false,
+  "browser": false,
+  "audio": false,
+  "records": [
+    {
+      "file": "madeira-0.png",
+      "age": -7,
+      "cameraX": 822.2535722450846,
+      "bossX": 872.5
+    },
+    {
+      "file": "madeira-1.png",
+      "age": 0,
+      "cameraX": 839,
+      "bossX": 897
+    },
+    {
+      "file": "madeira-2.png",
+      "age": 16,
+      "cameraX": 895.2021484375,
+      "bossX": 953
+    },
+    {
+      "file": "madeira-3.png",
+      "age": 40,
+      "cameraX": 995.3388671875,
+      "bossX": 1037
+    },
+    {
+      "file": "guindaste-0.png",
+      "age": -7,
+      "cameraX": 1398.2535722450846,
+      "bossX": 1448.5
+    },
+    {
+      "file": "rider-motion.png",
+      "column": 0,
+      "age": -7,
+      "isolatedActor": true
+    },
+    {
+      "file": "guindaste-1.png",
+      "age": 0,
+      "cameraX": 1415,
+      "bossX": 1473
+    },
+    {
+      "file": "rider-motion.png",
+      "column": 1,
+      "age": 4,
+      "isolatedActor": true
+    },
+    {
+      "file": "rider-motion.png",
+      "column": 2,
+      "age": 15,
+      "isolatedActor": true
+    },
+    {
+      "file": "guindaste-2.png",
+      "age": 16,
+      "cameraX": 1471,
+      "bossX": 1529
+    },
+    {
+      "file": "guindaste-3.png",
+      "age": 40,
+      "cameraX": 1569.5294189453125,
+      "bossX": 1613
+    },
+    {
+      "file": "rider-motion.png",
+      "column": 3,
+      "age": 45,
+      "isolatedActor": true
+    },
+    {
+      "file": "comporta-0.png",
+      "age": -7,
+      "cameraX": 3502.253572245085,
+      "bossX": 3552.5
+    },
+    {
+      "file": "comporta-1.png",
+      "age": 0,
+      "cameraX": 3519,
+      "bossX": 3577
+    },
+    {
+      "file": "comporta-2.png",
+      "age": 16,
+      "cameraX": 3575,
+      "bossX": 3633
+    },
+    {
+      "file": "comporta-3.png",
+      "age": 40,
+      "cameraX": 3672.8251953125,
+      "bossX": 3717
+    },
+    {
+      "file": "portico-0.png",
+      "age": -7,
+      "cameraX": 6942.253572245085,
+      "bossX": 6992.5
+    },
+    {
+      "file": "portico-1.png",
+      "age": 0,
+      "cameraX": 6959,
+      "bossX": 7017
+    },
+    {
+      "file": "portico-2.png",
+      "age": 16,
+      "cameraX": 7015,
+      "bossX": 7073
+    },
+    {
+      "file": "portico-3.png",
+      "age": 40,
+      "cameraX": 7111.3046875,
+      "bossX": 7157
+    },
+    {
+      "file": "guindaste-junta-0.png",
+      "age": 12,
+      "detail": true,
+      "contact": 24.559600830078125
+    },
+    {
+      "file": "guindaste-junta-1.png",
+      "age": 13,
+      "detail": true,
+      "contact": 24.559600830078125
+    },
+    {
+      "file": "guindaste-junta-2.png",
+      "age": 25,
+      "detail": true,
+      "contact": 24.559600830078125
+    },
+    {
+      "file": "guindaste-junta-3.png",
+      "age": 55,
+      "detail": true,
+      "contact": 24.559600830078125
+    },
+    {
+      "file": "portico-junta-0.png",
+      "age": 15,
+      "detail": true,
+      "contact": 35.018402099609375
+    },
+    {
+      "file": "portico-junta-1.png",
+      "age": 16,
+      "detail": true,
+      "contact": 35.018402099609375
+    },
+    {
+      "file": "portico-junta-2.png",
+      "age": 36,
+      "detail": true,
+      "contact": 35.018402099609375
+    },
+    {
+      "file": "portico-junta-3.png",
+      "age": 66,
+      "detail": true,
+      "contact": 35.018402099609375
+    }
+  ],
+  "scope": "Authored positions, fracture ages and terrain masks; native motion, destruction, geometry, particles and framing. No gameplay validation."
+}

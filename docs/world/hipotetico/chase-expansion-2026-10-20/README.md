@@ -105,6 +105,47 @@ Esses ajustes aumentam a pressão da água e encurtam um pouco o voo do
 perseguidor. São parâmetros de projeto, ainda sem comprovação por partida
 ou avaliação de jogadores nesta revisão.
 
+## Terceira passagem: contato com as estruturas e reação do corpo
+
+- **Primeiro apoio:** `chaseStrikeX` usa o montante de entrada, 23 px antes do
+  centro do conjunto. Preparação, aviso, ruptura e reconstrução de checkpoint
+  consultam esse mesmo marco. Antes, a cabeça atravessava esse apoio antes de
+  começar a quebra. O alcance continua em 56 px à frente do corpo.
+- **Peso por material:** a compressão máxima acompanha a falha do primeiro
+  encaixe; a recuperação do pescoço segue a liberação da viga. Madeira,
+  guindaste, comporta e pórtico usam a ordem de ruptura própria de cada conjunto.
+  O avanço perde brevemente uma fração do impulso e se recupera de forma
+  limitada, mantendo o controle de distância da perseguição.
+- **Movimento secundário:** tronco, cabeça do cavaleiro, roupa, rédeas e ponta
+  da cauda têm respostas defasadas. `dinosaurTail` aceita uma articulação distal
+  independente nesta animação; as poses anteriores continuam usando seu
+  parâmetro padrão.
+- **Textura e partículas:** as fissuras progridem na união do apoio; lascas ou
+  pequenas peças de metal saem da altura do contato, percorrem um arco, rebatem
+  e repousam. A névoa local se dissipa rapidamente. Cada montante fica inteiro
+  até seu próprio instante de ruptura, e o som do segundo encaixe acompanha
+  essa separação. A viga e o cabo usam a mesma pose, sem um tremor isolado que
+  deslocava a polia.
+- **Assentamento:** as peças rígidas giram pelo canto que tocou a margem,
+  conservando a identidade desse canto durante o tombamento. Um deslizamento
+  residual curto dissipa o impulso, em vez de arrastar a viga inteira pela
+  origem usada durante a queda.
+
+Os intervalos reservados ao RPG, à água, ao salto e às patrulhas continuam
+separando esses eventos da entrada de novas rajadas. Os estilhaços destas
+estruturas são cenográficos e ficam no plano atrás do perseguidor.
+
+`scripts/render_hypothetical_chase_impacts.ts` produziu as pranchas em
+`impacts/` e uma sequência dirigida de **495 quadros a 30 fps** (16,5 segundos,
+sem áudio). O roteiro seleciona estruturas pelo tipo, em vez de índices que
+ficaram desatualizados após a expansão do mapa. Há uma sequência isolada do
+corpo e duas das cargas suspensas para observar os encaixes.
+
+Foram feitas duas passagens de autoria visual: a primeira mostrou as poses
+e os contatos; a segunda incorporou o assentamento pelo canto e a apresentação
+do pico de compressão. As imagens são poses preparadas, não uma partida nem
+uma medição da dificuldade. O vídeo também não comprova a sincronização sonora.
+
 ## Arte e limites da revisão
 
 `scripts/render_hypothetical_chase_expansion.ts` compõe 449 quadros dirigidos

@@ -11,6 +11,7 @@ import {HypotheticalModel} from '../src/adventure/hipotetico/HypotheticalModel';
 import {hypotheticalStage} from '../src/adventure/hipotetico/HypotheticalStage';
 import {CHASE_COUNTERS,CHASE_BREAKS,CHASE_ATTACKS} from '../src/adventure/hipotetico/HypotheticalLayout';
 import {chaseCollapsedEdge} from '../src/adventure/hipotetico/HypotheticalChaseDetails';
+import {CHASE_STRIKE_REACH,chaseStrikeX} from '../src/adventure/hipotetico/HypotheticalChasePerformance';
 import {drawHypotheticalBackground,drawHypotheticalTerrain,drawHypotheticalObjects,drawHypotheticalCombat} from '../src/adventure/hipotetico/HypotheticalArt';
 import {pixelText} from '../src/graphics/BitmapFont';
 
@@ -42,7 +43,7 @@ const paint=(scene:ReturnType<typeof make>,cx:number,reduced=false)=>{
     const {b,o,level,hero}=scene,edge=chaseCollapsedEdge(b.x)/16;
     level.data.tiles=scene.stage.level.tiles.map((row,y)=>row.map((tile,x)=>y>=13&&x<edge?0:tile));
     o.bodies=o.bodies.filter(p=>p.x>=edge*16);level.bodies=o.bodies;
-    b.chaseBreaks=CHASE_BREAKS.map(s=>s.x>b.x+56?-1:b.tick-Math.floor((b.x+56-s.x)/3.5));
+    b.chaseBreaks=CHASE_BREAKS.map(s=>chaseStrikeX(s)>b.x+CHASE_STRIKE_REACH?-1:b.tick-Math.floor((b.x+CHASE_STRIKE_REACH-chaseStrikeX(s))/3.5));
     b.chaseReactions=b.chaseReactions.map((_,i)=>i*400<b.x?b.tick-90:-1);
     drawHypotheticalBackground(c,b,cx,64,reduced);drawHypotheticalTerrain(c,level,b,cx,64);
     drawHypotheticalObjects(c,o,b,cx,64,reduced);drawHypotheticalCombat(c,b,cx,64,reduced);

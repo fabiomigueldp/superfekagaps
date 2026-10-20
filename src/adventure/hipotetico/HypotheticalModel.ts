@@ -11,7 +11,7 @@ import { HypotheticalSiege, SIEGE_WIDTH, SIEGE_SECTORS } from './HypotheticalSie
 import {chaseDeckSpans,chaseMaterialAt,chaseTerraceFall,chaseRuinAt,CHASE_WATER_Y} from './HypotheticalChaseDetails';
 import { RIFLE_BURSTS, RIFLE_SPEED, type GunImpact } from './HypotheticalGunfire';
 import {chaseReactionStarts,updateChaseReactions} from './HypotheticalChaseLife';
-import {CHASE_STRIKE_REACH,chaseStructureTiming,type ChaseSound} from './HypotheticalChasePerformance';
+import {CHASE_STRIKE_REACH,chaseStrikeX,chasePerformance,chaseStructureTiming,type ChaseSound} from './HypotheticalChasePerformance';
 import {ARRIVAL,arrivalGate} from './HypotheticalArrival';
 import {SCENIC_STARTS,nextScenicTick,devastationAt} from './HypotheticalDevastation';
 import type {HelicopterCue} from './HypotheticalHelicopter';
@@ -104,9 +104,9 @@ export class HypotheticalModel {
         this.destroyed = this.backdrop.breaches.filter(t=>t>=0).length;
         this.backgroundX = this.backdrop.displayX;
         this.health = health;
-        if (act === 'chase') { this.x = chaseStart?chaseStart-114:-18; this.facing = 1;const next=CHASE_ATTACKS.findIndex(a=>a.x>=chaseStart);this.pursuitIndex=next<0?CHASE_ATTACKS.length:next;this.chaseBreaks=CHASE_BREAKS.map(s=>s.x<this.x?-1000:-1);if(chaseStart)this.state='rest'; }
+        if (act === 'chase') { this.x = chaseStart?chaseStart-114:-18; this.facing = 1;const next=CHASE_ATTACKS.findIndex(a=>a.x>=chaseStart);this.pursuitIndex=next<0?CHASE_ATTACKS.length:next;this.chaseBreaks=CHASE_BREAKS.map(s=>chaseStrikeX(s)<=this.x+CHASE_STRIKE_REACH?-1000:-1);if(chaseStart)this.state='rest'; }
         if (act === 'chase') this.chaseReactions=chaseReactionStarts(chaseStart);
-        if (act === 'chase') this.chaseAlerts=CHASE_BREAKS.map(s=>s.x<this.x?-1000:-1);
+        if (act === 'chase') this.chaseAlerts=CHASE_BREAKS.map(s=>chaseStrikeX(s)<=this.x+128?-1000:-1);
         if (act === 'siege') this.state = 'rest';
     }
     get arrivalSkipped(){return this.arrivalSeen||this.route.cleared>0&&this.backdropOffset>0;}
@@ -422,6 +422,9 @@ export class HypotheticalModel {
         for(const [i,site]of CHASE_BREAKS.entries()){
             const at=this.chaseBreaks[i];if(at<0)continue;
             const age=this.tick-at,pose=chaseRuinAt(age,site.kind==='crane'?78:site.kind==='sluice'?58:69,site.kind),contact=pose.beamContact;
+            // The far socket tears after the first impact, before the detached
+            // load lands. Geometry, splinters and this quieter report share it.
+            if(age===pose.score.right)this.emit(site.kind==='sluice'||site.kind==='gantry'?'distant-metal':'distant-wood');
             if(age>=contact&&age-1<contact)this.emit('debris-land');
             const secondary=site.kind==='sluice'?pose.panelContact:pose.suspended?.contact??-1;
             if(secondary>=0&&age>=secondary&&age-1<secondary)this.emit(site.kind==='crane'?'chase-wood':'chase-metal');
@@ -432,7 +435,7 @@ export class HypotheticalModel {
         const surge=this.pursuitKind==='ram'&&this.state==='attack'?(this.age<20?1.15:this.age<52?-.6:0):0;
         const credit=this.counters.escapeCredit(this.tick);
         const speed = clamp(3.5 + (player.x - this.x - 110-credit*56) * .025+surge, 2.25, credit>0?4.8:6)
-            *this.counters.speedScale(this.tick)*this.course.movementScale;
+            *this.counters.speedScale(this.tick)*this.course.movementScale*chasePerformance(this).driveScale;
         // Catch up and keep pressure after the helmet absorbs the first hit.
         // The pursuer must never run harmlessly through a stationary Feka.
         const leapX=this.course.leapPosition;
@@ -460,11 +463,11 @@ export class HypotheticalModel {
             this.frameHazards.push(hazard);
             this.chaseThreats.set(hazard,{kind:'wave',x:hazard.x,y:hazard.y,direction:1});
         }
-        for(const [i,site]of CHASE_BREAKS.entries())if(this.chaseAlerts[i]===-1&&this.x+128>=site.x){
+        for(const [i,site]of CHASE_BREAKS.entries())if(this.chaseAlerts[i]===-1&&this.x+128>=chaseStrikeX(site)){
             this.chaseAlerts[i]=this.tick;
             this.emit(site.kind==='sluice'?'distant-leak':site.kind==='pier'?'distant-creak':'distant-chain');
         }
-        for(const [i,site] of CHASE_BREAKS.entries())if(this.chaseBreaks[i]===-1&&this.x+CHASE_STRIKE_REACH>=site.x){
+        for(const [i,site] of CHASE_BREAKS.entries())if(this.chaseBreaks[i]===-1&&this.x+CHASE_STRIKE_REACH>=chaseStrikeX(site)){
             this.chaseBreaks[i]=this.tick;this.emit('break');
             this.emit(site.kind==='sluice'||site.kind==='gantry'?'chase-metal':'chase-wood');
         }

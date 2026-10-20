@@ -139,6 +139,6 @@ export function dinosaurLeg(body: number, gait: number, rear: boolean, stride: n
 }
 
 /** The distal tail is both painted and sampled for collision; no invisible floor-wide rectangle. */
-export function dinosaurTail(body: number, stroke: number): readonly Point[] {
-    return [[-22, body + 11], [-44, body + 11 + stroke * 18], [-82, body + 1 + stroke * 32]];
+export function dinosaurTail(body: number, stroke: number, tipStroke=stroke): readonly Point[] {
+    return [[-22, body + 11], [-44, body + 11 + stroke * 18], [-82, body + 1 + tipStroke * 32]];
 }
