@@ -1,3 +1,5 @@
+import { touchControlsEnabled } from './TouchMode';
+import { menuHint, movementHint } from '../controls/LegacyPrompts';
 // Sistema de Renderização - Super Feka Gaps
 
 import {
@@ -102,7 +104,9 @@ export class Renderer {
       chosenDpr = Math.max(1, Math.round(dpr));
     }
 
-    this.scale = chosenScale;
+    const available = Math.min(windowWidth / GAME_WIDTH, windowHeight / GAME_HEIGHT);
+    const fullscreen = !!document.fullscreenElement || document.documentElement.dataset.embeddedFullscreen === 'true';
+    this.scale = fullscreen || available < 1 ? available : chosenScale;
     this.dpr = chosenDpr;
 
     // CSS size (mantem dimensao inteira para pixel-perfect)
@@ -423,7 +427,7 @@ export class Renderer {
 
         ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
         ctx.fillStyle = '#AAAAAA';
-        ctx.fillText('Pressione ENTER para reiniciar', Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 45) * pixelScale));
+        ctx.fillText(menuHint('RECOMEÇAR'), Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 45) * pixelScale));
 
         ctx.restore();
         return;
@@ -530,7 +534,7 @@ export class Renderer {
 
         ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
         ctx.fillStyle = '#8B0000';
-        ctx.fillText('Pressione ENTER para jogar novamente', Math.round(w / 2), Math.round((GAME_HEIGHT - 8) * pixelScale));
+        ctx.fillText(menuHint('VOLTAR'), Math.round(w / 2), Math.round((GAME_HEIGHT - 8) * pixelScale));
 
         ctx.restore();
         return;
@@ -566,11 +570,11 @@ export class Renderer {
 
       ctx.font = `${Math.max(8, Math.round(10 * pixelScale))}px monospace`;
       ctx.fillStyle = '#AAAAAA';
-      ctx.fillText('Pressione ENTER para começar', Math.round(w / 2), Math.round(120 * pixelScale));
+      ctx.fillText(menuHint('JOGAR'), Math.round(w / 2), Math.round(120 * pixelScale));
 
       ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
       ctx.fillStyle = '#888888';
-      ctx.fillText('← → : Mover   ESPAÇO : Pular   SHIFT : Correr', Math.round(w / 2), Math.round(145 * pixelScale));
+      ctx.fillText(movementHint(), Math.round(w / 2), Math.round(145 * pixelScale));
       ctx.fillText('ESC : Pause   M : Som', Math.round(w / 2), Math.round(157 * pixelScale));
 
       // Ground pound instruction (moved up to avoid overlapping credits)
@@ -2247,12 +2251,12 @@ export class Renderer {
     // Instruções
     ctx.font = '10px monospace';
     ctx.fillStyle = '#AAAAAA';
-    ctx.fillText('Pressione ENTER para começar', GAME_WIDTH / 2, 120);
+    ctx.fillText(menuHint('JOGAR'), GAME_WIDTH / 2, 120);
 
     // Controles
     ctx.font = '8px monospace';
     ctx.fillStyle = '#888888';
-    ctx.fillText('← → / A/D / WASD : Mover   ESPAÇO : Pular   SHIFT : Correr', GAME_WIDTH / 2, 145);
+    ctx.fillText(movementHint(), GAME_WIDTH / 2, 145);
     ctx.fillText('ESC : Pause   M : Som', GAME_WIDTH / 2, 157);
 
     // Instrução da sentada violenta (posicionada acima dos créditos)
@@ -2296,7 +2300,7 @@ export class Renderer {
 
     ctx.font = '8px monospace';
     ctx.fillStyle = COLORS.MENU_TEXT;
-    ctx.fillText('Pressione ESC para continuar', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 15);
+    ctx.fillText(menuHint('CONTINUAR'), GAME_WIDTH / 2, GAME_HEIGHT / 2 + 15);
   }
 
   drawGameOver(score: number, highScore: number, newRecord: boolean, totalRunTime: number, bestTime: number, newTimeRecord: boolean): void {
@@ -2375,7 +2379,7 @@ export class Renderer {
 
   drawTouchControls(): void {
     // Verifica se e dispositivo touch
-    if (!('ontouchstart' in window)) return;
+    if (!touchControlsEnabled()) return;
 
     const ctx = this.offscreenCtx;
     ctx.globalAlpha = 0.5;
@@ -2397,6 +2401,9 @@ export class Renderer {
     ctx.fillStyle = '#FFFFFF';
     this.drawRunIcon(GAME_WIDTH - 72, GAME_HEIGHT - 34);
     this.drawJumpIcon(GAME_WIDTH - 32, GAME_HEIGHT - 34);
+    ctx.fillStyle = '#333333'; ctx.fillRect(144, GAME_HEIGHT - 40, 32, 30);
+    ctx.fillStyle = '#FFFFFF'; ctx.font = '18px monospace'; ctx.textAlign = 'center';
+    ctx.fillText('↓', 160, GAME_HEIGHT - 18);
 
     ctx.globalAlpha = 1;
   }

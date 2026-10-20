@@ -1,0 +1,19 @@
+.feka-pad-focus { outline: 3px solid #ffe29a !important; outline-offset: 2px; }
+.feka-control-settings { border-top: 1px solid #bc845d; padding-top: 10px; }
+.feka-control-settings summary { cursor: pointer; min-height: 44px; padding: 10px 0; box-sizing: border-box; font-weight: bold; color: #ffe29a; }
+.world-controls-content > label { display: flex; align-items: center; gap: 10px; min-height: 44px; margin: 12px 0; }
+.world-controls-content > label input { min-width: 24px; min-height: 24px; accent-color: #ffe29a; }
+.feka-control-settings label { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.feka-control-settings :is(select, input, button) { font: inherit; max-width: 100%; min-height: 44px; }
+.feka-control-settings :is(select, button) { background: #273d54; color: #f5efd3; border: 1px solid #bc845d; padding: 8px; }
+.feka-control-settings select { min-width: 120px; }
+.feka-control-settings input[type="range"] { width: 150px; accent-color: #ffe29a; }
+.feka-control-settings input[type="checkbox"] { width: 24px; accent-color: #ffe29a; }
+.feka-control-settings .feka-control-message { min-height: 1.5em; }
+.feka-control-settings :focus-visible, .feka-pad-keyboard :focus-visible { outline: 3px solid #ffe29a; outline-offset: 2px; }
+.feka-pad-keyboard { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; margin: 8px 0; padding: 4px; }
+.feka-pad-keyboard button { min-width: 0; min-height: 44px; padding: 4px; font: inherit; color: #f5efd3; background: #273d54; border: 1px solid #bc845d; overflow-wrap: anywhere; }
+@media (forced-colors: active) {
+    .feka-pad-focus { outline-color: Highlight !important; }
+    .feka-control-settings :is(select,button), .feka-pad-keyboard button { color: ButtonText; background: ButtonFace; border-color: ButtonText; }
+}

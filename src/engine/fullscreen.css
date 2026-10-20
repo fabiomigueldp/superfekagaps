@@ -1,0 +1,4 @@
+#game-fullscreen{position:fixed;right:max(4px,env(safe-area-inset-right));top:max(4px,env(safe-area-inset-top));z-index:40;width:44px;height:44px;display:grid;place-items:center;border:1px solid #8793aa;background:#191f35cc;color:#fff;cursor:pointer;touch-action:manipulation}
+#game-fullscreen:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#game-fullscreen[hidden]{display:none}
+:root:fullscreen{width:100%;height:100%;background:#191f35}

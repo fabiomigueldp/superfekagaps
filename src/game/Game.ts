@@ -12,6 +12,7 @@ import {
   CollectibleType, Particle, Firework, EnemyType, GroundPoundState, LevelData, CameraTrigger
 } from '../types';
 import { Input } from '../engine/Input';
+import { LegacyControls } from '../controls/LegacyControls';
 import { Audio } from '../engine/Audio';
 import { Renderer } from '../engine/Renderer';
 import { AudioVoicePlayer } from '../voice/AudioVoicePlayer';
@@ -30,6 +31,7 @@ import { EditorController } from '../editor/EditorController';
 
 export class Game {
   // Engine
+  private controls?: LegacyControls;
   private input: Input;
   private audio: Audio;
   private renderer: Renderer;
@@ -93,7 +95,7 @@ export class Game {
   private triggerController = new TriggerController();
 
   constructor(canvas: HTMLCanvasElement) {
-    this.input = new Input();
+    this.input = new Input(canvas, false);
     this.audio = new Audio();
     this.renderer = new Renderer(); // Pass canvas to renderer
 
@@ -115,6 +117,19 @@ export class Game {
       this.editorController.init();
     } else {
       this.state = GameState.BOOT;
+      this.controls = new LegacyControls(canvas, this.input, {
+        state: () => this.state,
+        ready: () => this.state === GameState.MENU || this.state === GameState.PAUSED ||
+          (this.state === GameState.GAME_OVER && this.gameOverTimer <= 0) ||
+          (this.state === GameState.ENDING && this.endingTimer > 5000),
+        pause: () => { if (this.state === GameState.PLAYING) this.changeState(GameState.PAUSED); },
+      }, false);
+      const interrupt = () => {
+        this.input.reset(); this.lastTime = performance.now(); this.accumulator = 0;
+        if (this.state === GameState.PLAYING) this.changeState(GameState.PAUSED);
+      };
+      window.addEventListener('blur', interrupt);
+      document.addEventListener('visibilitychange', () => { if (document.hidden) interrupt(); });
       this.validateLevelsOnStartup();
     }
   }
@@ -157,7 +172,8 @@ export class Game {
   };
 
   private update(deltaTime: number): void {
-    this.input.update();
+    if (this.controls) { if (this.controls.update()) return; }
+    else this.input.update();
 
     // Toggle som
     if (this.input.consumeMute()) {
@@ -675,12 +691,13 @@ export class Game {
     );
 
     // Touch controls
-    this.renderer.drawTouchControls();
+    if (this.state === GameState.PLAYING) this.renderer.drawTouchControls();
   }
 
   private changeState(newState: GameState): void {
     const prevState = this.state;
     this.state = newState;
+    this.input.reset(); this.input.setMenuMode(newState !== GameState.PLAYING);
     this.audio.onStateChange(prevState, newState, {
       levelId: this.level?.data.id ?? null,
       isBossLevel: this.level?.data.isBossLevel ?? false,
@@ -1515,6 +1532,7 @@ export class Game {
 
       const spawnPos = this.activeCheckpoint || this.level.data.playerSpawn;
       this.player.respawn(spawnPos);
+      this.input.reset();
       // Preserve o tempo restante; após timeout, uma nova vida precisa de tempo para jogar.
       if (this.levelTime <= 0) this.levelTime = this.level.data.timeLimit;
       this.deathTimer = 0;

@@ -1,6 +1,7 @@
 // Ponto de entrada - Super Feka Gaps
 
 import { Game } from './game/Game';
+import { installFullscreen } from './engine/Fullscreen';
 
 // Inicializa o jogo quando a página carregar
 window.addEventListener('DOMContentLoaded', () => {
@@ -11,6 +12,13 @@ window.addEventListener('DOMContentLoaded', () => {
     console.error('Canvas element not found!');
     return;
   }
+  const isEditor = new URLSearchParams(location.search).get('editor') === 'true';
+  if (!isEditor) {
+    canvas.contentEditable = 'true'; canvas.spellcheck = false; canvas.tabIndex = 0;
+    canvas.setAttribute('inputmode', 'none');
+    canvas.addEventListener('pointerdown', () => canvas.focus({preventScroll:true}));
+  }
+  if (!isEditor) installFullscreen();
   const game = new Game(canvas);
   game.start();
 
