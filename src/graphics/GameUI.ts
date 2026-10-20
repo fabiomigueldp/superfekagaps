@@ -1,3 +1,4 @@
+import { menuHint, movementHint } from '../controls/LegacyPrompts';
 import { ART } from './palette';
 import { pixelText, panel, fitText } from './BitmapFont';
 import { SpriteAtlas } from './pixels';
@@ -45,16 +46,16 @@ export class GameUI {
     pixelText(c,'FEKA GAPS',160,31,ART.goldLight,3,'center');
     pixelText(c,'UMA AVENTURA CHEIA DE GAPS',160,62,ART.ink,1,'center');
     panel(c,82,80,156,21,ART.ink,ART.gold);
-    pixelText(c,touch?'TOQUE PARA JOGAR':'ENTER PARA JOGAR',160,87,ART.paper,1,'center');
+    pixelText(c,menuHint('JOGAR'),160,87,ART.paper,1,'center');
     c.fillStyle=ART.goldLight;c.fillRect(91,88+Math.floor(time/700)%2,2,3);
     c.fillStyle=ART.ink;c.fillRect(0,146,320,34);
-    pixelText(c,touch?'← → MOVER   X CORRER   ↑ PULAR':'A/D OU ←/→ MOVER  W/ESPAÇO PULAR  SHIFT CORRER',160,153,ART.paper,1,'center');
+    pixelText(c,movementHint(),160,153,ART.paper,1,'center');
     pixelText(c,touch?'↓ NO AR: SENTADA   TOPO: PAUSA':'S/↓ NO AR: SENTADA  ESC PAUSA  M SOM',160,166,ART.muted,1,'center');
   }
   pause(c:CanvasRenderingContext2D,touch:boolean):void {
     this.dim(c);panel(c,49,52,222,78,ART.ink,ART.teal);
     pixelText(c,'PAUSA',160,65,ART.goldLight,2,'center');
-    pixelText(c,touch?'TOQUE PARA CONTINUAR':'ESC PARA CONTINUAR',160,92,ART.paper,1,'center');
+    pixelText(c,menuHint('CONTINUAR'),160,92,ART.paper,1,'center');
     pixelText(c,'RESPIRE. O PRÓXIMO SALTO ESPERA.',160,112,ART.muted,1,'center');
   }
   gameOver(c:CanvasRenderingContext2D,p:ResultsModel,touch:boolean):void {
@@ -64,7 +65,7 @@ export class GameUI {
     pixelText(c,'PONTOS  '+p.score,160,85,ART.paper,1,'center');
     pixelText(c,'RECORDE '+p.highScore,160,98,ART.muted,1,'center');
     if(Number.isFinite(p.bestTime)&&p.bestTime>0)pixelText(c,'MELHOR TEMPO '+p.bestTime.toFixed(1)+'S',160,114,ART.tealLight,1,'center');
-    pixelText(c,touch?'TOQUE PARA RECOMEÇAR':'ENTER PARA RECOMEÇAR',160,138,ART.paper,1,'center');
+    pixelText(c,menuHint('RECOMEÇAR'),160,138,ART.paper,1,'center');
   }
   clear(c:CanvasRenderingContext2D,level:string,score:number,bonus:number):void {
     this.dim(c);panel(c,33,37,254,107,ART.ink,ART.leafLight);
@@ -89,7 +90,7 @@ export class GameUI {
     pixelText(c,'PONTOS '+p.score,12,140,ART.paper);
     pixelText(c,p.newRecord?'NOVO RECORDE!':'RECORDE '+p.highScore,308,140,ART.goldLight,1,'right');
     pixelText(c,'TEMPO '+p.totalRunTime.toFixed(1)+'S'+(p.newTimeRecord?'  NOVO RECORDE!':''),160,153,ART.tealLight,1,'center');
-    pixelText(c,time<5000?'OBRIGADO POR JOGAR!':touch?'TOQUE PARA VOLTAR':'ENTER PARA VOLTAR',160,168,ART.paper,1,'center');
+    pixelText(c,time<5000?'OBRIGADO POR JOGAR!':menuHint('VOLTAR'),160,168,ART.paper,1,'center');
   }
   boot(c:CanvasRenderingContext2D,time:number):void {
     c.fillStyle=ART.ink;c.fillRect(0,0,320,180);

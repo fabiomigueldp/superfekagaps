@@ -1,0 +1,12 @@
+.legacy-menu-action{position:fixed;z-index:15;border:0;background:transparent;color:transparent;cursor:pointer;touch-action:manipulation}
+.legacy-menu-action:focus-visible{outline:2px solid #f5efd3;outline-offset:2px}
+.legacy-guide,.legacy-touch-pause{position:fixed;z-index:30;width:44px;height:44px;top:max(4px,env(safe-area-inset-top));border:1px solid #8793aa;background:#191f35;color:#f5efd3;font:20px monospace;cursor:pointer;touch-action:manipulation}
+.legacy-guide{left:max(4px,env(safe-area-inset-left))}
+.legacy-touch-pause{left:calc(50% - 22px)}
+.legacy-guide:focus-visible,.legacy-touch-pause:focus-visible{outline:2px solid #f5efd3;outline-offset:2px}
+.legacy-menu-action[hidden],.legacy-guide[hidden],.legacy-touch-pause[hidden]{display:none}
+.legacy-menu{position:fixed;inset:0;pointer-events:none;z-index:15}
+.legacy-menu button{pointer-events:auto}
+.legacy-exit{position:fixed;left:max(8px,env(safe-area-inset-left));bottom:max(8px,env(safe-area-inset-bottom));min-height:44px;padding:8px 20px;border:1px solid #8793aa;background:#191f35;color:#f5efd3;font:14px monospace;cursor:pointer}
+.legacy-exit[hidden]{display:none}
+.legacy-exit:focus-visible{outline:2px solid #f5efd3;outline-offset:2px}

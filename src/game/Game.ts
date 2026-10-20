@@ -12,6 +12,7 @@ import {
   CollectibleType, Particle, Firework, EnemyType, GroundPoundState, LevelData, CameraTrigger
 } from '../types';
 import { Input } from '../engine/Input';
+import { LegacyControls } from '../controls/LegacyControls';
 import { Audio } from '../engine/Audio';
 import { Renderer } from '../engine/Renderer';
 import { ART } from '../graphics/palette';
@@ -34,6 +35,7 @@ import { EditorController } from '../editor/EditorController';
 
 export class Game {
   // Engine
+  private controls?: LegacyControls;
   private input: Input;
   private audio: Audio;
   private renderer: Renderer;
@@ -98,7 +100,7 @@ export class Game {
   private globalScoreboard = new GlobalScoreboard();
 
   constructor(canvas: HTMLCanvasElement) {
-    this.input = new Input();
+    this.input = new Input(canvas, false);
     this.audio = new Audio();
     this.renderer = new Renderer(); // Pass canvas to renderer
 
@@ -120,6 +122,19 @@ export class Game {
       this.editorController.init();
     } else {
       this.state = GameState.BOOT;
+      this.controls = new LegacyControls(canvas, this.input, {
+        state: () => this.state,
+        ready: () => this.state === GameState.MENU || this.state === GameState.PAUSED ||
+          (this.state === GameState.GAME_OVER && this.gameOverTimer <= 0) ||
+          (this.state === GameState.ENDING && this.endingTimer > 5000),
+        pause: () => { if (this.state === GameState.PLAYING) this.changeState(GameState.PAUSED); },
+      }, true);
+      const interrupt = () => {
+        this.input.reset(); this.lastTime = performance.now(); this.accumulator = 0;
+        if (this.state === GameState.PLAYING) this.changeState(GameState.PAUSED);
+      };
+      window.addEventListener('blur', interrupt);
+      document.addEventListener('visibilitychange', () => { if (document.hidden) interrupt(); });
     }
   }
 
@@ -149,7 +164,8 @@ export class Game {
 
   private update(deltaTime: number): void {
     this.input.setMenuMode([GameState.MENU, GameState.PAUSED, GameState.GAME_OVER, GameState.ENDING].includes(this.state));
-    this.input.update();
+    if (this.controls) { if (this.controls.update()) return; }
+    else this.input.update();
     if (this.state !== GameState.PAUSED) this.renderer.advanceClock(deltaTime);
 
     // Toggle som
@@ -670,7 +686,7 @@ export class Game {
     );
 
     // Touch controls
-    this.renderer.drawTouchControls();
+    if (this.state === GameState.PLAYING) this.renderer.drawTouchControls();
     this.renderer.drawPlayerTransition(this.player.data, this.camera);
   }
 
@@ -678,6 +694,7 @@ export class Game {
     const prevState = this.state;
     if (prevState === GameState.ENDING && newState !== GameState.ENDING) this.globalScoreboard.hide();
     this.state = newState;
+    this.input.reset(); this.input.setMenuMode(newState !== GameState.PLAYING);
     this.audio.onStateChange(prevState, newState, {
       levelId: this.level?.data.id ?? null,
       isBossLevel: this.level?.data.isBossLevel ?? false,
@@ -1444,6 +1461,7 @@ export class Game {
 
       const spawnPos = this.activeCheckpoint || this.level.data.playerSpawn;
       this.player.respawn(spawnPos);
+      this.input.reset();
       // The opening iris must reveal the checkpoint, even when it is far from the death camera.
       if (this.camera) {
         const zoom = sceneZoom(this.camera.zoom || 1);

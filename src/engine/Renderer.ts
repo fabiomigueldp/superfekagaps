@@ -1,3 +1,4 @@
+import { touchControlsEnabled } from './TouchMode';
 import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, TileType, FALLING_PLATFORM_FALL_MS, FALLING_PLATFORM_FALL_DISTANCE, PLAYER_RESPAWN_REVEAL_MS } from '../constants';
 import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState, FallingPlatformPhase, LevelTheme, PaletteItem, LevelTrigger, TriggerType } from '../types';
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_WALK } from '../assets/playerSpriteSpec';
@@ -36,7 +37,7 @@ export class Renderer {
   private editorLink:HTMLElement|null;
   private debug=false;
   private zoom=1;
-  private touch=false;
+  private get touch():boolean{return touchControlsEnabled();}
 
   constructor() {
     this.canvas=document.getElementById('game-canvas') as HTMLCanvasElement;
@@ -48,7 +49,7 @@ export class Renderer {
     this.worldCanvas.width=GAME_WIDTH;this.worldCanvas.height=GAME_HEIGHT;
     this.worldCtx=this.worldCanvas.getContext('2d')!;this.offscreenCtx=this.worldCtx;
     this.editorLink=document.getElementById('open-editor');
-    this.touch=navigator.maxTouchPoints>0;
+
     this.debug=location.hash.includes('debug');
     (window as unknown as {renderer:Renderer}).renderer=this;
     this.resize();window.addEventListener('resize',()=>this.resize());
@@ -63,7 +64,9 @@ export class Renderer {
     if(this.impacts.length>32)this.impacts.shift();
   }
   private resize():void {
-    const cssScale=Math.max(1,Math.floor(Math.min(window.innerWidth/GAME_WIDTH,window.innerHeight/GAME_HEIGHT)));
+    const available=Math.min(window.innerWidth/GAME_WIDTH,window.innerHeight/GAME_HEIGHT);
+    const fullscreen=!!document.fullscreenElement||document.documentElement.dataset.embeddedFullscreen==='true';
+    const cssScale=fullscreen||available<1?available:Math.floor(available);
     const physicalScale=Math.max(1,Math.round(cssScale*(window.devicePixelRatio||1)));
     this.canvas.style.width=GAME_WIDTH*cssScale+'px';
     this.canvas.style.height=GAME_HEIGHT*cssScale+'px';
@@ -403,7 +406,7 @@ export class Renderer {
       for(const [x,label] of [[8,'←'],[56,'→'],[144,'↓'],[232,'X'],[280,'↑']] as const){
         panel(c,x,145,32,29,ART.ink,ART.rockLight);pixelText(c,label,x+16,153,ART.paper,2,'center');
       }
-      c.globalAlpha=1;c.fillStyle=ART.paper;c.fillRect(171,7,1,7);c.fillRect(174,7,1,7);
+      c.globalAlpha=1;
     });
   }
   drawMenu(title:string,options:string[],selected:number):void {
