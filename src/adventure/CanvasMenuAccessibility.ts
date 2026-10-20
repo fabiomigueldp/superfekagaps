@@ -217,7 +217,7 @@ export class CanvasMenuAccessibility {
 
     private ownsFocus(): boolean { return this.controls.some(button => button === document.activeElement); }
     private ownsKey(event: KeyboardEvent): boolean {
-        return !event.altKey && !event.ctrlKey && !event.metaKey && ['Enter', ' ', 'Escape', 'ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'w', 's'].includes(event.key);
+        return !event.altKey && !event.ctrlKey && !event.metaKey && ['enter', ' ', 'escape', 'arrowdown', 'arrowup', 'arrowleft', 'arrowright', 'w', 's'].includes(event.key.toLowerCase());
     }
     private key(event: KeyboardEvent): void {
         if (!this.ownsKey(event)) return;
@@ -231,7 +231,7 @@ export class CanvasMenuAccessibility {
         if (event.repeat) return;
         if (event.key === 'Escape') { this.host.escape(); return; }
         const current = this.controls.findIndex(button => button === document.activeElement);
-        const backward = ['ArrowUp', 'ArrowLeft', 'w'].includes(event.key);
+        const backward = ['arrowup', 'arrowleft', 'w'].includes(event.key.toLowerCase());
         const next = (Math.max(0, current) + (backward ? -1 : 1) + this.controls.length) % this.controls.length;
         this.controls[next]?.focus({ preventScroll: true });
     }
