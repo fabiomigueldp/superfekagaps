@@ -292,7 +292,7 @@ export class HypotheticalGame extends WorldGame {
             if(this.chaseDefeat){
                 const elapsed=this.defeatElapsed,[x,y]=this.chaseDefeat.cameraAt(elapsed,this.renderer.reducedMotion);
                 this.camera.x=clamp(x,0,CHASE_WIDTH-320);this.camera.y=y;this.camera.shakeTimer=0;
-                if(this.chaseDefeat.kind==='caught')for(const [at,cue]of [[90,'chase-scoop'],[CHASE_CAPTURE.catch,'chase-catch'],[960,'chase-gulp']] as const)
+                for(const {at,cue}of this.chaseDefeat.cues)
                     if(this.defeatCueTime<at&&elapsed>=at)this.defeatAudio.play(cue);
                 this.defeatCueTime=elapsed;
             }

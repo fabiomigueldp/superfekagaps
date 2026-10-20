@@ -2,7 +2,8 @@ import { drawGunMuzzle, drawGunTracer, drawGunImpact, drawGunCasing } from './Hy
 import {drawChaseCollapse,drawChaseWave} from './HypotheticalChaseArt';
 import {chasePerformance,type ChaseGesture} from './HypotheticalChasePerformance';
 import {drawChaseFootfall} from './HypotheticalChaseImpactArt';
-import {drawCapturedHero,type HeldHero} from './HypotheticalCapturedHero';
+import {drawCapturedHero,type HeldHero,type CapturedHeroPose} from './HypotheticalCapturedHero';
+import {captureNeck} from './HypotheticalCaptureAnatomy';
 import { box, oval, pixelLine, polygon, type Point } from '../WorldPainting';
 import { pixelText } from '../../graphics/BitmapFont';
 import type { WorldLevel, WorldObjects } from '../WorldPhysics';
@@ -30,7 +31,7 @@ const P = { ink: '#172c36', deep: '#263f3d', shade: '#556047', hide: '#92845a', 
     suit: '#304659', lapel: '#607487', skin: '#c58d68', face: '#edbc8e', hair: '#3c3034',
     brass: '#d3a75c', mint: '#99e0cf', hot: '#ffb267', scute:'#6e7953', skinLight:'#f7d2a6',
     mouth:'#593b40', tongue:'#bc796a', leather:'#583f38', stitch:'#b8885d', clothShade:'#203644' };
-export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; headPitch?:number; jawHinge?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; swallow?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet; chaseGesture?:ChaseGesture; capturedHero?:HeldHero }
+export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; headPitch?:number; jawHinge?:number; riderDrop?:number; riderLean?:number; riderHeadTilt?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; swallow?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet; chaseGesture?:ChaseGesture; capturedHero?:HeldHero; captureApproach?:CapturedHeroPose; captureDetail?:number }
 const fogPalette=new Map<string,string>();
 function distantColor(color:string){
     if(!fogPalette.has(color)){
@@ -134,10 +135,16 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     if((pose.pivot??0)>.78){drawDinosaurPivot(c,pose);return;}
     const { x, y, facing: d } = pose, bow = pose.bow, bob = pose.breath;
     const profile=Math.sqrt(Math.max(0,1-(pose.pivot??0)**2));
-    let riderBase:number|null=null,headFacing=1,skull=false;
+    let riderBase:number|null=null,headFacing=1,skull=false,riderHead=false;
     const headPoint=(point:Point)=>dinosaurHeadPoint(point,neck,pose.headPitch??0);
-    const riderPoint=(xx:number,yy:number):Point=>skull?headPoint([xx,yy]):riderBase===null?[xx,yy]
-        :riderTorsoPoint([xx*headFacing,yy],riderBase,pose.riderDrop??pose.tuck*18,pose.recoil-pose.tuck*10,pose.riderLean??0);
+    const riderPoint=(xx:number,yy:number):Point=>{
+        if(skull)return headPoint([xx,yy]);if(riderBase===null)return[xx,yy];
+        const drop=pose.riderDrop??pose.tuck*18,shift=pose.recoil-pose.tuck*10,lean=pose.riderLean??0;
+        const p=riderTorsoPoint([xx*headFacing,yy],riderBase,drop,shift,lean),angle=pose.riderHeadTilt??0;
+        if(!riderHead||!angle)return p;
+        const pivot=riderTorsoPoint([-2,riderBase-23],riderBase,drop,shift,lean),dx=p[0]-pivot[0],dy=p[1]-pivot[1];
+        return[pivot[0]+dx*Math.cos(angle)-dy*Math.sin(angle),pivot[1]+dx*Math.sin(angle)+dy*Math.cos(angle)];
+    };
     const tint=(color:string)=>pose.distant?distantColor(color):color;
     const poly = (pts: Point[], color: string) => polygon(c, pts.map(([xx, yy]) => {
         const p=riderPoint(xx,yy);return [Math.round(x+p[0]*d*profile),Math.round(y+p[1])];
@@ -214,10 +221,16 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     ell(-21,body-9,45,19,P.light); ell(-22,body+5,49,19,P.shade);
     poly([[-26,body-1],[-20,body-8],[-9,body-10],[-5,body-6],[-14,body-2],[-19,body+8],[-25,body+11]],'#a7966c');
     poly([[-17,body+18],[-9,body+10],[8,body+9],[19,body+4],[25,body+8],[17,body+18],[4,body+22]],'#716b4f');
-    poly([[1,body+5],[19,body-10],[29,neck-7],[45,neck-7],[47,neck+17],[25,body+19],[12,body+23]],P.ink);
-    poly([[5,body+5],[22,body-10],[30,neck-4],[41,neck-3],[42,neck+14],[23,body+16],[12,body+19]],P.hide);
-    poly([[22,body+10],[33,neck+7],[40,neck+9],[38,neck+18],[23,body+18],[12,body+19]],P.cream);
-    if((pose.swallow??0)>.02){
+    const capture=pose.captureDetail!==undefined?captureNeck(body,neck,pose.headPitch??0,pose.captureDetail,pose.swallow??0):null;
+    if(capture){
+        poly(capture.outer,P.ink);poly(capture.skin,P.hide);poly(capture.throat,P.cream);
+        for(const fold of capture.folds){line(...fold.from,...fold.to,P.shade);line(fold.from[0]+1,fold.from[1]-1,fold.to[0],fold.to[1]-1,P.light);}
+    }else{
+        poly([[1,body+5],[19,body-10],[29,neck-7],[45,neck-7],[47,neck+17],[25,body+19],[12,body+23]],P.ink);
+        poly([[5,body+5],[22,body-10],[30,neck-4],[41,neck-3],[42,neck+14],[23,body+16],[12,body+19]],P.hide);
+        poly([[22,body+10],[33,neck+7],[40,neck+9],[38,neck+18],[23,body+18],[12,body+19]],P.cream);
+    }
+    if(!capture&&(pose.swallow??0)>.02){
         const u=pose.swallow!,swell=Math.sin(Math.PI*u)*5.5;
         const bx=39-19*u,by=neck+17+(body+18-(neck+17))*u;
         poly([[bx-6,by-2],[bx+6,by-3],[bx+4,by+swell+2],[bx-4,by+swell+1]],P.ink);
@@ -233,7 +246,7 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     }
     for(let i=0;i<3;i++){
         line(19+i*4,body+2-i*5,24+i*4,body+3-i*5,P.shade);
-        line(25+i*4,neck+11+i*3,33+i*2,neck+13+i*3,P.light);
+        if(!capture)line(25+i*4,neck+11+i*3,33+i*2,neck+13+i*3,P.light);
     }
     // Hinged lower jaw, teeth and palate. The eye keeps a readable 1px pupil.
     skull=(pose.headPitch??0)!==0;
@@ -249,16 +262,30 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     poly([[30,neck+6],[65,neck+5],lowerJaw(61,neck+17+jaw),lowerJaw(37,neck+15+jaw),[27,neck+10]],P.ink);
     poly([[32,neck+8],[62,neck+7],lowerJaw(59,neck+12+jaw),lowerJaw(38,neck+11+jaw)],P.mouth);
     poly([lowerJaw(36,neck+11+jaw*.4),lowerJaw(55,neck+11+jaw*.7),lowerJaw(59,neck+13+jaw),lowerJaw(39,neck+12+jaw)],P.tongue);
+    if(capture){
+        // Cheek web and tendon terminate at the hinged mandible, not a fixed
+        // stretched rectangle. Keep this back joint behind the held character.
+        poly([[29,neck+7],[34,neck+8],lowerJaw(37,neck+12),lowerJaw(30,neck+11)],P.rust);
+        line(30,neck+8,...lowerJaw(33,neck+12),P.shade,2);
+        line(31,neck+8,...lowerJaw(34,neck+11),P.light);
+    }
+    if(pose.captureApproach)drawCapturedHero(c,pose.captureApproach,point=>{
+        const p=headPoint(point);return [x+d*p[0]*profile,y+p[1]];
+    },-Infinity,neck+6);
     if(pose.capturedHero){
         const held=pose.capturedHero,anchor=dinosaurMouthPoint(neck,pose.jaw,0,pose.jawHinge);
         // Feka is behind the near lip and teeth, attached to the very same
         // skull/mandible anchor as the mouth. The throat hides him progressively.
-        drawCapturedHero(c,{x:anchor[0]-held.swallow*36,y:anchor[1],angle:-1.2,facing:held.facing,frame:held.frame},point=>{
+        drawCapturedHero(c,{x:anchor[0]-held.swallow*36,y:anchor[1]-Math.sin(held.swallow*Math.PI)*1.2,angle:held.angle,facing:held.facing,frame:held.frame},point=>{
             const p=headPoint(point);return [x+d*p[0]*profile,y+p[1]];
-        },held.swallow>0?34:-Infinity);
+        },held.swallow>0?34:-Infinity,neck+6);
     }
     poly([[29,neck+10],lowerJaw(37,neck+12+jaw),lowerJaw(60,neck+14+jaw),lowerJaw(59,neck+16+jaw),lowerJaw(37,neck+14+jaw)],P.hide);
     line(...lowerJaw(37,neck+14+jaw),...lowerJaw(57,neck+15+jaw),P.cream);
+    if(capture)for(const x of [39,46,53]){
+        line(...lowerJaw(x,neck+14),...lowerJaw(x+3,neck+14),P.scute);
+        line(...lowerJaw(x+1,neck+15),...lowerJaw(x+3,neck+15),P.light);
+    }
     line(32,neck+7,63,neck+6,P.rust);
     const mouth=dinosaurMouthPoint(neck,pose.jaw,pose.headPitch,pose.jawHinge);
     if(pose.heldDebris)drawDebrisPiece(c,x+d*mouth[0],y+mouth[1],pose.heldDebris,1/AFTERMATH_SCALE);
@@ -338,6 +365,7 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     line(8-r,rider-20,9-r,rider-10,P.lapel);rect(4-r,rider-7,2,2,P.brass);
     if(pose.armor<=6){line(-14-r,rider-10,-10-r,rider-8,P.lapel);rect(-12-r,rider-9,2,1,P.ink);}
     // The head absorbs less recoil than the shoulder; jaw, cheek and ear remain distinct.
+    riderHead=true;
     const hr=pose.recoil*.45-pose.tuck*10,faceY=rider+pose.recoil*.22,focus=pose.focus??0;
     const look=pose.lookBack??0;
     // Three authored head views retain their volume at pixel scale. The rifle and hands
@@ -375,7 +403,7 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     if(pose.blink){rect(1-hr,faceY-33,6,3,P.face);line(2-hr,faceY-31,6-hr,faceY-31,P.hair);}
     if(pose.defeated){line(0-hr,faceY-33,4-hr,faceY-30,P.ink);line(0-hr,faceY-30,4-hr,faceY-33,P.ink);}
     }
-    headFacing=1;riderBase=null;
+    headFacing=1;riderBase=null;riderHead=false;
     // Rifle and both hands use one angle, so muzzle flash aligns with the bullet.
     const lean=pose.riderLean??0,lower=pose.launcher?.rifleLower??0;
     const gx=(7-r+riderBend(14,lean))*(1-lower)-14*lower,gy=rider-14+lower*19,a=pose.aim*(1-lower)+lower*1.24;

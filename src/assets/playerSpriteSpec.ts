@@ -17,10 +17,11 @@ export const PLAYER_HITBOX_H = 24;
 export const PLAYER_RENDER_OFFSET_X = -1;
 export const PLAYER_RENDER_OFFSET_Y = -2;
 
-type Pose = 'idle' | 'walk' | 'jump' | 'fall' | 'windup' | 'sit' | 'land' | 'hurt' | 'caught' | DeathPose | 'celebrate';
+type Pose = 'idle' | 'walk' | 'jump' | 'fall' | 'windup' | 'sit' | 'land' | 'hurt' | 'caught' | 'caughtBrace' | DeathPose | 'celebrate';
 function hero(pose: Pose, frame = 0): string[] {
   const g = new PixelGrid(16, 26);
   const dying = pose.startsWith('death');
+  const captured=pose==='caught'||pose==='caughtBrace';
   const seated = pose === 'sit' || pose === 'deathCrouch';
   const landingBend = pose === 'land' ? (frame === 0 ? 2 : 1) : 0;
   const headY = seated ? 7 : pose === 'land' ? landingBend : pose === 'deathRecoil' ? 4 : pose === 'windup' ? 3 : pose === 'deathImpact' ? 2 : pose === 'deathApex' ? 1 : pose === 'walk' && frame % 3 === 1 ? 1 : 0;
@@ -33,10 +34,11 @@ function hero(pose: Pose, frame = 0): string[] {
     g.rect(3,19+landingBend,5,5-landingBend,'K').rect(4,20+landingBend,3,3-landingBend,'D');
     g.rect(10,19+landingBend,5,5-landingBend,'K').rect(11,20+landingBend,3,3-landingBend,'B');
     g.rect(3,24,5,2,'K').rect(10,24,6,2,'K').rect(4,24,3,1,'G').rect(11,24,3,1,'G');
-  } else if (pose === 'caught') {
-    const kick=[0,2,1,-1][frame%4];
+  } else if (captured) {
+    const kick=pose==='caughtBrace'?1-frame:[-1,0,1,2,1,0][frame%6];
     g.rect(3,18,5,5,'K').rect(4,19,3,3,'D').rect(1,21-kick,6,3,'K').rect(2,21-kick,4,1,'G');
     g.rect(9,18,5,4,'K').rect(10,19,3,2,'B').rect(11,20+kick,4,4,'K').rect(12,21+kick,3,1,'G');
+    g.dot(5,20,'b').dot(11,20,'D').dot(3,23-kick,'H');
   } else if (pose === 'deathRecoil') {
     g.rect(3,20,5,4,'K').rect(4,21,3,2,'D').rect(2,24,6,2,'K').rect(3,24,4,1,'G');
     g.rect(9,20,5,4,'K').rect(10,21,3,2,'B').rect(9,24,6,2,'K').rect(10,24,4,1,'G');
@@ -68,8 +70,12 @@ function hero(pose: Pose, frame = 0): string[] {
   g.rect(4,bodyY,9,hipY-bodyY+2,'K').rect(5,bodyY+1,7,hipY-bodyY,'B');
   g.rect(5,bodyY+1,5,2,'b').rect(10,bodyY+3,2,Math.max(1,hipY-bodyY-2),'D');
   g.rect(5,hipY,7,1,'D').dot(8,hipY,'y');
-  if (pose === 'caught') {
-    const reach=[1,-1,0,2][frame%4];
+  if (pose === 'caughtBrace') {
+    g.rect(0,bodyY,5,4,'K').rect(1,bodyY+1,3,2,'D').rect(0,bodyY-3,3,4,'K').rect(1,bodyY-2,2,3,'S');
+    g.rect(12,bodyY+1,4,4,'K').rect(13,bodyY+2,2,2,'B').rect(13,bodyY-2+frame,3,4,'K').rect(14,bodyY-1+frame,2,2,'L');
+    g.dot(3,bodyY+1,'b').dot(14,bodyY+2,'D').dot(0,bodyY-1,'s');
+  } else if (pose === 'caught') {
+    const reach=[2,1,0,-1,0,1][frame%6];
     g.rect(0,bodyY-1+reach,5,4,'K').rect(1,bodyY+reach,3,2,'D').rect(0,bodyY-3+reach,3,4,'K').rect(1,bodyY-2+reach,2,2,'S');
     g.rect(12,bodyY-reach,4,4,'K').rect(13,bodyY+1-reach,2,2,'B').rect(13,bodyY-3-reach,3,4,'K').rect(14,bodyY-2-reach,2,2,'L');
   } else if (pose === 'deathImpact') {
@@ -115,9 +121,11 @@ function hero(pose: Pose, frame = 0): string[] {
   } else if(pose!=='hurt' && !(pose==='idle'&&frame===1)) { g.rect(6,headY+7,2,1,'W').dot(7,headY+7,'K').rect(11,headY+7,2,1,'W').dot(12,headY+7,'K'); }
   g.rect(6,headY+9,7,2,'S').rect(7,headY+11,4,1,'s').rect(10,headY+10,3,1,pose==='hurt'?'K':'s');
   if (dying) g.rect(6,headY+9,7,3,'S').rect(9,headY+9,3,3,'K').dot(10,headY+10,'s');
-  if (pose==='caught') {
+  if (captured) {
     g.rect(6,headY+6,2,2,'W').dot(7,headY+6,'K').rect(11,headY+6,2,2,'W').dot(12,headY+6,'K');
     g.rect(10,headY+9,3,2,'K').dot(11,headY+10,'s');
+    g.rect(6,bodyY+4,2,1,'b').rect(8,bodyY+5,2,1,'D').dot(6,bodyY+7,'D');
+    if(pose==='caughtBrace')g.rect(6,headY+6,2,1,'K').rect(11,headY+6,2,1,'K');
   }
   return g.finish();
 }
@@ -136,5 +144,5 @@ export const PLAYER_SPRITES = {
   celebrate: hero('celebrate'), helmet,
 };
 export const PLAYER_WALK = [PLAYER_SPRITES.walk1,PLAYER_SPRITES.walk2,PLAYER_SPRITES.walk3,PLAYER_SPRITES.walk4,PLAYER_SPRITES.walk5,PLAYER_SPRITES.walk6];
-/** Native silhouette and palette, with alternating reaching arms and tucked knees. */
-export const PLAYER_CAPTURE = [hero('caught',0),hero('caught',1),hero('caught',2),hero('caught',3)];
+/** Six reach in-betweens followed by two held poses, on the native pixel grid. */
+export const PLAYER_CAPTURE = [hero('caught',0),hero('caught',1),hero('caught',2),hero('caught',3),hero('caught',4),hero('caught',5),hero('caughtBrace',0),hero('caughtBrace',1)];
