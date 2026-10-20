@@ -1,6 +1,6 @@
 # Controles
 
-Clássico, World, Hipotético, salão da fábrica, Guaíra e Delícia usam a mesma configuração de teclado e dispositivo. Os controles preservam a física, o salto variável, o buffer de pulo e os custos/regras de cada campanha.
+World, a campanha Remastered da main (`?classic=true`), Hipotético, salão da fábrica, Guaíra e Delícia usam a mesma configuração de teclado e dispositivo. Os controles preservam a física, o salto variável, o buffer de pulo e os custos/regras de cada campanha. A edição Classic original fixada em tag e o serviço histórico Remastered têm publicações independentes.
 
 ## Padrão Xbox / ROG Ally em Gamepad Mode
 
@@ -54,3 +54,5 @@ A API web depende do sistema, navegador e modo do controle. No ROG Ally, use Gam
 Referências: [Gamepad API](https://www.w3.org/TR/gamepad/), [modos de controle do ROG Ally](https://www.asus.com/br/support/faq/1050220/).
 
 A publicação segue `AGENTS.md`: somente build Vite de produção e publicação pelo script Oracle. Não são executados suíte de testes, typecheck ou revisão em navegador. Compatibilidade implementada não significa validação física com cada modelo, USB, Bluetooth ou dispositivo portátil.
+
+Publicação de 20/10/2026: commit `89b54872e1b930f6530585923f65095cd3522046`, build `89b54872e1b930f6530585923f65095cd3522046-5d88de052f34`. Vite concluiu em 10,90 s; o publicador atualizou as 11 experiências World existentes. A página do catálogo, o HTML do jogo e seu módulo principal responderam HTTP 200. O iframe mantém a origem isolada, sem política que bloqueie `gamepad`; a configuração atual já é compatível com a permissão padrão da API. Logs locais em `.tmp/deploy/89b54872e1b930f6530585923f65095cd3522046-065d5a820d4d/`.
