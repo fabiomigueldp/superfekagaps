@@ -85,13 +85,19 @@ export class DomGamepadMenu {
         keyboard.className = 'feka-pad-keyboard'; keyboard.setAttribute('role', 'group'); keyboard.setAttribute('aria-label', 'Escrever nome');
         const change = (value: string) => {
             const limit = target.maxLength > 0 ? target.maxLength : 80;
-            target.value = value.slice(0, limit); target.dispatchEvent(new Event('input', { bubbles: true }));
+            // Keep the UTF-16 limit, but only cut between complete code points.
+            let end = 0;
+            for (const character of value) {
+                if (end + character.length > limit) break;
+                end += character.length;
+            }
+            target.value = value.slice(0, end); target.dispatchEvent(new Event('input', { bubbles: true }));
         };
         for (const character of [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 'Espaço', 'Apagar', 'Concluir']) {
             const b = document.createElement('button'); b.type = 'button'; b.textContent = character;
             b.addEventListener('click', () => {
                 if (character === 'Concluir') { this.closeKeyboard(); return; }
-                change(character === 'Apagar' ? target.value.slice(0, -1) : target.value + (character === 'Espaço' ? ' ' : character));
+                change(character === 'Apagar' ? [...target.value].slice(0, -1).join('') : target.value + (character === 'Espaço' ? ' ' : character));
             });
             keyboard.append(b);
         }
