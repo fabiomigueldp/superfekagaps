@@ -123,18 +123,6 @@ export const DATA: LevelData = {
       "zoom": 1,
       "lockX": false,
       "lockY": true
-    },
-    {
-      "id": "da3f3b66-8668-4d4c-9b16-496365f26d35",
-      "x": 672,
-      "y": 112,
-      "width": 64,
-      "height": 32,
-      "oneShot": false,
-      "active": true,
-      "type": TriggerType.DAMAGE,
-      "damagePerTick": 1,
-      "instantKill": true
     }
   ]
 };
