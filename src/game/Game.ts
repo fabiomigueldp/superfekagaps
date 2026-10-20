@@ -12,6 +12,9 @@ import {
   CollectibleType, Particle, Firework, EnemyType, GroundPoundState, LevelData, CameraTrigger
 } from '../types';
 import { Input } from '../engine/Input';
+import { StandardGamepad } from '../engine/StandardGamepad';
+import { DomGamepadMenu, closeGamepadDialog, menuId } from '../engine/DomGamepadMenu';
+import { WorldControlsHelp } from '../adventure/WorldControlsHelp';
 import { Audio } from '../engine/Audio';
 import { Renderer } from '../engine/Renderer';
 import { ART } from '../graphics/palette';
@@ -36,6 +39,9 @@ import { EditorController } from '../editor/EditorController';
 export class Game {
   // Engine
   private input: Input;
+  private gamepad?: StandardGamepad;
+  private controlsHelp?: WorldControlsHelp;
+  private readonly controllerMenu = new DomGamepadMenu();
   private audio: Audio;
   private renderer: Renderer;
 
@@ -121,6 +127,14 @@ export class Game {
       this.editorController.init();
     } else {
       this.state = GameState.BOOT;
+      this.gamepad = new StandardGamepad(this.input);
+      this.controlsHelp = new WorldControlsHelp(canvas, {
+        canOpen: () => this.state !== GameState.PLAYING && this.state !== GameState.EDITOR,
+        resetInput: () => this.input.reset(), suspendTouch: () => this.input.suspendCanvasTouchControls(),
+      }, { regionLabel: 'Controles do modo clássico', closeLabel: 'VOLTAR', navigation: [
+        'A confirma; B volta; Menu pausa. View abre os controles.',
+        'A sentada é usada no ar. Segure correr para ganhar velocidade.',
+      ] });
     }
 
     window.addEventListener('blur', () => this.handleInterruption(true));
@@ -163,8 +177,33 @@ export class Game {
   };
 
   private update(deltaTime: number): void {
+    if (this.gamepad) {
+      if (this.controlsHelp?.isOpen) {
+        const command = this.gamepad.updateMenu('classic:controls');
+        if (command) this.controlsHelp.control(command);
+        return;
+      }
+      const dialog = Array.from(document.querySelectorAll<HTMLDialogElement>('dialog[open]')).at(-1);
+      if (dialog) {
+        const command = this.gamepad.updateMenu(menuId(dialog));
+        if (command) this.controllerMenu.control(dialog, command, () => closeGamepadDialog(dialog));
+        return;
+      }
+      if (this.state === GameState.PLAYING) {
+        if (this.gamepad.update('playing')) { this.changeState(GameState.PAUSED); return; }
+      } else {
+        const command = this.gamepad.updateMenu(`classic:${this.state}`);
+        if (command === 'confirm') this.input.queueCommand('start');
+        else if ((command === 'back' || command === 'pause') && this.state === GameState.PAUSED) this.input.queueCommand('pause');
+        else if (command === 'guide') this.input.queueCommand('guide');
+      }
+    }
     this.input.setMenuMode([GameState.MENU, GameState.PAUSED, GameState.GAME_OVER, GameState.ENDING].includes(this.state));
     this.input.update();
+    if (this.input.consumeCommand('guide')) {
+      if (this.state === GameState.PLAYING) this.changeState(GameState.PAUSED);
+      this.controlsHelp?.open(); return;
+    }
     if (this.state !== GameState.PAUSED) this.renderer.advanceClock(deltaTime);
 
     // Toggle som
@@ -1407,6 +1446,7 @@ export class Game {
     if (!this.player || this.player.data.invincibleTimer > 0) return;
 
     const damageResult = this.player.takeDamage();
+    if (damageResult.damaged || damageResult.helmetUsed) this.gamepad?.device.rumble(.4, 90);
 
     if (damageResult.helmetUsed) {
       const center = this.player.getCenter();

@@ -7,6 +7,7 @@ import { FACTORY_SALON, hasSalonPassage, recordSalonPassage, recordSalonVictory,
 import { drawFactorySalon } from './FactorySalonArt';
 import { FactorySalonPresentation } from './FactorySalonPresentation';
 import './factory-salon.css';
+import { controlCode, keyAction } from '../../engine/ControlPreferences';
 
 /** Suspends the live campaign instead of copying or reloading its run/save. */
 export class FactoryCampaign extends WorldGame {
@@ -33,20 +34,16 @@ export class FactoryCampaign extends WorldGame {
         this.enterButton.hidden = true;
         document.body.append(this.enterButton);
         this.listen(this.enterButton, 'click', () => this.beginSalonEntry());
-        this.listen(campaignCanvas, 'keydown', e => {
-            if (e.ctrlKey || e.metaKey || e.altKey) return;
-            if (e.key.toLowerCase() === 'e' && !e.repeat) this.beginSalonEntry();
-        });
         this.listen(window, 'keydown', e => {
             if (!this.entry?.active || e.ctrlKey || e.metaKey || e.altKey) return;
             e.preventDefault(); e.stopImmediatePropagation();
             this.input.reset(); this.salon?.input.reset();
             if (e.repeat) return;
-            if (e.key === 'Escape') {
+            if (e.key === 'Escape' || keyAction(controlCode(e)) === 'pause') {
                 this.cancelEntry();
                 if (this.salon && this.salon.state === 'playing') this.salon.toggleLabPause();
                 else this.campaignCanvas.focus({ preventScroll: true });
-            } else if (e.key.toLowerCase() === 'e' || e.key === 'Enter' || e.key === ' ') this.stepEntry(this.entry.skip());
+            } else if (['interact', 'jump'].includes(keyAction(controlCode(e)) ?? '') || e.key === 'Enter') this.stepEntry(this.entry.skip());
         }, true);
         this.listen(window, 'keyup', e => {
             if (!this.entry?.active || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -146,9 +143,19 @@ export class FactoryCampaign extends WorldGame {
         (window as unknown as { worldGame: WorldGame }).worldGame = this;
         this.campaignCanvas.focus({ preventScroll: true });
     }
+    protected override interactFromControls(): void { this.beginSalonEntry(); }
     override update(dt: number): void {
         if (this.isDisposed) return;
+        if (!this.entry?.active) this.transitionControl(null);
         if (this.entry?.active) {
+            const command = this.transitionControl(`salon-entry:${this.entry.frame.phase}`);
+            if (command === 'confirm') { this.stepEntry(this.entry.skip()); return; }
+            if (command === 'back' || command === 'pause') {
+                this.cancelEntry();
+                if (this.salon?.state === 'playing') this.salon.toggleLabPause();
+                else this.campaignCanvas.focus({ preventScroll: true });
+                return;
+            }
             if (this.isDisposed || (!this.salon && (this.stage.id !== FACTORY_SALON.stage || this.state !== 'playing'))) {
                 this.cancelEntry();
             } else {

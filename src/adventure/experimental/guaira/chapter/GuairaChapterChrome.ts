@@ -88,6 +88,7 @@ export function chapterSceneChrome(scope: DisposalScope, canvas: HTMLCanvasEleme
         const owner = controllerOwner();
         if (!owner) return;
         if (owner === 'help') { help.control(command); return; }
+        if (command === 'guide') { help.button.click(); return; }
         if (owner === 'playing') return; // The host owns Start's live pause transition.
         if (command === 'back' || command === 'pause') {
             if (showingOptions) showOptions(false);

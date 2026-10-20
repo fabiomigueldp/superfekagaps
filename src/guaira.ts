@@ -1,4 +1,5 @@
 import { LabToolbarAction, labActionSize } from './adventure/experimental/JuiceLabToolbar';
+import { installDomGamepad } from './engine/DomGamepadMenu';
 import { GUAIRA_SELECTIONS, GuairaMapModel, guairaArrivalFromSearch, guairaReturnContextFromSearch, type GuairaSelection } from './adventure/experimental/guaira/GuairaMapModel';
 import { guairaMapPresentation } from './adventure/experimental/guaira/GuairaMapPresentation';
 import { approachGuairaCamera, guairaCamera, guairaScreenPoint, paintGuairaMap, paintGuairaWaterFrame, type GuairaCamera, GUAIRA_FEKA_PIXEL_WIDTH } from './adventure/experimental/guaira/GuairaMapArt';
@@ -341,6 +342,9 @@ export function startGuairaMap(): () => void {
     destinations.forEach(button => { button.disabled = true; button.hidden = markers.includes(button); });
     enter.disabled = true; skip.hidden = true; returnButton.hidden = true; returnButton.disabled = true;
     void load();
+    const releasePad = installDomGamepad(() => signal.aborted ? null : detours.open ? detours : document.body,
+        () => { if (live()) element('map-return')?.click(); });
+    signal.addEventListener('abort', releasePad, { once: true });
     function disposeMap() {
         if (signal.aborted) return;
         model?.close(); actionEpoch++; dismissDetours(false); actionBindings.abort(); menuBindings.abort(); abort.abort();

@@ -2,6 +2,7 @@
 
 import { InputState } from '../types';
 import { DisposalScope } from './DisposalScope';
+import { controlCode, keyAction, type ControlAction } from './ControlPreferences';
 
 export type InputAction = 'left' | 'right' | 'jump' | 'run' | 'down';
 type HeldAction = InputAction;
@@ -16,29 +17,10 @@ export interface InputActionSource {
 }
 type HorizontalAction = 'left' | 'right';
 
-const KEY_ACTIONS: Readonly<Record<string, HeldAction>> = {
-  ArrowLeft: 'left', KeyA: 'left',
-  ArrowRight: 'right', KeyD: 'right',
-  ArrowDown: 'down', KeyS: 'down',
-  Space: 'jump', KeyZ: 'jump', ArrowUp: 'jump', KeyW: 'jump',
-  ShiftLeft: 'run', ShiftRight: 'run', KeyX: 'run'
+const heldAction = (code: string): HeldAction | undefined => {
+  const action = keyAction(code);
+  return action && ['left', 'right', 'down', 'jump', 'run'].includes(action) ? action as HeldAction : undefined;
 };
-
-const LETTER_KEYS: Readonly<Record<string, string>> = {
-  a: 'KeyA', d: 'KeyD', w: 'KeyW', s: 'KeyS',
-  z: 'KeyZ', x: 'KeyX', m: 'KeyM'
-};
-
-function controlCode(event: KeyboardEvent): string {
-  // `key` follows the character printed by the active keyboard layout. This
-  // also covers virtual keyboards that report `code: "Unidentified"`.
-  const key = event.key?.toLowerCase();
-  if (key && LETTER_KEYS[key]) return LETTER_KEYS[key];
-  if (event.code && event.code !== 'Unidentified') return event.code;
-  if (event.key === ' ') return 'Space';
-  if (event.key === 'Shift') return 'ShiftLeft';
-  return event.key ?? '';
-}
 
 const createState = (): InputState => ({
   left: false, right: false, jump: false, run: false, down: false,
@@ -77,6 +59,11 @@ export class Input {
   private pendingDownPressed = false;
   private pendingHorizontal: HorizontalAction | null = null;
   private menuMode = false;
+  private pendingCommands = new Set<ControlAction | 'start'>();
+  private commands = new Set<ControlAction | 'start'>();
+
+  queueCommand(command: ControlAction | 'start'): void { this.pendingCommands.add(command); }
+  consumeCommand(command: ControlAction): boolean { return this.commands.delete(command); }
 
   setMenuMode(enabled: boolean): void { this.menuMode = enabled; }
 
@@ -91,6 +78,7 @@ export class Input {
       this.lifetime.listen(window, 'keyup', (event) => this.handleKeyUp(event), true);
       this.lifetime.listen(window, 'blur', () => this.reset());
       this.lifetime.listen(window, 'pagehide', () => this.reset());
+      this.lifetime.listen(window, 'feka-controls-change', () => this.reset());
       // Modern rotation events belong to ScreenOrientation, not window. Keep
       // the legacy event only as a fallback so one rotation does not reset twice.
       const orientation = window.screen?.orientation;
@@ -130,16 +118,17 @@ export class Input {
       ['Enter', 'Space'].includes(controlCode(event))) return;
 
     // Semantic map controls own native Enter/Space and directional navigation.
-    if (this.menuMode && target instanceof HTMLElement && target.closest('.world-map') && controlCode(event) !== 'KeyM') return;
+    if (this.menuMode && target instanceof HTMLElement && target.closest('.world-map')
+      && !['mute', 'guide', 'pause'].includes(keyAction(controlCode(event)) ?? '')) return;
 
     // Let browser/system shortcuts keep their normal behaviour.
     if (event.ctrlKey || event.metaKey || event.altKey) return;
 
     const code = controlCode(event);
     if (!code) return;
-    const action = KEY_ACTIONS[code];
+    const action = heldAction(code), command = keyAction(code);
 
-    if (action || code === 'Enter' || code === 'Escape' || code === 'KeyM') {
+    if (command || code === 'Enter' || code === 'Escape') {
       event.preventDefault();
     }
     // Repeated direction keys can recover after a missed initial keydown.
@@ -165,8 +154,9 @@ export class Input {
     if (action === 'jump' && this.pendingTouchJump.size) this.pendingJumpPressed = true;
     if (action === 'down' && this.pendingTouchDown.size) this.pendingDownPressed = true;
     if (code === 'Enter') this.pendingStart = true;
-    if (code === 'Escape') this.pendingPause = true;
-    if (code === 'KeyM') this.pendingMute = true;
+    if (command === 'pause' || code === 'Escape') this.pendingPause = true;
+    if (command === 'mute') this.pendingMute = true;
+    if (command === 'guide' || command === 'interact') this.queueCommand(command);
     this.refreshHeldActions();
 
     if (code === this.konamiCode[this.konamiIndex]) {
@@ -188,7 +178,7 @@ export class Input {
   private refreshHeldActions(captureEdges = true): void {
     const held = new Set(this.touchActions);
     this.pressedKeys.forEach((code) => {
-      const action = KEY_ACTIONS[code];
+      const action = heldAction(code);
       if (action) held.add(action);
     });
 
@@ -203,7 +193,7 @@ export class Input {
     // older held key, including an arrow-key alias, without a dead frame.
     let keyboardDirection: HorizontalAction | null = null;
     this.pressedKeys.forEach((code) => {
-      const action = KEY_ACTIONS[code];
+      const action = heldAction(code);
       if (action === 'left' || action === 'right') keyboardDirection = action;
     });
     const touchLeft = this.touchActions.has('left');
@@ -375,6 +365,10 @@ export class Input {
 
   update(): void {
     if (this.isDisposed) return;
+    this.commands = new Set(this.pendingCommands);
+    this.pendingCommands.clear();
+    this.pendingStart ||= this.commands.delete('start');
+    this.pendingPause ||= this.commands.delete('pause');
     this.refreshHeldActions();
     // Queued taps are a fallback, never a replacement for a surviving owner.
     // Two opposite touch holds intentionally resolve to neutral, but still own
@@ -473,6 +467,7 @@ export class Input {
     this.pendingHorizontal = null;
     this.konamiIndex = 0;
     this.konamiJustTriggered = false;
+    this.pendingCommands.clear(); this.commands.clear();
     // Invalidates active DOM captures too; an old move/up can never re-arm a reset gesture.
     this.notifySourceResets([...this.actionSources.values()]);
   }

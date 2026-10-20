@@ -1,5 +1,10 @@
 import { DisposalScope } from '../engine/DisposalScope';
 import type { GamepadMenuCommand } from '../engine/StandardGamepad';
+import { ControlSettings } from '../engine/ControlSettings';
+import { CONTROL_LABELS, bindingLabel, controlPreferences, keyLabel, profileFor, type ControlAction } from '../engine/ControlPreferences';
+import { selectedGamepad } from '../engine/GamepadDevice';
+import { DomGamepadMenu } from '../engine/DomGamepadMenu';
+import './world-controls-help.css';
 
 interface ControlsHelpHost {
     canOpen(): boolean;
@@ -15,6 +20,8 @@ export interface ControlsHelpContent {
     touch?: string;
     closeLabel?: string;
     footerHint?: string;
+    extraActions?: boolean;
+    extraContent?: HTMLElement;
 }
 
 /** Readable reference only; the host retains its settings/paused state and save. */
@@ -28,9 +35,14 @@ export class WorldControlsHelp {
     private restoreFocus: HTMLElement | null = null;
     private originalInert = false;
     private releaseTouch?: () => void;
+    private readonly navigation = new DomGamepadMenu();
+    private readonly settings: ControlSettings;
+    private readonly bindings = new Map<ControlAction, HTMLElement>();
 
     constructor(private readonly canvas: HTMLCanvasElement, private readonly host: ControlsHelpHost, contentOptions: ControlsHelpContent = {}) {
+        this.settings = new ControlSettings(contentOptions.extraActions);
         try {
+            this.lifetime.add(() => { this.settings.dispose(); this.navigation.dispose(); });
             this.dialog.id = contentOptions.id ?? 'world-controls-help'; this.dialog.className = 'world-controls-help';
             const titleId = contentOptions.id ? `${contentOptions.id}-title` : 'world-controls-title';
             this.dialog.setAttribute('aria-labelledby', titleId);
@@ -38,29 +50,27 @@ export class WorldControlsHelp {
             const content = this.content; content.className = 'world-controls-content'; content.tabIndex = 0;
             content.setAttribute('role', 'region'); content.setAttribute('aria-label', contentOptions.regionLabel ?? 'Controles da aventura World');
             const list = document.createElement('dl');
-            for (const [action, keys] of [
-                ['Mover', 'A / D ou ← / →'],
-                ['Pular', 'Espaço, W, Z ou ↑'],
-                ['Correr', 'Segure Shift ou X enquanto anda.'],
-                ['Sentada', 'No ar, aperte S ou ↓.'],
-                ['Pausar / continuar', 'Esc'],
-                ['Ligar / desligar som', 'M'],
-            ]) {
+            const actions: ControlAction[] = ['left', 'right', 'jump', 'run', 'down', 'interact', 'pause', 'guide', 'mute'];
+            if (contentOptions.extraActions) actions.splice(5, 0, 'seed', 'parry');
+            for (const action of actions) {
                 const term = document.createElement('dt'), description = document.createElement('dd');
-                term.textContent = action; description.textContent = keys; list.append(term, description);
+                term.textContent = CONTROL_LABELS[action]; this.bindings.set(action, description); list.append(term, description);
             }
             const navigation = (contentOptions.navigation ?? [
                 'Menus: Tab ou ↑/↓ para escolher; Enter ou Espaço para confirmar; Esc para voltar.',
-                'Controle padrão na campanha principal: ←/→ no direcional ou no analógico para andar; A/× pula; segure X/□ enquanto anda para correr. No ar, aperte o botão ↓ do direcional para a sentada.',
-                'Menus com controle: direcional/analógico escolhe; A/× confirma; B/○ volta; Start pausa/continua.',
+                'Controle: direcional/analógico escolhe; A/× confirma; B/○ volta; Menu pausa/continua.',
                 'Mapa: ←/→ fases; ↑/↓ regiões; X/□ ilhas; Y/△ mundo. A/× usa a ação selecionada ou pula a viagem.',
-                'Solte os controles ao trocar de tela. Nas conversas, na ajuda e nos arquivos, use teclado ou toque.',
+                'A sentada é usada no ar. Solte os botões ao trocar de tela.',
             ])
                 .map(text => { const paragraph = document.createElement('p'); paragraph.textContent = text; return paragraph; });
             const touchTitle = document.createElement('h3'); touchTitle.textContent = 'NA TELA DE TOQUE';
             const touch = document.createElement('p');
             touch.textContent = contentOptions.touch ?? '← / → para andar; ↑ para pular; segure X + direção para correr; ↓ no ar para a sentada. Toque no topo da tela para pausar.';
-            content.append(list, ...navigation, touchTitle, touch);
+            content.append(list, ...navigation, touchTitle, touch, this.settings.root);
+            if (contentOptions.extraContent) content.append(contentOptions.extraContent);
+            this.lifetime.listen(window, 'feka-controls-change', () => this.refreshBindings());
+            this.lifetime.listen(window, 'feka-gamepad-select', () => this.refreshBindings());
+            this.refreshBindings();
             const footer = document.createElement('footer');
             this.closeButton.type = 'button'; this.closeButton.textContent = contentOptions.closeLabel ?? 'VOLTAR ÀS OPÇÕES';
             if (contentOptions.id) this.closeButton.id = `${contentOptions.id}-close`;
@@ -99,13 +109,21 @@ export class WorldControlsHelp {
     }
     control(command: GamepadMenuCommand): void {
         if (!this.canControl()) return;
-        if (command === 'confirm' || command === 'back' || command === 'pause') this.close();
-        else if (command === 'up' || command === 'down') this.content.scrollBy({ top: command === 'up' ? -96 : 96, behavior: 'instant' });
+        this.navigation.control(this.dialog, command, () => this.close());
+    }
+    private refreshBindings(): void {
+        const pad = selectedGamepad();
+        for (const [action, node] of this.bindings) {
+            const keys = controlPreferences.keys[action].map(keyLabel).join(' / ') || 'Sem tecla';
+            const buttons = action === 'mute' ? '' : (pad ? profileFor(pad).bindings[action] : []).map(b => bindingLabel(b, pad)).join(' / ');
+            node.textContent = buttons ? `${keys} · ${buttons}` : keys;
+        }
     }
 
     open(): void {
         if (this.opened || this.lifetime.isDisposed || !this.host.canOpen() || document.hidden) return;
         this.restoreFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        this.settings.refreshDevices(); this.refreshBindings();
         this.originalInert = this.canvas.inert;
         this.host.resetInput(); this.releaseTouch = this.host.suspendTouch();
         this.canvas.inert = true; this.opened = true;
@@ -115,6 +133,7 @@ export class WorldControlsHelp {
 
     close(restore = true): void {
         if (!this.opened) return;
+        this.settings.cancelCapture(); this.navigation.closeKeyboard();
         this.opened = false; this.host.onOpenChange?.(false);
         if (this.dialog.open) this.dialog.close();
         this.canvas.inert = this.originalInert;

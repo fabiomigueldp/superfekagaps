@@ -155,6 +155,7 @@ export class GuairaTraversal extends WorldGame {
         if (this.finished) {
             if (this.updateController()) return;
             this.input.setMenuMode(this.state !== 'playing'); this.input.update();
+            if (this.handleControlCommands()) return;
             if (this.input.consumeMute()) this.audio.toggle();
             this.audio.tick(dt);
             if (this.state !== 'playing') return;

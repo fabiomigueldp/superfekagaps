@@ -3,6 +3,7 @@ import { LabToolbarAction } from '../experimental/JuiceLabToolbar';
 import { WorldControlsHelp } from '../WorldControlsHelp';
 import type { FactorySalonSession } from './FactorySalonSession';
 import { pixelText, textWidth } from '../../graphics/BitmapFont';
+import { DomGamepadMenu } from '../../engine/DomGamepadMenu';
 
 /** One visit's native controls. Nothing reserves space above the live canvas. */
 export class FactorySalonPresentation {
@@ -73,10 +74,32 @@ export class FactorySalonPresentation {
             navigation: [
                 'Apresentação: ande até a marca e aperte pular para posar.',
                 'Pausa: Tab ou ↑/↓ escolhe; Enter ou Espaço confirma; Esc continua.',
-                'O salão usa teclado ou toque. Voltar à fase mantém seu progresso na fábrica.',
+                'Controle: A pula ou posa; X/RT corre; LB faz a sentada; Menu pausa. Voltar à fase mantém seu progresso.',
             ],
         });
         events.add(() => this.help.dispose());
+        const padMenu = new DomGamepadMenu();
+        events.add(() => padMenu.dispose());
+        lab.enableGamepadControls({
+            owner: () => {
+                if (events.isDisposed || document.hidden) return null;
+                if (this.help.isOpen) return this.help.canControl() ? 'help' : null;
+                if (lab.state === 'paused') return 'salon:pause';
+                return lab.victorious ? 'salon:result' : 'playing';
+            },
+            control: command => {
+                if (this.help.isOpen) { this.help.control(command); return; }
+                if (command === 'guide') {
+                    if (lab.state === 'playing') lab.toggleLabPause();
+                    this.sync(); this.help.open(); return;
+                }
+                if (command === 'pause' || command === 'back') {
+                    lab.toggleLabPause(); this.sync(); return;
+                }
+                if (lab.victorious && command === 'confirm') { leave(); return; }
+                if (lab.state === 'paused') padMenu.control(this.menu, command, () => { lab.toggleLabPause(); this.sync(); });
+            },
+        });
         events.listen(shell, 'keydown', e => {
             // Input captures first. Never let either WorldGame menu consume the
             // same Escape or act on the suspended campaign underneath this visit.

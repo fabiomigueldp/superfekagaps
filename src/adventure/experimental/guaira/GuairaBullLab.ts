@@ -121,6 +121,7 @@ export class GuairaBullLab extends WorldGame {
             // Never hand the experimental identifier to campaign completion.
             if (this.updateController()) return;
             this.input.setMenuMode(this.state !== 'playing'); this.input.update();
+            if (this.handleControlCommands()) return;
             if (this.input.consumeMute()) this.audio.toggle();
             this.audio.tick(dt);
             if (this.state !== 'playing') return;

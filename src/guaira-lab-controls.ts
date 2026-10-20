@@ -2,10 +2,12 @@ import type { WorldGame } from './adventure/WorldGame';
 import { DisposalScope } from './engine/DisposalScope';
 import { GuairaTouchControls } from './adventure/experimental/guaira/GuairaTouchControls';
 import { fitGuairaLabCanvas } from './guaira-lab-layout';
+import { installStandaloneControls } from './adventure/StandaloneControls';
 
 /** Page-local controls; the engine and every other page retain their defaults. */
 export function installGuairaLabControls(game: WorldGame, canvas: HTMLCanvasElement, isComplete: () => boolean) {
     const lifetime = new DisposalScope();
+    if (!canvas.closest('.world-chapter-host')) lifetime.add(installStandaloneControls(game, canvas, isComplete));
     let mounted = new DisposalScope();
     let controls: GuairaTouchControls | null = null;
     function mount() {

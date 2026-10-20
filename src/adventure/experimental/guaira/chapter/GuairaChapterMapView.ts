@@ -1,4 +1,5 @@
 import { chapterJourneyStory } from './GuairaChapterStory';
+import { installDomGamepad } from '../../../../engine/DomGamepadMenu';
 import { guairaAlternateOpening } from './GuairaChapterProgress';
 import { guairaExplorationRows, type GuairaExplorationProgress } from '../GuairaCourseExploration';
 import { chapterExitPresentation } from './GuairaChapterPresentation';
@@ -212,6 +213,9 @@ export class GuairaChapterMapView {
             window.addEventListener('resize', this.resize, { signal });
             this.observer = new ResizeObserver(this.resize); this.observer.observe(this.scene);
             this.bindActions(); this.reflect(); this.resize(); void this.load();
+            const releasePad = installDomGamepad(() => this.closed || document.hidden ? null : this.menuOpen ? this.dialog : this.shell,
+                () => this.menuOpen ? this.closeMenu() : this.openMenu());
+            this.lifecycle.signal.addEventListener('abort', releasePad, { once: true });
         } catch (error) {
             // A failed constructor cannot be disposed by the host because it has no instance yet.
             this.dispose();

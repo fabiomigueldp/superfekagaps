@@ -169,7 +169,9 @@ export class JuiceMinibossLab extends WorldGame {
         if (!Number.isFinite(dt) || dt <= 0) return;
         this.introAudio?.setPaused(this.state === 'paused'); this.introAudio?.sync();
         if (this.labMode === 'intro' && this.intro) {
+            if (this.updateController()) return;
             this.input.setMenuMode(this.state !== 'playing'); this.input.update();
+            if (this.handleControlCommands()) return;
             if (this.input.consumeMute()) { this.audio.toggle(); this.introAudio?.sync(); }
             if (this.state !== 'playing') return;
             if (this.input.consumePause()) { this.toggleLabPause(); return; }
@@ -184,11 +186,13 @@ export class JuiceMinibossLab extends WorldGame {
         }
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load('juice-lab'); return; }
         if (this.boss instanceof LabEncounter && this.boss.phase === 'defeated') {
+            if (this.updateController()) return;
             this.audio.ambience();
             this.labMode = 'result';
             // Never call campaign completion with an experimental identifier.
             // Keep pause/mute alive, including after the final stomp.
             this.input.setMenuMode(this.state !== 'playing'); this.input.update();
+            if (this.handleControlCommands()) return;
             if (this.input.consumeMute()) this.audio.toggle();
             this.audio.tick(dt);
             if (this.state !== 'playing') return;

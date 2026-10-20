@@ -1,3 +1,4 @@
+import { installStandaloneControls } from './adventure/StandaloneControls';
 import { JuiceLabHost } from './adventure/experimental/JuiceLabHost';
 import { LabToolbarAction } from './adventure/experimental/JuiceLabToolbar';
 const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
@@ -38,6 +39,7 @@ if (skipButton) listen(skipButton, 'click', () => {
 if (replayButton) listen(replayButton, 'click', () => { resetFeedback(); game.replayIntro(); reflectPause(); focusCanvas(); });
 if (presentButton) listen(presentButton, 'click', () => { game.presentIntro(); focusCanvas(); });
 const pauseButton = document.getElementById('lab-pause')!;
+game.addCleanup(installStandaloneControls(game, canvas, () => game.victorious));
 const pauseAction = new LabToolbarAction(pauseButton);
 listen(pauseButton, 'click', () => { game.toggleLabPause(); reflectPause(); focusCanvas(); });
 function showControl(control: HTMLElement | null, visible: boolean) {

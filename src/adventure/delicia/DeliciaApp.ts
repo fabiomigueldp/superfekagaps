@@ -12,6 +12,11 @@ import { DeliciaPresentation, DELICIA_TOUCH_BUTTONS, type DeliciaMenu, type Deli
 import type { Preferences } from '../types';
 import { button, element, formatTime, heading, lettering, worldLink } from './DeliciaUI';
 import './delicia.css';
+import { GamepadDevice } from '../../engine/GamepadDevice';
+import { DomGamepadMenu, closeGamepadDialog, menuId } from '../../engine/DomGamepadMenu';
+import { controlCode, keyAction } from '../../engine/ControlPreferences';
+import { WorldControlsHelp } from '../WorldControlsHelp';
+const LOGICAL_KEYS:Record<string,string>={left:'arrowleft',right:'arrowright',jump:' ',run:'shift',down:'s',seed:'j',parry:'q',interact:'e'};
 const INPUT_KEYS:Record<string,string>={arrowleft:'arrowleft',a:'arrowleft','pad-left':'arrowleft',arrowright:'arrowright',d:'arrowright','pad-right':'arrowright',' ':' ',w:' ',z:' ',arrowup:' ','pad-jump':' ',shift:'shift',x:'shift','pad-dash':'shift',s:'s',arrowdown:'s','pad-pound':'s',j:'j','pad-seed':'j',q:'q','pad-parry':'q',e:'e','pad-interact':'e'};
 type Screen='title'|'map'|'menu'|'playing'|'pause'|'dialogue'|'clear'|'journal'|'settings'|'ending'|'dead';
 export interface DeliciaAppOptions { store?: DeliciaStore; initialStage?: string; startPaused?: boolean; returnToWorldMap?: (playedStage?: string) => void; preferences?: Preferences; savePreferences?: () => void }
@@ -34,11 +39,13 @@ export class DeliciaApp {
     private readonly systemMotion=typeof matchMedia==='function'?matchMedia('(prefers-reduced-motion: reduce)'):null;
     private mapNodes:Record<string,{x:number;y:number}>={};private mapSelection='delicia-1';private toast='';private toastTime=0;private shake=0;
     private cleanups:(()=>void)[]=[];private mapCanvas?:HTMLCanvasElement;private mapControls:HTMLButtonElement[]=[];
-    private hitStop=0;private zoneBanner='';private zoneBannerTime=0;private gamepadPause=false;
-    private menuPad=new Set<string>();
+    private hitStop=0;private zoneBanner='';private zoneBannerTime=0;
+    private readonly gamepad=new GamepadDevice(()=>this.releaseGamepad());
+    private readonly controllerMenu=new DomGamepadMenu();
+    private readonly controlsHelp:WorldControlsHelp;
+    private readonly assistControl=document.createElement('input');
+    private readonly pointerOwners=new Set<number>();
     private windowFocused=typeof document.hasFocus!=='function'||document.hasFocus();
-    private padArmed=false;private padDevice:string|null=null;
-    private padMenuLatch=new Set<string>();
     constructor(host:HTMLElement=document.body, private readonly options:DeliciaAppOptions={}){
         if(navigator.maxTouchPoints>0)this.root.classList.add('dl-has-touch');
         let storage:Storage|null=null;try{storage=localStorage;}catch{}this.store=options.store??new DeliciaStore(storage);this.mapSelection=this.store.save.selected;
@@ -49,17 +56,28 @@ export class DeliciaApp {
             select:index=>{this.menuSelection=index;this.invalidatePausedPaint();},
             activate:index=>this.activateMenu(index),escape:()=>this.goBack(),resetInput:()=>this.resetInput(),
         },()=>this.pause());
+        const assistLabel=element('label');this.assistControl.type='checkbox';this.assistControl.checked=this.store.save.assists;
+        assistLabel.append(this.assistControl,document.createTextNode(' Mais vida e avisos longos (sem recordes ou medalhas). Vale na próxima fase.'));
+        this.listen(this.assistControl,'change',()=>{this.store.save.assists=this.assistControl.checked;this.persistSettings();});
+        this.controlsHelp=new WorldControlsHelp(this.canvas,{
+            canOpen:()=>!this.disposed&&this.screen!=='playing',resetInput:()=>this.resetInput(),suspendTouch:()=>()=>{},
+        },{id:'delicia-controls',extraActions:true,extraContent:assistLabel,regionLabel:'Controles da Delícia',closeLabel:'VOLTAR',navigation:[
+            'A confirma; B volta; Menu pausa. View abre os controles.',
+            'Semente, rebatida e interação ficam disponíveis conforme os equipamentos e a fase.',
+        ],touch:'Use os botões na tela. É possível correr e pular ao mesmo tempo; soltar o pulo encurta o salto.'});
+        this.cleanups.push(()=>{this.controlsHelp.dispose();this.gamepad.dispose();this.controllerMenu.dispose();});
+        this.listen(window,'feka-controls-change',()=>this.resetInput());
         this.applyVolume();this.canvas.hidden=true;this.buildTouch();
         if(options.initialStage){if(!this.loadStage(options.initialStage))queueMicrotask(()=>{if(!this.disposed)this.showMap();});}else this.showTitle();
         this.listen(window,'keydown',this.keyDown);this.listen(window,'keyup',this.keyUp);this.listen(window,'blur',()=>{this.windowFocused=false;this.loseFocus();});
         this.listen(window,'focus',()=>{this.windowFocused=true;this.disarmGamepad();});
-        for(const event of ['gamepadconnected','gamepaddisconnected'])this.listen(window,event,()=>{this.padDevice=null;this.disarmGamepad();});
         this.listen(document,'visibilitychange',()=>{
             this.stopFrames();this.disarmGamepad();if(document.hidden)this.loseFocus();else{this.invalidatePausedPaint();this.requestFrame();}
 
         });
         this.listen(window,'pointerup',(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`));this.listen(window,'pointercancel',(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`,true));
         this.listen(this.canvas,'pointerdown',()=>this.canvas.focus({preventScroll:true}));this.listen(window,'pagehide',()=>this.dispose());
+        if(window.screen?.orientation)this.listen(window.screen.orientation,'change',()=>this.resetInput());
         this.listen(window,'resize',()=>{this.invalidatePausedPaint();if(this.screen==='map')this.fitMapTitle();});
         if(this.systemMotion){
             const changed=()=>{if(!this.disposed)this.invalidatePausedPaint();};
@@ -82,10 +100,13 @@ export class DeliciaApp {
     private get reducedMotion():boolean{return (this.options.preferences?!this.options.preferences.shake:this.store.save.reducedMotion)||!!this.systemMotion?.matches;}
     private applyVolume():void{const p=this.options.preferences;this.audio.setVolume(p?.music??this.store.save.music,p?.effects??this.store.save.effects,p?.voice??this.voiceVolume);}
     private keyDown=(event:KeyboardEvent):void=>{
-        const key=event.key.toLowerCase();if(this.disposed)return;
+        const key=event.key.toLowerCase(),action=keyAction(controlCode(event));if(this.disposed||this.controlsHelp.isOpen||event.ctrlKey||event.metaKey||event.altKey)return;
+        if((event.target as HTMLElement)?.closest('dialog[open]'))return;
         if((event.target as HTMLElement)?.closest('.canvas-menu-accessibility'))return;
         if(event.repeat){if(this.screen!=='playing'&&(key==='enter'||key===' '))event.preventDefault();return;}
-        if(key==='escape'){event.preventDefault();this.goBack();return;}
+        const editing=!!(event.target as HTMLElement)?.closest('input,textarea,select,[contenteditable="true"]');
+        if(key==='escape'||action==='pause'&&!editing){event.preventDefault();this.goBack();return;}
+        if(action==='guide'&&!editing){event.preventDefault();if(this.screen==='playing')this.pause();this.controlsHelp.open();return;}
         if(this.menu&&event.target===this.canvas){
             if(['arrowup','arrowdown','arrowleft','arrowright'].includes(key)){event.preventDefault();this.selectNativeMenu(key==='arrowup'||key==='arrowleft'?-1:1);}
             else if(key==='enter'||key===' '){event.preventDefault();this.activateMenu(this.menuSelection);}
@@ -94,7 +115,7 @@ export class DeliciaApp {
         }
         const editable=(event.target as HTMLElement)?.closest('input,textarea,select');if(editable){if(key==='tab')this.menuKeyboard(event);return;}
         const active=(this.screen==='playing'&&!(event.target as HTMLElement)?.closest('button,a,summary'))||event.target===this.canvas;
-        if(INPUT_KEYS[key]&&active){event.preventDefault();this.holdInput(`key:${this.physicalKey(event)}`,key);}
+        if(action&&LOGICAL_KEYS[action]&&active){event.preventDefault();this.holdInput(`key:${this.physicalKey(event)}`,LOGICAL_KEYS[action]);}
         if((key==='enter'||key===' ')&&event.target===this.canvas&&this.screen==='dialogue'){event.preventDefault();this.advanceDialogue();}
         if(this.screen==='map'&&!this.listOpen){
             if(['arrowleft','arrowright','arrowup','arrowdown'].includes(key)){
@@ -103,7 +124,7 @@ export class DeliciaApp {
             }else if(key==='enter'&&(event.target===document.body||(event.target as HTMLElement)?.closest('.dl-pin'))){event.preventDefault();this.loadStage(this.mapSelection);}
         }
         if(this.screen!=='playing'&&(this.screen!=='map'||this.listOpen))this.menuKeyboard(event);
-        if(key==='m'){this.audio.toggleMute();this.announce(this.audio.muted?'Som desligado.':'Som ligado.');}if(key==='r'&&this.screen==='dead')this.retry();
+        if(action==='mute'){this.audio.toggleMute();this.announce(this.audio.muted?'Som desligado.':'Som ligado.');}if(key==='r'&&this.screen==='dead')this.retry();
     };
     private physicalKey(event:KeyboardEvent):string{return(event.code&&event.code!=='Unidentified'?event.code:event.key).toLowerCase();}
     private keyUp=(event:KeyboardEvent):void=>{
@@ -131,53 +152,54 @@ export class DeliciaApp {
         const latest=horizontal[horizontal.length-1];
         return{left:latest==='arrowleft',right:latest==='arrowright',jump:down(' ','w','z','arrowup','pad-jump'),jumpPressed:tap(' ','w','z','arrowup','pad-jump'),jumpReleased:[' ','w','z','arrowup','pad-jump'].some(k=>this.released.has(k)),run:down('shift','x','pad-dash'),dash:false,pound:tap('s','arrowdown','pad-pound'),seed:tap('j','pad-seed'),parry:tap('q','pad-parry'),interact:tap('e','pad-interact')};
     }
-    /** Interrupt only this controller; keyboard/touch owners retain their inputs. */
-    private disarmGamepad():void{
-        this.padArmed=false;this.gamepadPause=false;this.menuPad.clear();this.padMenuLatch.clear();
+    /** Only this controller's owners are released on disconnect. */
+    private releaseGamepad():void{
         for(const source of this.sources.keys())if(source.startsWith('gamepad:'))this.releaseInput(source,true);
     }
+    private disarmGamepad():void{this.gamepad.reset();}
     private pollGamepad():void {
         if(this.disposed)return;
-        if(document.hidden||!this.windowFocused||(typeof document.hasFocus==='function'&&!document.hasFocus())){this.disarmGamepad();return;}
-        let pad:Gamepad|undefined;try{pad=Array.from(navigator.getGamepads?.()??[]).find((p):p is Gamepad=>!!p&&p.connected!==false&&p.mapping==='standard');}catch{}
-        if(!pad){this.padDevice=null;this.disarmGamepad();return;}
-        const device=`${pad.index}:${pad.id}`;
-        if(device!==this.padDevice){this.padDevice=device;this.disarmGamepad();}
-        // Returning/connecting with controls held must never activate a menu or
-        // resume gameplay. Require raw neutral, including opposed directions.
-        if(!this.padArmed){
-            this.padArmed=![0,1,2,3,4,5,9,12,13,14,15].some(index=>pad.buttons[index]?.pressed)
-                &&[0,1].every(index=>Math.abs(pad.axes[index]??0)<=.25);
-            return;
-
+        if(this.controlsHelp.isOpen){
+            const command=this.gamepad.menu(this.controlsHelp.canControl()?'delicia:controls':null);
+            if(command)this.controlsHelp.control(command);return;
         }
-        const down=(i:number)=>!!pad?.buttons[i]?.pressed,wasMenu=this.screen!=='playing';
-        const menuKeys:Record<string,boolean>={up:(pad?.axes[1]??0)<-.5||down(12),down:(pad?.axes[1]??0)>.5||down(13),left:(pad?.axes[0]??0)<-.5||down(14),right:(pad?.axes[0]??0)>.5||down(15),accept:down(0),back:down(1)};
-        const taps=new Set(Object.keys(menuKeys).filter(key=>menuKeys[key]&&!this.menuPad.has(key)));this.menuPad=new Set(Object.keys(menuKeys).filter(key=>menuKeys[key]));
-        if(this.screen!=='playing'&&(!this.menu||document.activeElement===this.canvas||this.presentation.menus.canControl())){
-            if(taps.has('back'))this.goBack();
-            else if(this.screen==='map'&&!this.listOpen){
-                const delta=taps.has('left')||taps.has('up')?-1:taps.has('right')||taps.has('down')?1:0;
-                if(delta){const i=Math.max(0,DELICIA_STAGES.findIndex(s=>s.id===this.mapSelection));this.selectMap(DELICIA_STAGES[(i+delta+DELICIA_STAGES.length)%DELICIA_STAGES.length].id);this.focusMapPin();}
-                if(taps.has('accept')){const focused=document.activeElement as HTMLElement;if(focused?.closest('.dl-map-tools'))focused.click();else this.loadStage(this.mapSelection);}
-            }else if(this.menu){
-                if(taps.has('up')||taps.has('left')||taps.has('down')||taps.has('right'))this.selectNativeMenu(taps.has('down')||taps.has('right')?1:-1);
-                if(taps.has('accept'))this.activateMenu(this.menuSelection);
-            }else{
-                const range=document.activeElement as HTMLInputElement;
-                if(range?.type==='range'&&(taps.has('left')||taps.has('right'))){taps.has('right')?range.stepUp():range.stepDown();range.dispatchEvent(new Event('input',{bubbles:true}));}
-                if(taps.has('up')||taps.has('down'))this.moveMenuFocus(taps.has('down')?1:-1);
-                if(taps.has('accept'))(document.activeElement as HTMLElement)?.click();
+        const dialog=Array.from(document.querySelectorAll<HTMLDialogElement>('dialog[open]')).at(-1);
+        if(dialog){
+            const command=this.gamepad.menu(menuId(dialog));
+            if(command)this.controllerMenu.control(dialog,command,()=>closeGamepadDialog(dialog));return;
+        }
+        if(this.screen==='playing'){
+            const ready=this.gamepad.game();
+            if(this.gamepad.consumeDisconnect()){this.pause();return;}
+            if(!ready)return;
+            if(this.gamepad.pressed('pause')){this.pause();return;}
+            if(this.gamepad.pressed('guide')){this.pause();this.controlsHelp.open();return;}
+            const left=this.gamepad.down('left'),right=this.gamepad.down('right');
+            for(const [action,key]of Object.entries(LOGICAL_KEYS)){
+                const active=action==='left'?left&&!right:action==='right'?right&&!left:this.gamepad.down(action as 'jump');
+                const source=`gamepad:${action}`;
+                if(active)this.holdInput(source,key);else this.releaseInput(source);
             }
+            return;
         }
-        const state:Record<string,boolean>={'pad-left':(pad?.axes[0]??0)<-.25||down(14),'pad-right':(pad?.axes[0]??0)>.25||down(15),'pad-jump':down(0),'pad-dash':down(2),'pad-seed':down(1),'pad-parry':down(3),'pad-pound':down(4)||down(13),'pad-interact':down(5)};
-        for(const [key,active] of Object.entries(state)){
-            if(wasMenu&&active)this.padMenuLatch.add(key);else if(!active)this.padMenuLatch.delete(key);
-            const source=`gamepad:${key}`;
-            if(this.padMenuLatch.has(key)){this.releaseInput(source,true);continue;}
-            if(active)this.holdInput(source,key);else this.releaseInput(source);
+        const command=this.gamepad.menu(`delicia:${this.menu?.id??this.screen}:${this.listOpen}`);
+        this.gamepad.consumeDisconnect();
+        if(!command)return;
+        if(command==='guide'){this.controlsHelp.open();return;}
+        if(command==='back'||command==='pause'){this.goBack();return;}
+        if(this.menu){
+            if(['up','left','down','right'].includes(command))this.selectNativeMenu(command==='down'||command==='right'?1:-1);
+            else if(command==='confirm')this.activateMenu(this.menuSelection);
+            return;
         }
-        const pause=down(9);if(pause&&!this.gamepadPause){if(this.screen==='playing')this.pause();else if(this.screen==='pause')this.resume();else this.goBack();}this.gamepadPause=pause;
+        if(this.screen==='map'&&!this.listOpen){
+            if(command==='left'||command==='right'){
+                const i=Math.max(0,DELICIA_STAGES.findIndex(s=>s.id===this.mapSelection));
+                this.selectMap(DELICIA_STAGES[(i+(command==='right'?1:-1)+DELICIA_STAGES.length)%DELICIA_STAGES.length].id);this.focusMapPin();return;
+            }
+            if(command==='confirm'&&(document.activeElement===this.mapCanvas||(document.activeElement as HTMLElement)?.closest('.dl-pin'))){this.loadStage(this.mapSelection);return;}
+        }
+        this.controllerMenu.control(this.panel,command,()=>this.goBack());
     }
     private invalidatePausedPaint():void{this.pausedPaint=null;}
     private stopFrames():void{
@@ -202,6 +224,7 @@ export class DeliciaApp {
     private loop=(now:number):void=>{
         if(this.disposed||document.hidden)return;const dt=this.last?Math.min(.05,(now-this.last)/1000):0;this.last=now;this.pollGamepad();
         if(this.disposed||document.hidden)return;
+        if(this.controlsHelp.isOpen){this.requestFrame();return;}
         if(this.screen==='playing'&&this.sim){
             if(this.hitStop>0){this.hitStop=Math.max(0,this.hitStop-dt);this.accumulator=0;}else this.accumulator+=dt;
             let first=true;while(this.accumulator+1e-9>=DELICIA_STEP){this.step(DELICIA_STEP,first?this.input():{...this.input(),jumpPressed:false,jumpReleased:false,dash:false,pound:false,seed:false,parry:false,interact:false});this.accumulator=Math.max(0,this.accumulator-DELICIA_STEP);first=false;if(this.screen!=='playing'||this.hitStop>0){this.accumulator=0;break;}}
@@ -226,16 +249,16 @@ export class DeliciaApp {
             else if(event.kind==='defeat'){this.audio.effect('victory');this.audio.voice(sim.boss?.character==='jaja'?'jaja-promessa':'guina-final');this.notify(sim.boss?.character==='jaja'?'Jajá derrotado!':'Guina derrotado!');}
             else if(event.kind==='clear'){this.clearStage();return;}
             else if(event.kind==='boss-hit'||event.kind==='enemy'){this.audio.effect('boss-hit');this.shake=.1;this.hitStop=event.kind==='boss-hit'?.055:.025;}
-            else if(event.kind==='hurt'){this.audio.effect('boss-hit',.5);this.shake=.16;}
+            else if(event.kind==='hurt'){this.gamepad.rumble(.5,100);this.audio.effect('boss-hit',.5);this.shake=.16;}
             else if(event.kind==='pound'){this.audio.effect('pound',.65);this.shake=.15;}
-            else if(event.kind==='parry'){this.audio.effect('parry',.7);this.hitStop=.065;this.notify('Rebatida perfeita!');}
+            else if(event.kind==='parry'){this.gamepad.rumble(.25,55);this.audio.effect('parry',.7);this.hitStop=.065;this.notify('Rebatida perfeita!');}
             else if(['dash','seed','jump'].includes(event.kind))this.audio.effect(event.kind,.5);
         }
         if(sim.dead){this.setScreen('dead');this.showDeath();}
         this.updateHud();
     }
     private resetInput():void{
-        for(const source of this.sources.keys())if(source.startsWith('gamepad:'))this.padMenuLatch.add(source.slice(8));
+        this.gamepad.reset();this.pointerOwners.clear();
         this.held.clear();this.pressed.clear();this.released.clear();this.sources.clear();this.buttonKeys.clear();this.accumulator=0;}
     private setScreen(screen:Screen):void{
         this.saveImportCleanup?.();
@@ -537,23 +560,7 @@ export class DeliciaApp {
             {label:'MEMÓRIAS',x:214,y:153,width:96,height:20,run:()=>this.openJournal(()=>this.showSettings(back))},
         ]});
     }
-    private showControls():void{
-        const back=this.settingsReturn;
-        this.nativeMenu({id:'controls',kind:'journal',title:'CONTROLES',back:()=>this.showSettings(back),text:[
-            'MOVER: SETAS / A D · DIRECIONAL',
-            'PULAR: ESPAÇO / W / Z · A / ×',
-            'CORRER: SHIFT / X · X / □',
-            'SENTADA: S / BAIXO · LB / BAIXO',
-            'SEMENTE: J · B / ○',
-            'REBATER: Q · Y / △',
-            'ABRIR FONTE: E · RB',
-            'PAUSA: ESC · MENU   SOM: M',
-        ].join('\n'),detail:'AJUDA: MAIS VIDA, SEM RECORDES OU MEDALHAS.',choices:[
-            {label:()=>`AJUDA: ${this.store.save.assists?'SIM':'NÃO'}`,ariaLabel:()=>`Mais vida e avisos longos: ${this.store.save.assists?'ativados':'desativados'}. Vale na próxima fase. Desativa recordes e medalhas.`,
-                x:24,y:145,width:150,height:20,run:()=>{this.store.save.assists=!this.store.save.assists;this.persistSettings();if(!this.store.warning)this.announce('Ajuda vale na próxima fase. Desativa recordes e medalhas.');}},
-            {label:'VOLTAR',x:215,y:145,width:80,height:20,run:()=>this.showSettings(back)},
-        ]});
-    }
+    private showControls():void{this.assistControl.checked=this.store.save.assists;this.controlsHelp.open();}
     private exportSave():void{const url=URL.createObjectURL(new Blob([JSON.stringify(this.store.save,null,2)],{type:'application/json'})),a=element('a');a.href=url;a.download='feka-imperio-delicia-save.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),500);}
     private importSave():void{
         this.saveImportCleanup?.();if(this.disposed||this.screen!=='settings')return;
@@ -588,8 +595,15 @@ export class DeliciaApp {
             const b=element('button','dl-touch-button');b.dataset.key=key;b.setAttribute('aria-label',name);b.type='button';
             Object.assign(b.style,{left:`${x/320*100}%`,top:`${y/180*100}%`,width:`${width/320*100}%`,height:`${height/180*100}%`});
             this.listen(b,'pointerdown',(e:PointerEvent)=>{
-                if(this.disposed||this.screen!=='playing'||e.button!==0)return;e.preventDefault();this.holdInput(`pointer:${e.pointerId}`,key);
+                if(this.disposed||this.screen!=='playing'||e.button!==0)return;e.preventDefault();this.pointerOwners.add(e.pointerId);this.holdInput(`pointer:${e.pointerId}`,key);
                 try{b.setPointerCapture(e.pointerId);}catch{/* Window terminal events still release this owner. */}
+            });
+            this.listen(b,'pointermove',(e:PointerEvent)=>{
+                if(!this.pointerOwners.has(e.pointerId)||this.screen!=='playing')return;
+                const next=document.elementFromPoint(e.clientX,e.clientY)?.closest<HTMLElement>('[data-key]');
+                const action=next&&this.touch.contains(next)?next.dataset.key:undefined,source=`pointer:${e.pointerId}`;
+                if(this.sources.get(source)===(action?INPUT_KEYS[action]:undefined))return;
+                this.releaseInput(source);if(action)this.holdInput(source,action);
             });
             this.listen(b,'keydown',(e:KeyboardEvent)=>{
                 if(this.disposed||this.screen!=='playing'||(e.key!=='Enter'&&e.key!==' '))return;e.preventDefault();if(e.repeat)return;
@@ -597,8 +611,8 @@ export class DeliciaApp {
             });
             this.listen(b,'keyup',(e:KeyboardEvent)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();this.keyUp(e);}});
             this.listen(b,'blur',()=>{for(const [physical,button] of this.buttonKeys)if(button===b){this.releaseInput(`button:${physical}`,true);this.buttonKeys.delete(physical);}});
-            this.listen(b,'pointerup',(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`));
-            for(const event of ['pointercancel','lostpointercapture'])this.listen(b,event,(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`,true));
+            this.listen(b,'pointerup',(e:PointerEvent)=>{this.pointerOwners.delete(e.pointerId);this.releaseInput(`pointer:${e.pointerId}`);});
+            for(const event of ['pointercancel','lostpointercapture'])this.listen(b,event,(e:PointerEvent)=>{this.pointerOwners.delete(e.pointerId);this.releaseInput(`pointer:${e.pointerId}`,true);});
             (key.startsWith('arrow')?directions:actions).append(b);
         }
     }

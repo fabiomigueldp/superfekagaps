@@ -12,6 +12,8 @@ import { runGuairaFlight } from './WorldGuairaFlight';
 import { guairaAlternateOpening, guairaChapterRoute } from './experimental/guaira/chapter/GuairaChapterProgress';
 import { Input } from '../engine/Input';
 import { StandardGamepad, type GamepadMenuCommand } from '../engine/StandardGamepad';
+import { DomGamepadMenu, closeGamepadDialog, menuId, installDomGamepad } from '../engine/DomGamepadMenu';
+import { GamepadDevice } from '../engine/GamepadDevice';
 import { DisposalScope } from '../engine/DisposalScope';
 import { Renderer } from '../engine/Renderer';
 import { Player } from '../entities/Player';
@@ -79,6 +81,8 @@ export class WorldGame {
     readonly renderer: Renderer;
     readonly input: Input;
     private gamepad?: StandardGamepad;
+    private transitionPad?: GamepadDevice;
+    private readonly controllerDom = new DomGamepadMenu();
     private gamepadHost?: WorldGamepadHost;
     readonly art = new WorldArt();
     private titleScene?: WorldTitleScene;
@@ -154,7 +158,7 @@ export class WorldGame {
             // Mount the modal's capture boundary before gameplay Input.
             if (!ephemeral && typeof document.body?.append === 'function') {
                 this.controlsHelp = new WorldControlsHelp(canvas, {
-                    canOpen: () => !this.isDisposed && this.state === 'settings',
+                    canOpen: () => !this.isDisposed && !this.chapterActive && this.state !== 'playing',
                     resetInput: () => this.input?.reset(),
                     suspendTouch: () => this.input.suspendCanvasTouchControls(),
                     onOpenChange: () => this.invalidateFrozenMenuPaint(),
@@ -226,10 +230,50 @@ export class WorldGame {
     }
     /** Opt in the main entry, or a chapter that supplies its own menu owner. */
     enableGamepadControls(host?: WorldGamepadHost): void {
-        if (this.isDisposed || this.gamepad) return;
+        if (this.isDisposed) return;
+        if (this.gamepad) { if (host) this.gamepadHost = host; return; }
         const gamepad = this.gamepad = new StandardGamepad(this.input);
+        this.addCleanup(() => this.controllerDom.dispose());
         this.gamepadHost = host;
+        // Standalone encounters use ordinary menus even with an ephemeral save.
+        if (!host && !this.menuAccessibility) {
+            this.menuAccessibility = new CanvasMenuAccessibility(this.mapCanvas, {
+                select: index => { this.menuSelection = index; },
+                activate: index => { this.audio.unlock(); this.buttons[index]?.run(); },
+                escape: () => this.backMenu(), resetInput: () => this.input.reset(),
+            });
+            this.addCleanup(() => this.menuAccessibility?.dispose());
+        }
+        if (!host && !this.controlsHelp) {
+            this.controlsHelp = new WorldControlsHelp(this.mapCanvas, {
+                canOpen: () => !this.isDisposed && this.state !== 'playing',
+                resetInput: () => this.input.reset(), suspendTouch: () => this.input.suspendCanvasTouchControls(),
+            });
+            this.addCleanup(() => this.controlsHelp?.dispose());
+        }
         this.addCleanup(() => { gamepad.dispose(); this.gamepad = undefined; this.gamepadHost = undefined; });
+    }
+    protected interactFromControls(): void {}
+    protected feedbackFromControls(strength = .25, duration = 70): void { this.gamepad?.device.rumble(strength, duration); }
+    protected transitionControl(owner: string | null): GamepadMenuCommand | null {
+        if (!this.transitionPad && owner) {
+            this.transitionPad = new GamepadDevice();
+            this.addCleanup(() => this.transitionPad?.dispose());
+        }
+        return this.transitionPad?.menu(owner) ?? null;
+    }
+    protected handleControlCommands(): boolean {
+        if (this.state !== 'playing' && this.input.consumePause()) {
+            if (this.gamepadHost) this.gamepadHost.control('pause'); else this.backMenu();
+            return true;
+        }
+        if (this.input.consumeCommand('guide')) {
+            if (this.gamepadHost) this.gamepadHost.control('guide');
+            else { if (this.state === 'playing') this.pause(); this.controlsHelp?.open(); }
+            return true;
+        }
+        if (this.input.consumeCommand('interact')) this.interactFromControls();
+        return false;
     }
     /** Restore the journey for bookmarks from the former standalone chapter. */
     restoreGuairaReturn(): void {
@@ -360,7 +404,7 @@ export class WorldGame {
         return `${this.state}:${this.state === 'intro' ? this.introPage : this.state === 'gallery' ? this.galleryWorld : 0}`;
     }
     private controllerMenuOwner(): string | null {
-        if (this.state === 'playing' || this.state === 'dialogue' || this.mapCanvas.inert) return null;
+        if (this.state === 'playing' || this.mapCanvas.inert) return null;
         if (this.state === 'map') {
             const owner = this.mapView?.controllerOwner();
             return owner ? `map:${owner}` : null;
@@ -370,6 +414,7 @@ export class WorldGame {
     private controllerMenu(command: GamepadMenuCommand, owner: string): void {
         // Re-check the live owner, never dispatch to an earlier rendered page.
         if (owner !== this.controllerMenuOwner()) return;
+        if (command === 'guide') { this.controlsHelp?.open(); return; }
         if (this.state === 'map') { this.mapView?.control(command); return; }
         if (command === 'pause') { if (this.state === 'paused') this.resume(); return; }
         if (command === 'back') { if (this.state !== 'title') this.backMenu(); return; }
@@ -391,10 +436,16 @@ export class WorldGame {
     protected updateController(): boolean {
         const gamepad = this.gamepad;
         if (!gamepad) return false;
+        if (this.controlsHelp?.isOpen) {
+            const command = gamepad.updateMenu(this.controlsHelp.canControl() ? 'controls' : null);
+            if (command) this.controlsHelp.control(command);
+            return true;
+        }
         if (this.gamepadHost) {
             const host = this.gamepadHost, owner = host.owner();
             if (owner === 'playing') {
                 if (gamepad.update('playing')) { host.control('pause'); return true; }
+                if (gamepad.device.pressed('guide')) { host.control('guide'); return true; }
                 return false;
             }
             const command = gamepad.updateMenu(owner);
@@ -404,8 +455,13 @@ export class WorldGame {
             }
             return false;
         }
-        if (this.controlsHelp?.isOpen || this.flightCleanup || this.saveImportCleanup
-            || document.querySelector?.('dialog[open]')) {
+        const dialog = Array.from(document.querySelectorAll<HTMLDialogElement>('dialog[open]')).at(-1);
+        if (dialog) {
+            const command = gamepad.updateMenu(menuId(dialog));
+            if (command) this.controllerDom.control(dialog, command, () => closeGamepadDialog(dialog));
+            return true;
+        }
+        if (this.saveImportCleanup) {
             gamepad.update('inactive'); return false;
         }
         if (this.state === 'playing') {
@@ -586,12 +642,15 @@ export class WorldGame {
             return;
         const result = this.player.takeDamage();
         if (result.damaged) {
+            this.feedbackFromControls(.5, 100);
             this.audio.sfx('hit');
             this.player.die('hit', sourceX);
             this.beginDeathFeedback();
         }
-        else if (result.helmetUsed)
+        else if (result.helmetUsed) {
+            this.feedbackFromControls(.3, 70);
             this.combatFeedback('helmetLoss', this.player.getCenter().x, this.player.data.position.y + 3);
+        }
     }
     private beginDeathFeedback() {
         this.hitStopInput = null;
@@ -622,12 +681,10 @@ export class WorldGame {
     }
     update(dt: number) {
         if (this.isDisposed || this.chapterActive) return;
-        if (this.controlsHelp?.isOpen) {
-            this.gamepad?.update('inactive'); this.input.reset(); return;
-        }
         if (this.updateController()) return;
         this.input.setMenuMode(this.state !== 'playing');
         this.input.update();
+        if (this.handleControlCommands()) return;
         if (this.input.consumeMute())
             this.audio.toggle();
         const frozen = this.state === 'paused' || this.state === 'settings';
@@ -1076,6 +1133,8 @@ export class WorldGame {
         host.addEventListener('keydown', event => {
             if (!disposeRuntime && event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(); }
         });
+        const releaseLoadingPad = installDomGamepad(() => !disposeRuntime && !controller.signal.aborted ? host : null, () => close());
+        controller.signal.addEventListener('abort', releaseLoadingPad, { once: true });
         window.addEventListener('pagehide', onPageHide, { once: true });
         try {
             const { mountWorldChapter } = await import('./WorldChapterHost');
@@ -1089,7 +1148,7 @@ export class WorldGame {
             const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = 'Tentar novamente';
             retry.addEventListener('click', () => { close(); void this.mountChapter(chapter, stage); });
             host.append(retry, back); back.focus();
-        } finally { releaseEntryActivity(); }
+        } finally { releaseEntryActivity(); if (disposeRuntime) releaseLoadingPad(); }
     }
     private paintCanvasIfNeeded(): void {
         if (!this.frozenMenuOwner?.() || (this.state !== 'paused' && this.state !== 'settings')) {
