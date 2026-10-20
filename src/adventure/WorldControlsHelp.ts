@@ -51,7 +51,8 @@ export class WorldControlsHelp {
             }
             const navigation = (contentOptions.navigation ?? [
                 'Menus: Tab ou ↑/↓ para escolher; Enter ou Espaço para confirmar; Esc para voltar.',
-                'Controle na campanha principal: direcional/analógico escolhe; A/× confirma; B/○ volta; Start pausa/continua.',
+                'Controle padrão na campanha principal: ←/→ no direcional ou no analógico para andar; A/× pula; segure X/□ enquanto anda para correr. No ar, aperte o botão ↓ do direcional para a sentada.',
+                'Menus com controle: direcional/analógico escolhe; A/× confirma; B/○ volta; Start pausa/continua.',
                 'Mapa: ←/→ fases; ↑/↓ regiões; X/□ ilhas; Y/△ mundo. A/× usa a ação selecionada ou pula a viagem.',
                 'Solte os controles ao trocar de tela. Nas conversas, na ajuda e nos arquivos, use teclado ou toque.',
             ])
