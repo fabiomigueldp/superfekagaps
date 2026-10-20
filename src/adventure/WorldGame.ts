@@ -1,5 +1,6 @@
 import { importProgressFile, progressImportMessage } from './ProgressImport';
 import { touchControlsEnabled } from '../engine/TouchMode';
+import { exitGame } from '../engine/ExitGame';
 import { JournalAccessibility } from './JournalAccessibility';
 import { WorldResultAccessibility, clearResultReceipt, endingResultReceipt } from './WorldResultAccessibility';
 import { campaignJournal } from './CampaignJournal';
@@ -1317,10 +1318,13 @@ export class WorldGame {
         pixelText(c, 'SUPER', 160, 16, WORKSHOP_UI.paper, 2, 'center');
         pixelText(c, 'FEKA', 160, 32, WORKSHOP_UI.gold, 3, 'center');
         pixelText(c, 'GAPS', 160, 55, WORKSHOP_UI.paper, 2, 'center');
-        this.button(c, this.store.save.completed.length ? 'CONTINUAR' : 'JOGAR', 102, 80, 116, () => this.begin(), WORKSHOP_UI.light, false, 22);
-        this.button(c, 'OPÇÕES', 102, 105, 116, () => this.settings('title'), WORKSHOP_UI.light, false, 22);
-        this.button(c, 'GALERIA', 102, 130, 116, () => this.change('gallery'), WORKSHOP_UI.light, false, 22);
-        if (this.bonusEncounter) this.button(c, 'MEGA BOSS', 102, 155, 116, this.bonusEncounter, WORKSHOP_UI.gold, false, 20);
+        this.button(c, this.store.save.completed.length ? 'CONTINUAR' : 'JOGAR', 102, 79, 116, () => this.begin(), WORKSHOP_UI.light, false, 18);
+        this.button(c, 'OPÇÕES', 102, 99, 116, () => this.settings('title'), WORKSHOP_UI.light, false, 18);
+        this.button(c, 'GALERIA', 102, 119, 116, () => this.change('gallery'), WORKSHOP_UI.light, false, 18);
+        if (this.bonusEncounter) this.button(c, 'MEGA BOSS', 102, 139, 116, this.bonusEncounter, WORKSHOP_UI.gold, false, 18);
+        this.button(c, 'SAIR', 102, this.bonusEncounter ? 159 : 139, 116, () => {
+            this.audio.pause(true); void exitGame('world');
+        }, WORKSHOP_UI.light, false, 18);
     }
     private renderStory(c: CanvasRenderingContext2D) {
         const ending = this.state === 'ending';
