@@ -23,6 +23,7 @@ export class GlobalScoreboard {
     this.root = document.createElement('section');
     this.root.id = 'scoreboard-root';
     this.root.hidden = true;
+    // The name pattern counts Unicode characters; maxlength counts UTF-16 units.
     this.root.innerHTML = `
       <button class="scoreboard-tab" type="button" hidden>PLACAR GLOBAL</button>
       <dialog class="scoreboard-panel" aria-labelledby="scoreboard-title">
@@ -33,7 +34,8 @@ export class GlobalScoreboard {
           <form class="scoreboard-form" hidden>
             <p class="scoreboard-record">NOVO RECORDE PESSOAL! <strong class="scoreboard-points"></strong> PONTOS</p>
             <label for="scoreboard-name">Seu nome no placar</label>
-            <div class="scoreboard-input-row"><input id="scoreboard-name" name="name" type="text" required minlength="2" maxlength="16" pattern="[A-Za-zÀ-ÿ0-9][A-Za-zÀ-ÿ0-9 ._\\-]{1,15}" autocomplete="nickname" spellcheck="false" placeholder="SEU NOME"><button type="submit">PUBLICAR</button></div>
+            <div class="scoreboard-input-row"><input id="scoreboard-name" name="name" type="text" required pattern="[\\p{L}\\p{N}][\\p{L}\\p{N} ._\\-]{1,15}" aria-describedby="scoreboard-name-help" autocomplete="nickname" spellcheck="false" placeholder="SEU NOME"><button type="submit">PUBLICAR</button></div>
+            <small id="scoreboard-name-help">Use de 2 a 16 caracteres. Comece com uma letra ou número; depois, também são permitidos espaços, ponto, _ e -.</small>
             <small>Seu nome e recorde só são enviados ao clicar em Publicar.</small>
           </form>
           <p class="scoreboard-status" role="status" aria-live="polite"></p>
