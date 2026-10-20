@@ -6,7 +6,7 @@ export const CHASE_CHECKPOINT = CHASE_CHECKPOINTS[0];
 // The long portico opening is crossed on its maintenance walk or fallen decks.
 // All other openings fit the native running jump (no new movement ability).
 export const CHASE_GAPS = [[36,40],[63,67],[128,133],[169,185],[203,208],
-    [238,242],[282,287],[302,307],[333,339],[356,361],[371,377],
+    [238,242],[282,287],[302,307],[333,339],[361,366],[371,377],
     [427,432],[451,456],[484,490],[493,498]] as const;
 export const CHASE_STEPS = [20,21,49,50,78,79,114,115,213,214,297,298,385,386,437,438] as const;
 export const CHASE_DISTRICTS = [
@@ -73,14 +73,14 @@ export const CHASE_COUNTERS = [
     {id:'lock-load',deck:'chase-terrace-lock-top',pad:{x:4148,y:168,width:22},load:{x:4096,y:116,width:28,height:24},material:'iron'},
     {id:'gate-load',deck:'chase-terrace-final-top',pad:{x:6800,y:168,width:22},load:{x:6752,y:116,width:28,height:24},material:'iron'},
 ] as const;
-export const CHASE_PORTICO={trigger:2240,fire:48,targetX:2720,targetY:110,settle:36,end:3056} as const;
+export const CHASE_PORTICO={trigger:2240,fire:52,targetX:2720,targetY:110,release:4,settle:36,end:3056} as const;
 export const CHASE_FALLEN_DECKS=[
     {id:'chase-fallen-a',x:2704,y:208,width:64,height:7,delay:0},
     {id:'chase-fallen-b',x:2800,y:208,width:64,height:7,delay:6},
     {id:'chase-fallen-c',x:2896,y:208,width:64,height:7,delay:12},
 ] as const;
-export const CHASE_FLOOD={warningX:3824,sourceX:3968,endX:4512,speed:5,width:30,height:18} as const;
-export const CHASE_LEAP={trigger:5488,until:5704,prepare:30,flight:44,landingX:5672,recover:24} as const;
+export const CHASE_FLOOD={warningX:3824,sourceX:3968,endX:4512,launchSpeed:4,speed:5.4,accelerate:14,grow:8,width:30,height:20} as const;
+export const CHASE_LEAP={trigger:5488,until:5704,prepare:30,flight:42,height:42,landingX:5672,recover:24,footRelease:16} as const;
 export const CHASE_PATROLS=[
     {id:'chase-scout-cargo',role:'scout',x:1440,y:224,trigger:1264},
     {id:'chase-loader',role:'loader',x:5184,y:168,trigger:4912},

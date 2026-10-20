@@ -17,12 +17,12 @@ export function chaseStructureTiming(kind:ChaseStructureKind){
         {left:7,right:15,beam:11,panel:8,release:16,gravity:.06,turn:.64,turnTime:38};
 }
 
-interface Pursuer {x:number;tick:number;travel:number;velocity:number;motionSpeed:number;chaseBreaks:readonly number[];counters?:{reaction(tick:number):{age:number;weight:number}}}
+interface Pursuer {x:number;tick:number;travel:number;velocity:number;motionSpeed:number;chaseBreaks:readonly number[];course?:{gaitWeight:number};counters?:{reaction(tick:number):{age:number;weight:number}}}
 
 /** Anticipation is measured to the actual fracture threshold, not to the camera.
  * Contact releases through the neck first, then the rider and the distal tail. */
 export function chasePerformance(b:Pursuer,reduced=false){
-    const moving=unit(Math.abs(b.motionSpeed)/3),phase=b.travel/11;
+    const moving=unit(Math.abs(b.motionSpeed)/3)*(b.course?.gaitWeight??1),phase=b.travel/11;
     let prepare=0,hit=0,follow=0,settle=0,framing=0,strength=1,kind:ChaseStructureKind='pier',site=-1;
     for(const [i,s]of CHASE_BREAKS.entries()){
         const at=b.chaseBreaks[i];

@@ -13,7 +13,7 @@ import {drawHypotheticalBackground,drawHypotheticalTerrain,drawHypotheticalObjec
 import {HypotheticalChasePatrol} from '../src/adventure/hipotetico/HypotheticalChasePatrol';
 import {drawChasePatrol} from '../src/adventure/hipotetico/HypotheticalChasePatrolArt';
 import {launcherGeometry} from '../src/adventure/hipotetico/HypotheticalTower';
-import {hypotheticalMotion,smoothMotion} from '../src/adventure/hipotetico/HypotheticalMotion';
+import {hypotheticalMotion,smoothMotion,dinosaurFootAnchor} from '../src/adventure/hipotetico/HypotheticalMotion';
 import {CHASE_BREAKS,CHASE_FALLEN_DECKS,CHASE_LEAP,CHASE_PATROLS,CHASE_PORTICO} from '../src/adventure/hipotetico/HypotheticalLayout';
 import {CHASE_QUAYS} from '../src/adventure/hipotetico/HypotheticalChaseLife';
 import {chaseCollapsedEdge} from '../src/adventure/hipotetico/HypotheticalChaseDetails';
@@ -30,6 +30,7 @@ const display=createCanvas(320,180);display.style={};const renderer=new Renderer
 const plate=(w:number,h:number)=>{const canvas=createCanvas(w,h),context=canvas.getContext('2d');context.imageSmoothingEnabled=false;
     context.fillStyle='#132b34';context.fillRect(0,0,w,h);return {canvas,context};};
 const board=plate(1280,816),details=plate(640,288),movie=plate(960,588);
+const contacts=plate(1280,612);
 let frameNumber=0;
 const make=()=>{
     const stage=hypotheticalStage('chase'),level=new WorldLevel(stage.level),objects=new WorldObjects(stage.mechanisms),b=new HypotheticalModel('chase');
@@ -65,35 +66,41 @@ function cell(row:number,col:number,title:string){
     board.context.drawImage(native,col*320,row*204+24);
     pixelText(board.context,title,col*320+8,row*204+8,'#e6c390');
 }
+function contact(row:number,col:number,title:string){
+    contacts.context.drawImage(native,col*320,row*204+24);
+    pixelText(contacts.context,title,col*320+8,row*204+8,'#e6c390');
+}
 function running(s:Scene,tick:number,playerX:number,playerY=200){
     const {b,hero}=s;b.tick=b.course.tick=tick;b.x=playerX-110;b.travel=b.x+18;
     hero.position={x:playerX,y:playerY};hero.isGrounded=playerY===200;hero.animationFrame=Math.floor(tick/5)%6;
 }
 try{
-    const s=make(),b=s.b,start=1000,impact=start+86;
-    running(s,start+48,CHASE_PORTICO.trigger+48*3.5);
-    b.course.porticoAt=start;b.course.launchAt=start+48;
+    const s=make(),b=s.b,start=1000,fire=CHASE_PORTICO.fire,flight=34,impact=start+fire+flight;
+    running(s,start+fire,CHASE_PORTICO.trigger+fire*3.5);
+    b.course.porticoAt=start;b.course.launchAt=start+fire;
     const g=launcherGeometry({bow:b.bow,...hypotheticalMotion(b)},b.chaseLauncher!);
     const source={x:b.x+g.mouth[0],y:b.y+g.mouth[1],backX:b.x+g.exhaust[0],backY:b.y+g.exhaust[1]};
     const dx=CHASE_PORTICO.targetX-source.x,dy=CHASE_PORTICO.targetY-source.y,length=Math.hypot(dx,dy);
     for(let a=0;a<=190;a+=2){
         const jump=a>=132&&a<=164?a-132:-1;
         running(s,start+a,CHASE_PORTICO.trigger+a*3.5,jump<0?200:200-8*jump+.25*jump*jump);
-        b.course.porticoAt=start;b.course.launchAt=a<48?-1:start+48;b.course.impactAt=a<86?-1:impact;
-        b.course.launch=a<48?null:{...source,dx:dx/length,dy:dy/length};b.course.rocket=null;b.course.trail=[];
-        if(a>=48&&a<86){
-            const t=(a-48)/38,progress=t*t*.25+t*.75;
+        b.course.porticoAt=start;b.course.launchAt=a<fire?-1:start+fire;b.course.impactAt=a<fire+flight?-1:impact;
+        b.course.launch=a<fire?null:{...source,dx:dx/length,dy:dy/length};b.course.rocket=null;b.course.trail=[];
+        if(a>=fire&&a<fire+flight){
+            const t=(a-fire)/flight,progress=t*t*.25+t*.75;
             b.course.rocket={x:source.x+dx*progress,y:source.y+dy*progress,fromX:source.x,fromY:source.y,
-                dx:dx/length,dy:dy/length,age:a-48,remaining:length*(1-progress),speed:14,motorAge:a<54?-1:a-54};
-            for(let i=0;i<Math.min(30,(a-54)*2);i++){
+                dx:dx/length,dy:dy/length,age:a-fire,remaining:length*(1-progress),speed:14,motorAge:a<fire+6?-1:a-fire-6};
+            for(let i=0;i<Math.min(30,(a-fire-6)*2);i++){
                 const p=Math.max(0,progress-i*.012);
                 b.course.trail.push({x:source.x+dx*p,y:source.y+dy*p,born:b.tick-i*.4,seed:i});
             }
         }
-        const lead=62*smoothMotion((a-48)/24),cx=s.hero.position.x-150+lead;
+        const lead=b.course.cameraLead(s.hero.position.x),cx=s.hero.position.x-150+lead;
         paint(s,cx);film('PORTICO / PREPARACAO, DISPARO E TRAVESSIA');
-        const col=[32,54,88,120].indexOf(a);if(col>=0)cell(0,col,['SACAR E APOIAR','FOGUETE','RUPTURA','NOVOS APOIOS'][col]);
-        if(a===32||a===54){
+        const col=[32,60,88,128].indexOf(a);if(col>=0)cell(0,col,['SACAR E APOIAR','FOGUETE','RUPTURA','NOVOS APOIOS'][col]);
+        const detailCol=[96,116,130,148].indexOf(a);
+        if(detailCol>=0)contact(0,detailCol,['TENSIONAR','SOLTAR E GIRAR','PRIMEIRO CONTATO','ASSENTAR'][detailCol]);
+        if(a===32||a===56){
             const col=a===32?0:1;details.context.drawImage(native,0,24,160,132,col*320,24,320,264);
             pixelText(details.context,col?'SAIDA DO CANO':'CAVALEIRO / APOIO',col*320+8,8,'#e6c390');
         }
@@ -102,7 +109,7 @@ try{
         running(s,1240,2828,upper?120:184);b.course.tick=1240;b.course.impactAt=impact;b.course.rocket=null;
         paint(s,2680,undefined,i===1);cell(1,i,upper?'PASSARELA DE MANUTENCAO':'DECKS ASSENTADOS');
     }
-    for(let a=-50;a<=100;a+=2){
+    for(let a=-50;a<=148;a+=2){
         const water=make();running(water,1800+a,4022+a*3.5);
         water.b.course.floodWarningAt=1720;water.b.course.floodAt=a<0?-1:1800;
         const jump=a-18;if(jump>=0&&jump<=32){
@@ -111,16 +118,22 @@ try{
         paint(water,water.hero.position.x-110);film('COMPORTAS / PRESSAO, RUPTURA E FRENTE DE AGUA');
         if(a===-20)cell(1,2,'PRESSAO NO RESERVATORIO');
         if(a===36){cell(1,3,'CRUZAR A CRISTA');writeFileSync(join(out,'water.png'),native.toBuffer('image/png'));}
+        const col=[4,12,32,110].indexOf(a);
+        if(col>=0)contact(1,col,['TAMPA / PRIMEIRO JATO','FORMAR A CRISTA','AGUA E GRAVIDADE','ESCOAR NO CANAL'][col]);
     }
     for(let a=0;a<=108;a+=2){
         const leap=make();running(leap,2400+a,CHASE_LEAP.trigger+a*3.5);
         leap.b.course.leapAt=2400;leap.b.course.leapFrom=CHASE_LEAP.trigger-110+87;leap.b.course.leapTo=CHASE_LEAP.landingX;
-        const px=leap.b.course.leapPosition;
-        leap.b.x=px??(a<30?CHASE_LEAP.trigger-110+a*2.9:CHASE_LEAP.landingX+Math.max(0,a-74)*2.4);
+        const land=CHASE_LEAP.prepare+CHASE_LEAP.flight,px=leap.b.course.leapPosition;
+        const gait=(leap.b.course.leapFrom+18)/11;
+        leap.b.course.takeoffFeet=[dinosaurFootAnchor(gait,true,1,0,0),dinosaurFootAnchor(gait,false,1,0,0)];
+        leap.b.x=px??(a<CHASE_LEAP.prepare?CHASE_LEAP.trigger-110+a*2.9:CHASE_LEAP.landingX+Math.max(0,a-land)*2.4);
         leap.b.y=224-leap.b.course.leapHeight;leap.b.travel=leap.b.x+18;
-        const jump=a-54;if(jump>=0&&jump<=32){leap.hero.position.y=200-8*jump+.25*jump*jump;leap.hero.isGrounded=false;}
+        const jump=a-76;if(jump>=0&&jump<=32){leap.hero.position.y=200-8*jump+.25*jump*jump;leap.hero.isGrounded=false;}
         paint(leap,leap.hero.position.x-126);film('PASSARELAS / IMPULSO, VOO E ATERRISSAGEM');
-        const col=[18,48,74,90].indexOf(a);if(col>=0)cell(2,col,['PREPARACAO','TRAJETORIA','CONTATO','RECUPERACAO'][col]);
+        const col=[18,48,land,90].indexOf(a);if(col>=0)cell(2,col,['PREPARACAO','TRAJETORIA','CONTATO','RECUPERACAO'][col]);
+        const detailCol=[28,46,70,78].indexOf(a);
+        if(detailCol>=0)contact(2,detailCol,['APOIO / IMPULSO','PERNAS RECOLHIDAS','ESTENDER OS PES','ABSORVER O IMPACTO'][detailCol]);
     }
     for(const [index,spec]of CHASE_PATROLS.entries()){
         for(let a=0;a<=130;a+=2){
@@ -149,6 +162,7 @@ try{
     }
     writeFileSync(join(out,'chase-expansion.png'),board.canvas.toBuffer('image/png'));
     writeFileSync(join(out,'rider-details.png'),details.canvas.toBuffer('image/png'));
-    writeFileSync(join(out,'art-study.json'),JSON.stringify({kind:'directed native art',gameplay:false,audio:false,frames:frameNumber,fps:30},null,2)+'\n');
+    writeFileSync(join(out,'event-detail.png'),contacts.canvas.toBuffer('image/png'));
+    writeFileSync(join(out,'art-study.json'),JSON.stringify({kind:'directed native art',revision:'contact-2',gameplay:false,audio:false,frames:frameNumber,fps:30},null,2)+'\n');
     console.log(`Authored ${frameNumber} directed frames and native art plates.`);
 }finally{renderer.dispose();for(const dispose of clean.reverse())dispose();}

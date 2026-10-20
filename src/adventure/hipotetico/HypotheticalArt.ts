@@ -466,17 +466,21 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
 export function dinosaurPose(b: HypotheticalModel, cx: number, cy: number, reduced = false): DinosaurPose {
     const m=hypotheticalMotion(b);
     const pursuit=b.act==='chase'?chasePerformance(b,reduced):null;
+    const course=pursuit?b.course.bodyMotion:null;
     const activeTail=b.attack==='tail'&&['tell','attack'].includes(b.state);
     const focus=Math.max(b.state==='tell'?smoothMotion(b.age/b.warningTicks):b.state==='attack'?1:0,pursuit?.prepare??0);
     return { x: b.x-cx, y:b.y-cy, facing:b.visualFacing, pivot:b.pivot, gait:b.travel/11,
         ...m, breath:reduced||pursuit?0:Math.sin(b.tick/13)*.6, bow:b.bow,
         tail:reduced||activeTail||pursuit?m.tail:m.tail+(1-b.bow)*(Math.sin(b.tick/22)*.025-m.tuck*.08),
-        headPitch:pursuit?(pursuit.headPitch+b.course.bodyMotion.headPitch):undefined,jawHinge:pursuit?Math.min(.4,pursuit.jawHinge+m.jaw*.32):undefined,
+        headPitch:pursuit?pursuit.headPitch+course!.headPitch:undefined,jawHinge:pursuit?Math.min(.4,pursuit.jawHinge+m.jaw*.32):undefined,
+        feet:pursuit?b.course.feet(b.travel/11,(1-b.bow)*m.stride,b.x):undefined,
+        riderHeadTilt:course?.headTilt,
         aim:b.weaponAngle,
         armor:b.health,heat:b.heat,cloth:reduced?0:Math.min(5,Math.abs(b.motionSpeed)*.7)+Math.sin(b.travel/11-.8)*m.stride*.9+Math.sin(b.tick/9)*.25+(pursuit?.cloth??0),
-        chaseGesture:pursuit?.gesture,
+        chaseGesture:pursuit?{...pursuit.gesture,armFold:Math.max(pursuit.gesture.armFold,course!.tuck*.65),
+            reinSag:pursuit.gesture.reinSag*(1-course!.tuck*.6)}:undefined,
         launcher:b.chaseLauncher,
-        focus,eyeClose:Math.max(pursuit?.hit??0,pursuit?.counterHit??0)>.9||!reduced&&b.state==='rest'&&b.tick%137<4?1:0,
+        focus,eyeClose:course?.eyeClose||Math.max(pursuit?.hit??0,pursuit?.counterHit??0)>.9||!reduced&&b.state==='rest'&&b.tick%137<4?1:0,
         voice:b.state==='roar'?Math.max(0,Math.sin(b.age/9))*(1-smoothMotion((b.age-75)/30)):0,
         blink:Math.max(pursuit?.hit??0,pursuit?.counterHit??0)>.92||b.state==='rest'&&b.tick%160<4,daze:reduced?0:b.age/14,
         flash:b.state==='hurt'&&b.age<12, defeated:b.won };
@@ -607,8 +611,11 @@ export function drawHypotheticalCombat(c:CanvasRenderingContext2D,b:Hypothetical
                 for(let i=0;i<4;i++)polygon(c,[[x+5+i*9,floor-2],[x+8+i*9,floor-6],[x+11+i*9,floor-2]],P.hot);
             }
         }
-        // A fixed ground shadow locates the body during the jump; it never suggests a platform.
-        oval(c,b.x-cx-26,floor-4,52,5,P.deep);
+        // One shadow stays on the ground beneath the actor, softening as it
+        // rises. The late effects pass must not add a second landing shadow.
+        const altitude=b.act==='chase'?b.course.leapHeight:0,shadow=26-altitude*.21;
+        c.save();c.globalAlpha*=1-Math.min(.45,altitude*.01);
+        oval(c,b.x-cx-shadow,floor-4,shadow*2,5,P.deep);c.restore();
         if(!actor&&b.attack==='tail'&&b.state==='attack'&&b.age>=12&&b.age<=32){
             const path=dinosaurTail(-43,hypotheticalMotion(b).tail);
             pixelLine(c,b.x+b.facing*path[1][0]-cx,b.y+path[1][1]-cy-5,b.x+b.facing*path[2][0]-cx,b.y+path[2][1]-cy-5,P.cream);

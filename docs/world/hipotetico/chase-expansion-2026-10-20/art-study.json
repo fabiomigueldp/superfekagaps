@@ -1,7 +1,8 @@
 {
   "kind": "directed native art",
+  "revision": "contact-2",
   "gameplay": false,
   "audio": false,
-  "frames": 425,
+  "frames": 449,
   "fps": 30
 }

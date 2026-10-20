@@ -58,7 +58,7 @@ de sua janela de entrada.
 
 A primeira rajada baixa depois do pórtico foi antecipada para o vão seguinte:
 o projeto permite combinar a esquiva com a travessia. O salto do dinossauro
-tem 30 ticks de preparação, 44 de voo e 24 de recuperação; a aterrissagem
+tem 30 ticks de preparação, 42 de voo e 24 de recuperação; a aterrissagem
 é comprometida e não persegue a posição de Feka durante o voo.
 
 O reservatório avisa antes de romper e só libera a água após a aproximação
@@ -69,18 +69,56 @@ Não foram acrescentados “PISE”, “ALTO”, “BAIXO” ou instruções flu
 Postura, direção da arma, cabo, válvula, borda dos apoios e água comunicam as
 ações. As descrições detalhadas continuam no status acessível fora da tela.
 
+## Segunda passagem: contatos, peso e continuidade
+
+- **RPG:** a preparação dura 52 ticks e conserva uma pausa com a arma apoiada
+  antes do disparo. Depois de lançar, o cano mantém a direção comprometida.
+  Clarão curto, fumaça desprendida da arma, aletas abrindo e núcleo de chama
+  distinguem a expulsão do foguete da ignição do motor.
+- **Pórtico:** `HypotheticalChaseChoreography` compartilha o movimento entre
+  pintura e eventos. Cabos tensionam antes de romper; as vigas giram sobre as
+  juntas e conservam a rotação durante a queda. O primeiro canto que encontra
+  a água define o respingo e seu som. Cada piso assenta após 36 ticks, com
+  atrasos de 0, 6 e 12 ticks. Os grampos amortecem abaixo da superfície fixa
+  que recebe os pés e a colisão nativa.
+- **Água:** a crista cresce durante 8 ticks e acelera suavemente de 4 para
+  5,4 px/tick nos primeiros 14 ticks. Desenho e dano usam a mesma trajetória.
+  A área de dano fica dentro da crista e termina na borda do canal. A tampa
+  percorre um arco, rebate e assenta; o jato pulsa, a espuma circula e a água
+  escoa ao chegar ao canal, deixando uma esteira que se dissipa.
+- **Salto:** a altura passa a 42 px. Os pés preservam a pose de saída,
+  recolhem de forma assimétrica e se estendem nos últimos 12 ticks de voo.
+  O pé dianteiro toca primeiro, o traseiro dois ticks depois. Durante a
+  absorção inicial, permanecem presos ao mundo; a corrida retorna até o
+  16º tick após a aterrissagem. O cavaleiro reage depois do corpo, com
+  inclinação da cabeça e tensão das rédeas. O balanço de corrida diminui
+  durante o salto. Uma única sombra acompanha o corpo sobre o chão.
+- **Banco de aterrissagem:** o vão seguinte foi deslocado de 5.696–5.776
+  para 5.776–5.856, conservando seus 80 px. A recuperação do dinossauro
+  acontece sobre o cais; Feka continua até a próxima travessia e suas
+  passarelas, em vez de assistir aos pés se apoiando sobre água.
+- **Leitura:** a câmera acompanha o foguete e recupera o enquadramento do
+  perseguidor conforme os apoios assentam. Permanecem os intervalos sem
+  novas rajadas/investidas sobre esses eventos.
+
+Esses ajustes aumentam a pressão da água e encurtam um pouco o voo do
+perseguidor. São parâmetros de projeto, ainda sem comprovação por partida
+ou avaliação de jogadores nesta revisão.
+
 ## Arte e limites da revisão
 
-`scripts/render_hypothetical_chase_expansion.ts` compõe 425 quadros dirigidos
+`scripts/render_hypothetical_chase_expansion.ts` compõe 449 quadros dirigidos
 com os renderizadores nativos. Ele não atualiza a simulação, não reproduz
 entradas, não executa asserções e não abre uma sessão de navegador. As pranchas
-foram inspecionadas durante a autoria; a segunda passagem refinou os apoios,
-a continuidade das peças que caem e a soltura da preparação do salto.
+permitem examinar os contatos, a direção do foguete, a crista e a extensão
+das pernas. Os tempos e posições preparados para apresentação não são
+registros de uma partida.
 
 - `chase-expansion.png`: 16 composições dos eventos, rotas e inimigos.
 - `rider-details.png`: apoio da arma e saída do foguete, ampliados em pixels inteiros.
 - `water.png`: composição da crista e rota elevada.
-- `chase-expansion.mp4`: 425 quadros / 30 fps, composição dirigida sem áudio.
+- `event-detail.png`: doze composições da queda, água e anatomia do salto.
+- `chase-expansion.mp4`: 449 quadros / 30 fps, composição dirigida sem áudio.
 - `art-study.json`: metadados que identificam a natureza dessas imagens.
 
 Por instrução do projeto, não foram executados testes, typecheck, scripts de

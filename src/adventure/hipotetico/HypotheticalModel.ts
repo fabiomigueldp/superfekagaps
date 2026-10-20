@@ -6,7 +6,7 @@ import { ARENA_COLUMNS, CHASE_ATTACKS, CHASE_EXIT, CHASE_WIDTH, CHASE_GAPS, CHAS
 import {HypotheticalChaseCounterplay} from './HypotheticalChaseCounterplay';
 import {HypotheticalChaseSetpieces,type ChaseScenicCue} from './HypotheticalChaseSetpieces';
 import {launcherGeometry,type LauncherPose} from './HypotheticalTower';
-import {CHASE_PORTICO} from './HypotheticalLayout';
+import {CHASE_PORTICO,CHASE_LEAP} from './HypotheticalLayout';
 import { HypotheticalSiege, SIEGE_WIDTH, SIEGE_SECTORS } from './HypotheticalSiege';
 import {chaseDeckSpans,chaseMaterialAt,chaseTerraceFall,chaseRuinAt,CHASE_WATER_Y} from './HypotheticalChaseDetails';
 import { RIFLE_BURSTS, RIFLE_SPEED, type GunImpact } from './HypotheticalGunfire';
@@ -145,6 +145,8 @@ export class HypotheticalModel {
         if(this.act!=='chase')return undefined;
         const p=this.course.launcher;
         if(!p)return {draw:0,rifleLower:0,reach:0,aim:-.12,recoil:0,fired:this.course.launchAt!==-1};
+        const shot=this.course.launch;
+        if(shot)return {...p,aim:Math.atan2(shot.dy,shot.dx)};
         const m=hypotheticalMotion(this),g=launcherGeometry({bow:this.bow,...m},{...p,aim:0});
         return {...p,aim:Math.atan2(CHASE_PORTICO.targetY-this.y-g.y,CHASE_PORTICO.targetX-this.x-g.x)};
     }
@@ -399,6 +401,11 @@ export class HypotheticalModel {
     private chase(player: Rect) {
         this.course.update(this.tick,player,this.x);
         if (this.tick < (this.chaseStart?18:60)) return;
+        if(this.course.leapAge===CHASE_LEAP.prepare){
+            const stride=Math.min(1,Math.abs(this.previousVelocity)/2.8);
+            this.course.takeoffFeet=[dinosaurFootAnchor(this.travel/11,true,stride,0,0),
+                dinosaurFootAnchor(this.travel/11,false,stride,0,0)];
+        }
         this.counters.update(this.tick,player,this.body,this.chaseCover);
         if(this.counters.releasedThisTick>=0)this.emit('chase-cable');
         if(this.counters.waterThisTick>=0)this.emit('collapse-water');
@@ -439,11 +446,13 @@ export class HypotheticalModel {
             this.course.ignite({x:this.x+g.mouth[0],y:this.y+g.mouth[1],backX:this.x+g.exhaust[0],backY:this.y+g.exhaust[1]});
         }
         this.events.push(...this.course.events);
-        if(this.course.leapLanded)this.particle('stone',this.x,HYPOTHETICAL.floor);
+        if(this.course.leapLanded)this.particle('stone',this.course.leapTo+17,HYPOTHETICAL.floor);
+        if(this.course.landingAge===2){this.particle('step',this.course.leapTo-9,HYPOTHETICAL.floor);this.emit('step');}
         // A moving pursuer commits to a forward angle, not a world point it can
         // overtake halfway through the burst. The whole tell remains on screen.
         this.targetX=this.x+240;this.targetY=this.pursuitKind==='high'?this.rifleShoulder.y-4:HYPOTHETICAL.floor-12;
-        if(!this.course.airborne)this.footstep(oldTravel);
+        if(!this.course.airborne&&(this.course.landingAge<0||this.course.landingAge>=CHASE_LEAP.footRelease))
+            this.footstep(oldTravel);
         const body=this.body;
         this.frameHazards.push(body);
         this.chaseThreats.set(body,{kind:'caught',x:this.x,y:this.y-36,direction:this.facing});

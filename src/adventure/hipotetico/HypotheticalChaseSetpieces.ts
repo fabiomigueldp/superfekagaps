@@ -1,11 +1,13 @@
 import type {Rect} from '../../types';
 import {clamp} from '../types';
-import {smoothMotion} from './HypotheticalMotion';
+import {smoothMotion,dinosaurFootAnchor} from './HypotheticalMotion';
+import type {Point} from '../WorldPainting';
 import type {LauncherPose} from './HypotheticalTower';
 import {advanceRocketMotor,rocketTail,type ScenicRocket} from './HypotheticalRocketMotion';
 import {CHASE_PORTICO as P,CHASE_FALLEN_DECKS,CHASE_FLOOD as W,CHASE_LEAP as L} from './HypotheticalLayout';
+import {chaseCargoMotion,chasePorticoBeam,chaseFloodTravel,chaseFloodCap,CHASE_FLOOD_END} from './HypotheticalChaseChoreography';
 
-export type ChaseScenicCue='distant-metal'|'chase-launch'|'chase-rocket'|'chase-blast'|
+export type ChaseScenicCue='distant-metal'|'chase-launch'|'chase-rocket'|'chase-blast'|'chase-cable'|
     'distant-chain'|'distant-leak'|'chase-metal'|'collapse-water'|'slam'|'debris-land';
 const envelope=(age:number,rise:number,end:number)=>smoothMotion(age/rise)*(1-smoothMotion((age-rise)/(end-rise)));
 
@@ -16,6 +18,7 @@ export class HypotheticalChaseSetpieces {
     porticoAt=-1;launchAt=-1;impactAt=-1;
     floodWarningAt=-1;floodAt=-1;
     leapAt=-1;leapFrom=0;leapTo=0;leapSpent=false;
+    takeoffFeet:readonly [Point,Point]=[[-8,0],[14,0]];
     rocket:ScenicRocket|null=null;
     launch:{x:number;y:number;backX:number;backY:number;dx:number;dy:number}|null=null;
     trail:Array<{x:number;y:number;born:number;seed:number}>=[];
@@ -33,19 +36,26 @@ export class HypotheticalChaseSetpieces {
     get needsLaunch(){return this.porticoAge>=P.fire&&this.launchAt===-1;}
     get airborne(){return this.leapAge>=L.prepare&&this.leapAge<L.prepare+L.flight;}
     get leaping(){return this.leapAge>=0&&this.leapAge<L.prepare+L.flight+L.recover;}
+    get landingAge(){return this.leapAge<0?-1:this.leapAge-L.prepare-L.flight;}
     get leapHeight(){
         if(!this.airborne)return 0;
-        const u=(this.leapAge-L.prepare)/L.flight;return 4*38*u*(1-u);
+        const u=(this.leapAge-L.prepare)/L.flight;return 4*L.height*u*(1-u);
     }
     get leapPosition(){
         if(!this.airborne)return null;
         return this.leapFrom+(this.leapTo-this.leapFrom)*(this.leapAge-L.prepare)/L.flight;
     }
     get leapLanded(){return this.leapAge===L.prepare+L.flight;}
+    get gaitWeight(){
+        if(this.leapAge<0)return 1;
+        if(this.leapAge<L.prepare)return 1-.65*smoothMotion(this.leapAge/L.prepare);
+        if(this.airborne)return .35*(1-smoothMotion((this.leapAge-L.prepare)/6));
+        return smoothMotion(this.landingAge/L.footRelease);
+    }
     get movementScale(){
         if(!this.leaping)return 1;
         if(this.leapAge<L.prepare)return 1-.34*smoothMotion(this.leapAge/L.prepare);
-        return this.airborne?1:.66+.34*smoothMotion((this.leapAge-L.prepare-L.flight)/L.recover);
+        return this.airborne?1:.70+.30*smoothMotion(this.landingAge/L.recover);
     }
     /** No incoming rifle or ram is scheduled on top of a new movement lesson. */
     reservesAttack(x:number){
@@ -70,13 +80,19 @@ export class HypotheticalChaseSetpieces {
             if(r.remaining<=0){this.rocket=null;this.impactAt=tick;this.events.push('chase-blast');}
         }
         this.trail=this.trail.filter(p=>tick-p.born<54).slice(-44);
-        if(this.impactAge===9)this.events.push('distant-chain');
-        for(const d of CHASE_FALLEN_DECKS)if(this.impactAge===d.delay+P.settle)this.events.push('debris-land');
+        for(const [i,d]of CHASE_FALLEN_DECKS.entries()){
+            if(this.impactAge===d.delay+P.release)this.events.push('chase-cable');
+            if(this.impactAge===d.delay+P.settle)this.events.push('debris-land');
+            const beam=chasePorticoBeam(i,this.impactAge);
+            if(this.impactAge>=beam.contact&&this.impactAge-1<beam.contact)this.events.push('collapse-water');
+        }
         if(this.floodWarningAt===-1&&player.x>=W.warningX){this.floodWarningAt=tick;this.events.push('distant-leak');}
         if(this.floodAt===-1&&this.floodWarningAt!==-1&&tick-this.floodWarningAt>=48&&pursuerX+56>=W.sourceX){
             this.floodAt=tick;this.events.push('chase-metal','collapse-water');
         }
-        const end=Math.ceil((W.endX-W.sourceX)/W.speed);
+        const cap=chaseFloodCap(this.floodAge);
+        if(this.floodAge>=cap.contact&&this.floodAge-1<cap.contact)this.events.push('chase-metal');
+        const end=Math.ceil(CHASE_FLOOD_END);
         if(this.floodAge===end)this.events.push('collapse-water');
         if(!this.leapSpent&&this.leapAt===-1&&player.x>=L.trigger&&player.x<L.until&&player.x-pursuerX<220){
             this.leapAt=tick;
@@ -110,39 +126,60 @@ export class HypotheticalChaseSetpieces {
         const launcher=this.launcher,brace=launcher?.draw??0,recoil=launcher?.recoil??0;
         const a=this.leapAge,wind=a>=0&&a<L.prepare?smoothMotion(a/L.prepare):0;
         const release=this.airborne?1-smoothMotion((a-L.prepare)/6):0;
-        const tuck=this.airborne?Math.sin(Math.PI*(a-L.prepare)/L.flight):0;
+        const fly=a-L.prepare;
+        const tuck=this.airborne?smoothMotion(fly/9)*(1-smoothMotion((fly-L.flight+12)/12)):0;
         const land=a>=L.prepare+L.flight?envelope(a-L.prepare-L.flight,4,L.recover):0;
+        const riderLand=this.landingAge>=0?envelope(this.landingAge,7,L.recover):0;
         const water=this.floodAge<0?0:envelope(this.floodAge,3,22);
         return {compression:(wind+release)*5+tuck*6+land*8+brace*.8+water*3,
             tuck,strideScale:1-tuck,neckDrop:(wind+release)*4-land*3-water*2,
-            riderDrop:(wind+release)*4+tuck*9+land*5+recoil*2,
-            riderLean:-brace*2-recoil*4-(wind+release)*2+tuck*3-land*3,
-            tail:-(wind+release)*.08+tuck*.10+land*.06,rein:1-brace,
-            headPitch:(wind+release)*.045-tuck*.06+land*.04};
+            riderDrop:(wind+release)*4+tuck*9+riderLand*6+recoil*2,
+            riderLean:-brace*2-recoil*4-(wind+release)*2+tuck*3-riderLand*3,
+            tail:-(wind+release)*.08+tuck*.10+riderLand*.075,rein:1-brace,
+            headPitch:(wind+release)*.045-tuck*.06+land*.04,
+            headTilt:-recoil*.055-riderLand*.04,eyeClose:recoil>.65||land>.8};
+    }
+    feet(gait:number,stride:number,pursuerX:number):readonly [Point,Point]|undefined {
+        const a=this.leapAge,land=this.landingAge;
+        if(!this.airborne&&(land<0||land>=L.footRelease))return undefined;
+        const blend=(p:Point,q:Point,t:number):Point=>[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];
+        const planted:readonly [Point,Point]=[[-9,0],[17,0]];
+        return ([0,1] as const).map(i=>{
+            if(this.airborne){
+                const t=a-L.prepare;
+                const tuck:Point=i?[11,-16]:[-15,-21];
+                const landing:Point=[planted[i][0],i?0:-2];
+                return blend(blend(this.takeoffFeet[i],tuck,smoothMotion(t/8)),landing,
+                    smoothMotion((t-L.flight+12)/12));
+            }
+            const lock:Point=[planted[i][0]-(pursuerX-this.leapTo),i?0:-2*(1-smoothMotion(land/2))];
+            const native=dinosaurFootAnchor(gait,i===0,stride,0,0),u=smoothMotion((land-6)/(L.footRelease-6));
+            return blend(lock,native,u);
+        }) as [Point,Point];
     }
     fallenDeck(index:number){
         const d=CHASE_FALLEN_DECKS[index],age=this.impactAge<0?-1:this.impactAge-d.delay;
-        const u=clamp(age/P.settle,0,1),fall=u*u;
-        return {...d,age,ready:age>=P.settle,drawY:168+40*fall,
-            turn:age<0||age>=P.settle?0:Math.sin(u*Math.PI)*.16*(index===1?-1:1),
-            // The last bounce is visual only and never moves a supported foot.
-            settle:age>=P.settle?Math.sin((age-P.settle)*.8)*Math.exp(-(age-P.settle)/7):0};
+        return {...d,age,...chaseCargoMotion(age,index)};
     }
     get floodFront(){
         const age=this.floodAge;if(age<0)return null;
-        const x=W.sourceX+age*W.speed;
+        const x=W.sourceX+chaseFloodTravel(age);
         if(x>=W.endX)return null;
-        return {x,y:224-W.height,width:W.width,height:W.height,age};
+        const height=4+(W.height-4)*smoothMotion(age/W.grow);
+        return {x,y:224-height,width:W.width,height,age};
     }
     get hazards():Rect[]{
         const front=this.floodFront;
-        return front?[{x:front.x+7,y:front.y+3,width:18,height:front.height-3}]:[];
+        if(!front||front.age<W.grow)return [];
+        const x=front.x+10,width=Math.min(14,W.endX-x);
+        return width>0?[{x,y:front.y+6,width,height:front.height-6}]:[];
     }
     /** Functional look-ahead is retained with reduced motion enabled. */
     cameraLead(x:number){
         const zone=(from:number,to:number,amount:number)=>amount*smoothMotion((x-from)/96)*(1-smoothMotion((x-to)/112));
         const flightLook=this.porticoAge<0?0:smoothMotion((this.porticoAge-P.fire)/24);
-        return Math.max(zone(P.trigger-80,P.end-80,62)*flightLook,zone(W.warningX-96,W.endX-48,44),
+        const settleLook=this.impactAge<0?0:smoothMotion((this.impactAge-16)/32);
+        return Math.max(zone(P.trigger-80,P.end-80,62-34*settleLook)*flightLook,zone(W.warningX-96,W.endX-48,44),
             zone(4848,5296,48),zone(1264-80,1544,40),zone(6608-80,6872,40),
             zone(L.trigger-64,5952,24));
     }
