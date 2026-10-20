@@ -195,6 +195,74 @@ as inclinações, velocidades e encaixes nativos da arma. O script de autoria
 sem avançar a simulação nem reproduzir controles. Os títulos ficam somente
 na apresentação; não foram acrescentadas instruções visíveis no jogo.
 
+## Quinta passagem: materiais, objetos de serviço e leitura da margem
+
+Foram revistas as superfícies, os apoios, a composição e a distribuição de
+detalhes dos seis distritos. A inspeção encontrou repetição excessiva de
+pequenas chapas e tábuas de 16 px, além de uma mesma placa com seta antes de
+cada vão. A direção desta passagem é tornar a construção mais clara e
+variada, preservando o contraste dos personagens, ataques e apoios reais.
+
+- **Pisos:** `HypotheticalChaseSurfaceArt` desenha tábuas e chapas em módulos
+  de 48 px e alvenaria em cursos desencontrados de 32 px. Cada trecho é
+  recortado pela célula sólida nativa de 16 px; a textura não atravessa um
+  vão nem reaparece sobre o trecho já destruído. Veios, nós, juntas,
+  reforços e oxidação pertencem ao material. A região das comportas ganha
+  drenos embutidos na face da margem.
+- **Leitura dos saltos:** as quinze placas de seta foram removidas.
+  Terminações de metal, pedra ou madeira dão acabamento às bordas de saída
+  e chegada. A faixa clara continua sobre a superfície de colisão, com
+  água visível no vão. As terminações ficam dentro da margem sólida.
+- **Degraus e passarelas:** cada degrau de carga de duas células passa a
+  compartilhar cintas, veios e um puxador rebaixado. Os apoios elevados
+  ganham juntas, marcas de umidade nos pés e desgaste preso à peça.
+  A mesma geometria conserva os detalhes durante a queda.
+- **Decoração:** `HypotheticalChaseRoadside` acrescenta doze conjuntos,
+  dois por distrito, com seis tipos de construção: amarração, rede,
+  carretel, ferramentas, armário técnico e tubulação protegida.
+  Bases de três pixels chegam ao piso real em y=224. Silhuetas e cores
+  ficam atrás dos atores e dos projéteis; os conjuntos são cenográficos.
+- **Movimento:** a rede recebe o vento comum do cais. Ferramentas,
+  carretéis e pequenos componentes respondem aos eventos reais de passo
+  e aterrissagem próximos, com um impulso curto que decai em 24 ticks.
+  Não há um tremor contínuo baseado apenas no deslocamento do perseguidor.
+  Movimento reduzido suprime essas oscilações.
+- **Destruição:** o objeto consulta o instante em que sua célula de apoio
+  entrou em `bridgeDebris`. A peça inclina, cai e é recortada na superfície
+  da água. O primeiro canto do pedestal define o instante e a posição
+  fixa do respingo. O desenho gira suas coordenadas antes da rasterização
+  para manter a grade de pixels. O checkpoint não ressuscita um objeto
+  cujo apoio já desapareceu.
+
+| Trecho | Identidade e decisões consideradas na revisão |
+| --- | --- |
+| Cais | Alvenaria, amarração e rede; bordas dos primeiros saltos e distinção da rota do contrapeso. |
+| Carga | Tábuas longas, carretel e ferramentas; espaço visual para o batedor, a investida e os andaimes. |
+| Pórtico | Chapas e reforços; detalhes baixos deixam o foguete, as vigas e as duas travessias em destaque. |
+| Comportas | Alvenaria úmida, drenos e tubulação; a frente de água conserva sua silhueta clara diante dos objetos. |
+| Passarelas | Madeira e armazenamento de cabos; os apoios elevados mantêm a leitura durante o salto do dinossauro e a retomada dos tiros. |
+| Portaria | Chapas com nervuras, armário e ferramentas; acabamento junto da combinação final e da aproximação do portal. |
+
+A distribuição dos objetos usa margens existentes, afastadas das bocas dos
+vãos e dos apoios dos contrapesos. Os intervalos de RPG, água, salto,
+patrulhas e fuziladas foram considerados como espaços de atenção do jogador
+na revisão de composição. Esta passagem não acrescenta obstáculos de
+colisão nem pretende comprovar que toda combinação é equilibrada.
+
+`scripts/render_hypothetical_chase_environment.ts` produziu:
+
+- `environment/environment.png`: 24 vistas preparadas dos seis distritos.
+- `environment/fixtures.png`: os seis tipos de objeto em ampliação inteira.
+- `environment/fixture-motion.png`: apoio, soltura, contato e submersão de
+  três conjuntos, com os mesmos desenhadores usados no jogo.
+- `environment/art-study.json`: natureza e alcance da autoria.
+
+Na primeira passagem visual, os objetos mostraram uma pequena separação da
+margem. A segunda acrescentou seus pedestais, ajustou o contato do canto
+com a água e reforçou discretamente os contornos. As vistas foram compostas
+com posições e tempos explícitos, sem atualizar a simulação. Não são
+capturas de gameplay, testes de dificuldade ou medições de desempenho.
+
 ## Arte e limites da revisão
 
 `scripts/render_hypothetical_chase_expansion.ts` compõe 449 quadros dirigidos

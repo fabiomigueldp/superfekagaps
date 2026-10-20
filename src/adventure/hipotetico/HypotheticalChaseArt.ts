@@ -204,6 +204,14 @@ export function drawChaseTerrace(c:CanvasRenderingContext2D,p:ChaseTerrace,cx:nu
         rect(u,7,4,v-7,body);line(u+1,8,u+1,v-2,light);
         line(u+2,Math.min(v-10,24),u+(u===5?15:-11),8,body,3);rect(u+1,10,2,2,'#c6b68e');
         rect(u-2,v-5,8,5,'#3f606a');line(u-1,v-5,u+4,v-5,'#7da09c');
+        // Staggered joinery and wet feet remain attached when the deck tips.
+        const collar=Math.max(9,v-14);
+        rect(u-1,collar,6,3,body);rect(u,collar,1,1,light);
+        if(!iron&&v>28){
+            line(u+2,19,u+2,26,'#766f58');
+            line(u+2,v-22,u+3,v-17,'#8c8567');
+        }
+        rect(u,v-8,4,3,'#4d7a74');
         if(age<0&&p.y+v===CHASE_WATER_Y)line(u-3,v,u+6,v,'#79aaa5');
     }
     rect(0,0,w,7,'#213545');rect(0,0,w,1,age<0?'#f0d4a1':'#a6b3a4');rect(0,1,w,1,age<0?'#c6b68e':'#8b9c90');
@@ -211,6 +219,10 @@ export function drawChaseTerrace(c:CanvasRenderingContext2D,p:ChaseTerrace,cx:nu
     for(let u=5;u<w-2;u+=iron?12:17){rect(u,2,1,3,body);rect(u-2,3,1,1,'#c6b68e');}
     line(2,5,w-3,5,light);
     for(const u of [4,w-8]){rect(u,2,4,4,'#3f606a');rect(u+1,3,1,1,'#c6b68e');}
+    for(let u=12;u<w-12;u+=27){
+        if(iron){line(u,3,u+10,3,'#587f80');rect(u+8,4,2,1,'#77958a');}
+        else{line(u,3,u+9,3,'#634f43');line(u+3,4,u+11,4,'#9b7958');}
+    }
 }
 
 function waterContact(c:CanvasRenderingContext2D,x:number,y:number,age:number,large:boolean,reduced:boolean){

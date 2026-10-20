@@ -1,16 +1,18 @@
 import { box, oval, pixelLine, polygon } from '../WorldPainting';
 import type { WorldLevel, WorldObjects, MovingBody } from '../WorldPhysics';
 import { HYPOTHETICAL, type HypotheticalModel } from './HypotheticalModel';
-import { ARENA_BALCONIES, ARENA_COLUMNS, CHASE_GAPS } from './HypotheticalLayout';
+import { ARENA_BALCONIES, ARENA_COLUMNS } from './HypotheticalLayout';
 import { SIEGE_SECTORS, SIEGE_WIDTH, SIEGE_UNLOCK_TICKS, SIEGE_LOCK_TICKS } from './HypotheticalSiege';
 import { DESTRUCTION_SITES, ruinAge, rubbleApproach } from './HypotheticalDevastation';
 import { backdropBaseline } from './HypotheticalBackdrop';
 import {drawChaseLandmarks,drawChaseTerrace} from './HypotheticalChaseArt';
-import {chaseCollapsedEdge,chaseMaterialAt} from './HypotheticalChaseDetails';
+import {chaseCollapsedEdge} from './HypotheticalChaseDetails';
 import {CHASE_QUAYS,chaseQuayX,chaseQuayBase,chaseWindAt} from './HypotheticalChaseLife';
 import {drawChaseIndustry,drawChaseQuayLife,drawChaseSkiffs} from './HypotheticalChaseLifeArt';
 import {drawChaseQuayGround,drawChaseFrontage,drawChaseShoreWater} from './HypotheticalChaseQuayArt';
 import {drawChaseDressing,drawChaseHarbor} from './HypotheticalChaseDressing';
+import {drawChaseRoadside} from './HypotheticalChaseRoadside';
+import {drawChaseStep,drawChaseSurfaceTile,drawChaseBankEnds} from './HypotheticalChaseSurfaceArt';
 import {drawArrivalCourtyard,drawArrivalPlaza,drawArrivalFittings} from './HypotheticalArrivalArt';
 import {drawForecourt} from './HypotheticalForecourt';
 import {masonryFall,SCENIC_FRACTURE,scenicRecoil,craneLoad,bastionCloth,arsenalPressure,scenicChip} from './HypotheticalScenicMotion';
@@ -299,6 +301,7 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
         drawChaseShoreWater(c,b,cx,cy,reduced);
         drawChaseSkiffs(c,b,cx,cy,reduced);
         // Nothing spans the foreground gaps: water remains visible through the missing deck.
+        drawChaseRoadside(c,b,cx,cy,reduced);
         drawChaseLandmarks(c,b,cx,cy,reduced);
         if(cx>HYPOTHETICAL.chaseEnd-420){
             // This gateway is tied to the chase's destination, not the repeating parallax street.
@@ -508,36 +511,6 @@ export function drawHypotheticalDestruction(c: CanvasRenderingContext2D, b: Hypo
     }
 }
 
-function timberStep(c: CanvasRenderingContext2D, x: number, y: number, col: number) {
-    box(c,x,y,16,16,S.ink);box(c,x+1,y+2,14,13,S.wood);
-    for(let j=0;j<3;j++){box(c,x+2,y+3+j*4,12,1,S.woodLight);box(c,x+3,y+5+j*4,10,1,S.woodShade);}
-    const band=col%2?12:1;box(c,x+band,y+1,3,14,S.iron);box(c,x+band,y+2,2,1,S.cap);box(c,x+band,y+12,2,1,S.cap);
-    box(c,x,y,16,1,S.edge);box(c,x+1,y+1,14,1,S.cap);
-}
-
-/** Long deck planks and steel plates stay distinct from the raised cargo crates. */
-function chaseDeckTile(c:CanvasRenderingContext2D,x:number,y:number,col:number,iron:boolean){
-    box(c,x,y,16,16,S.ink);box(c,x+1,y+2,15,7,iron?S.iron:S.wood);
-    box(c,x,y,16,1,S.edge);box(c,x,y+1,16,1,S.cap);
-    if(iron){
-        box(c,x+2,y+3,12,4,'#5e7e83');pixelLine(c,x+4,y+5,x+9,y+5,S.ironLight);
-        box(c,x+2,y+3,1,1,S.cap);box(c,x+12,y+6,1,1,S.cap);
-        box(c,x+4,y+10,8,2,S.iron);box(c,x+5,y+10,7,1,S.ironLight);
-        if(col%3===1){box(c,x+10,y+5,3,1,'#8a8b76');box(c,x+12,y+7,1,2,'#617576');}
-        pixelLine(c,x+15,y+3,x+15,y+7,'#304e5c');
-    }else{
-        const seam=col%2===0;
-        if(seam)box(c,x,y+2,1,7,S.woodShade);
-        pixelLine(c,x+2,y+3,x+12,y+3,S.woodLight);
-        pixelLine(c,x+4+col%3,y+6,x+11,y+6,S.woodShade);
-        if(col%4===1){box(c,x+8,y+4,3,2,S.woodShade);box(c,x+9,y+4,1,1,S.woodLight);}
-        box(c,x,y+10,16,4,S.woodShade);box(c,x,y+10,16,1,S.wood);
-        if(col%3===0){pixelLine(c,x+5,y+12,x+11,y+12,'#79604f');box(c,x+7,y+13,2,1,'#a17a59');}
-    }
-    if(col%2===0){box(c,x+1,y+7,4,8,S.iron);box(c,x+2,y+8,1,1,S.cap);box(c,x+2,y+13,1,1,S.ironLight);}
-    box(c,x,y+15,16,1,S.stoneShade);
-}
-
 /** Terrain paint samples the surviving tile mask, including the collapsing chase bridge. */
 export function drawHypotheticalMasonry(c: CanvasRenderingContext2D, level: WorldLevel, b: HypotheticalModel, cx: number, cy: number) {
     const tiles=level.data.tiles,left=Math.max(0,Math.floor(cx/16)),right=Math.min(level.data.width,Math.ceil((cx+320)/16));
@@ -545,9 +518,10 @@ export function drawHypotheticalMasonry(c: CanvasRenderingContext2D, level: Worl
     for(let row=0;row<level.data.height;row++)for(let col=left;col<right;col++){
         if(!solid(col,row))continue;
         const x=col*16-cx,y=row*16-cy;
-        if(b.act==='chase'&&row===13){timberStep(c,x,y,col);continue;}
-        if(b.act==='chase'&&row===14&&chaseMaterialAt(col*16)!=='stone'){
-            chaseDeckTile(c,x,y,col,chaseMaterialAt(col*16)==='iron');continue;
+        if(b.act==='chase'){
+            if(row===13)drawChaseStep(c,col,cx,cy);
+            else drawChaseSurfaceTile(c,col,row,cx,cy,solid);
+            continue;
         }
         box(c,x,y,16,16,S.stoneShade);
         const seam=mod(col+Math.floor(row/2),2)===0;
@@ -570,20 +544,7 @@ export function drawHypotheticalMasonry(c: CanvasRenderingContext2D, level: Worl
             const x=col*16-cx,y=224-cy;
             pixelLine(c,x+4,y+2,x+8,y+4,S.joint);pixelLine(c,x+8,y+4,x+6,y+7-k,S.joint);
         }
-        for(const [from,to] of CHASE_GAPS){
-            for(const col of [from-1,to]){
-                if(!solid(col,14))continue;
-                const x=col*16-cx,y=224-cy;
-                // Inlaid edge marks stay on the solid bank; they cannot bridge the hole.
-                box(c,x+3,y+1,9,2,'#98734f');box(c,x+5,y+1,4,1,S.edge);
-            }
-        }
-        for(const x of CHASE_GAPS.map(([a])=>a*16-80)){
-            if(!solid(Math.floor(x/16),14))continue;
-            box(c,x-cx,201-cy,2,23,S.woodShade);box(c,x-5-cx,195-cy,17,10,S.ink);
-            box(c,x-4-cx,196-cy,15,7,S.cap);
-            pixelLine(c,x+1-cx,198-cy,x+5-cx,200-cy,S.ink);pixelLine(c,x+5-cx,200-cy,x+1-cx,202-cy,S.ink);
-        }
+        drawChaseBankEnds(c,cx,cy,solid);
     }else if(b.act==='duel'){
         // Small sockets explain the winch cable's attachment, without implying extra platforms.
         for(const x of [53,263]){box(c,x-cx,224-cy,5,3,S.ink);box(c,x+1-cx,224-cy,3,1,S.ironLight);}

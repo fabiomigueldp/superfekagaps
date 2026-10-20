@@ -1,0 +1,45 @@
+{
+  "kind": "directed native art",
+  "gameplay": false,
+  "browser": false,
+  "frames": 0,
+  "views": [
+    [
+      32,
+      256,
+      620,
+      880
+    ],
+    [
+      1152,
+      1416,
+      1648,
+      1888
+    ],
+    [
+      2264,
+      2480,
+      2688,
+      3040
+    ],
+    [
+      3552,
+      3792,
+      4112,
+      4656
+    ],
+    [
+      4960,
+      5264,
+      5576,
+      6064
+    ],
+    [
+      6592,
+      6872,
+      7328,
+      7720
+    ]
+  ],
+  "scope": "24 authored environment views; six native fixture details; three staged falling fixtures. No simulation advanced."
+}
