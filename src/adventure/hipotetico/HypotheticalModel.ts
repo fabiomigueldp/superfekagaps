@@ -12,6 +12,7 @@ import {chaseDeckSpans,chaseMaterialAt,chaseTerraceFall,chaseRuinAt,CHASE_WATER_
 import { RIFLE_BURSTS, RIFLE_SPEED, type GunImpact } from './HypotheticalGunfire';
 import {chaseReactionStarts,updateChaseReactions} from './HypotheticalChaseLife';
 import {CHASE_STRIKE_REACH,chaseStrikeX,chasePerformance,chaseStructureTiming,type ChaseSound} from './HypotheticalChasePerformance';
+import {chaseRiflePitch,chaseShotSpeed,chaseSequenceFits} from './HypotheticalChaseGunplay';
 import {ARRIVAL,arrivalGate} from './HypotheticalArrival';
 import {SCENIC_STARTS,nextScenicTick,devastationAt} from './HypotheticalDevastation';
 import type {HelicopterCue} from './HypotheticalHelicopter';
@@ -81,7 +82,7 @@ export class HypotheticalModel {
     lastChaseContact:ChaseContact|null=null;
     private bowFrom = 0;
     private weaponFrom=-.15;
-    pursuitIndex=0; pursuitKind:ChaseStrike='high'; pursuitTell=52;
+    pursuitIndex=0; pursuitKind:ChaseStrike='high'; pursuitTell=CHASE_ATTACKS[0].tell;
     pursuitStep=0;pursuitCount=1;
     private pursuitVolley:ChaseVolley=CHASE_ATTACKS[0];
     private pursuitNext:ChaseVolley|null=null;
@@ -150,7 +151,10 @@ export class HypotheticalModel {
         const m=hypotheticalMotion(this),g=launcherGeometry({bow:this.bow,...m},{...p,aim:0});
         return {...p,aim:Math.atan2(CHASE_PORTICO.targetY-this.y-g.y,CHASE_PORTICO.targetX-this.x-g.x)};
     }
-    get rifleAngle() { const s=this.rifleShoulder;return Math.atan2(this.targetY-s.y,Math.max(1,(this.targetX-s.x)*this.facing)); }
+    get rifleAngle() {
+        if(this.act==='chase')return chaseRiflePitch(this.pursuitKind);
+        const s=this.rifleShoulder;return Math.atan2(this.targetY-s.y,Math.max(1,(this.targetX-s.x)*this.facing));
+    }
     get aim() { const a=this.rifleAngle,s=this.rifleShoulder;return {x:s.x+this.facing*31*Math.cos(a),y:s.y+31*Math.sin(a)}; }
     get weaponAngle(){
         const m=hypotheticalMotion(this),target=this.won?-.15+smoothMotion(this.age/35)*1.05
@@ -453,7 +457,7 @@ export class HypotheticalModel {
         if(this.course.landingAge===2){this.particle('step',this.course.leapTo-9,HYPOTHETICAL.floor);this.emit('step');}
         // A moving pursuer commits to a forward angle, not a world point it can
         // overtake halfway through the burst. The whole tell remains on screen.
-        this.targetX=this.x+240;this.targetY=this.pursuitKind==='high'?this.rifleShoulder.y-4:HYPOTHETICAL.floor-12;
+        this.aimPursuit();
         if(!this.course.airborne&&(this.course.landingAge<0||this.course.landingAge>=CHASE_LEAP.footRelease))
             this.footstep(oldTravel);
         const body=this.body;
@@ -481,7 +485,8 @@ export class HypotheticalModel {
         if(reserved&&(this.state==='tell'||this.state==='attack')){
             this.pursuitNext=null;this.enter('rest');this.attack='rifle';this.muzzle=0;
         }
-        if (!reserved&&this.state === 'rest' && this.age >= 18 && this.counters.reaction(this.tick).weight===0&&cue&&player.x>=cue.x&&player.x-this.x<180) {
+        if (!reserved&&this.state === 'rest' && this.age >= 18 && this.counters.reaction(this.tick).weight===0&&cue&&player.x>=cue.x&&player.x-this.x<180
+            &&chaseSequenceFits(cue,player.x,player.x-this.x)) {
             this.pursuitStep=0;this.pursuitCount=cue.followup?2:1;this.pursuitNext=cue.followup??null;this.pursuitIndex++;
             this.preparePursuit(cue);
         } else if (this.state === 'tell' && this.age >= this.warningTicks) this.enter('attack');
@@ -490,10 +495,10 @@ export class HypotheticalModel {
                 if(this.age===12){this.shoot(this.x+40,HYPOTHETICAL.floor-12,this.x+240,HYPOTHETICAL.floor-12,7,'wave');this.emit('slam');this.particle('stone',this.x+40);}
             }else if(this.pursuitVolley.shots.includes(this.age)){
                 this.muzzle=5;const m=this.aim,a=this.rifleAngle;
-                this.shoot(m.x,m.y,m.x+Math.cos(a)*200,m.y+Math.sin(a)*200,this.pursuitKind==='high'?6.6:6.8);
+                this.shoot(m.x,m.y,m.x+Math.cos(a)*200,m.y+Math.sin(a)*200,chaseShotSpeed(this.pursuitVolley));
             }
             if (this.age >= this.pursuitVolley.duration) {
-                if(this.pursuitNext&&player.x<CHASE_EXIT-216){
+                if(this.pursuitNext&&player.x<CHASE_EXIT-216&&chaseSequenceFits(this.pursuitNext,player.x,player.x-this.x)){
                     const next=this.pursuitNext;this.pursuitNext=null;this.pursuitStep++;
                     this.preparePursuit(next);
                 }else{this.pursuitNext=null;this.enter('rest');this.attack='rifle';}
@@ -505,8 +510,13 @@ export class HypotheticalModel {
         const from=hypotheticalStateMotion(this),weapon=this.weaponAngle;
         this.pursuitVolley=volley;this.pursuitKind=volley.kind;this.pursuitTell=volley.tell;
         this.attack=volley.kind==='ram'?'charge':'rifle';
-        this.targetX=this.x+240;this.targetY=volley.kind==='high'?this.rifleShoulder.y-4:HYPOTHETICAL.floor-12;
+        this.aimPursuit();
         this.enter('tell',from,weapon);this.emit('warning');
+    }
+    private aimPursuit(){
+        const shoulder=this.rifleShoulder,angle=chaseRiflePitch(this.pursuitKind);
+        this.targetX=shoulder.x+Math.cos(angle)*232;
+        this.targetY=shoulder.y+Math.sin(angle)*232;
     }
     private siege(player: Rect, livingGuards: number) {
         if(!this.arrivalSkipped&&this.arrivalTime>ARRIVAL.hold&&this.backdrop.tick<=ARRIVAL.hold&&player.x<ARRIVAL.watchX)this.arrivalWait++;

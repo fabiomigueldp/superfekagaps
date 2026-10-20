@@ -24,6 +24,8 @@ A etapa seguinte do arsenal e o duelo continuam no mesmo encontro.
 
 - `HypotheticalLayout`: dados únicos de regiões, ataques, vãos, plataformas,
   inimigos, contrapesos e eventos.
+- `HypotheticalChaseGunplay`: inclinação e velocidade dos tiros, intervalos
+  reservados e estimativa de espaço para completar cada sequência.
 - `HypotheticalChaseSetpieces`: relógio da preparação do RPG, disparo pelo
   encaixe real da arma, ignição após a saída do cano, impacto, decks,
   reservatório e salto. A pintura consulta o estado; não dispara eventos.
@@ -145,6 +147,53 @@ Foram feitas duas passagens de autoria visual: a primeira mostrou as poses
 e os contatos; a segunda incorporou o assentamento pelo canto e a apresentação
 do pico de compressão. As imagens são poses preparadas, não uma partida nem
 uma medição da dificuldade. O vídeo também não comprova a sincronização sonora.
+
+## Quarta passagem: rajadas descendentes e pressão do percurso
+
+A programação passa de **6 para 9 rajadas**, sendo **7 inclinadas para baixo**
+(antes eram 2). Cada rajada contém 4 ou 5 disparos, em vez de 3. O total
+programado passa de 18 para 40 tiros; é um máximo de autoria, pois contrapesos,
+atrasos, checkpoints e interrupções podem impedir algumas sequências. As duas
+investidas continuam no percurso.
+
+| Entrada de Feka | Sequência | Papel no percurso |
+| --- | --- | --- |
+| 600 | Alta, 4 tiros | Apresentar a direção da arma antes de exigir a esquiva descendente. |
+| 912 | Baixa, 4 tiros | Retomar a pressão depois do segundo vão; a rota elevada permite interrompê-la com a carga. |
+| 3.056 / 3.392 | Duas baixas, 5 tiros cada | Combinar a saída do pórtico com o salto seguinte e uma segunda preparação na margem. |
+| 4.560 | Baixa, 4 tiros | Reabrir a pressão depois do canal da água, antes do próximo operador. O checkpoint em 4.640 já a considera consumida. |
+| 5.984 / 6.288 | Baixas, 4 e 5 tiros | Retomar depois da aterrissagem do dinossauro e aumentar a cadência antes do próximo batedor. |
+| 7.336 | Alta com 4, seguida de baixa com 5 | Preparar separadamente a mudança de altura junto da travessia final. |
+
+Os tiros baixos mantêm **0,29 radianos de inclinação** (aproximadamente 16,6°).
+A arma conserva essa direção durante a rajada, embora sua origem acompanhe o
+corpo e o recuo. A mira não muda para acompanhar o salto de Feka. O desenho
+preserva espaço sob a trajetória para uma aproximação do dinossauro, com o
+risco de contato, além da possibilidade de saltar a sequência no momento certo.
+
+A velocidade baixa progride de 7,1 para 7,3 px/tick. As primeiras sequências
+têm 5 ticks entre tiros e 40 de preparação; as mais intensas chegam a 4 ticks
+entre tiros e 34 de preparação. Esses valores são parâmetros de projeto,
+não medidas de dificuldade ou de reação de jogadores.
+
+`chaseSequenceFits` considera a preparação, a duração, a eventual troca de
+mira e o tempo estimado para o último projétil ultrapassar a largura inteira
+de Feka, à velocidade nativa de corrida. A estimativa usa a distância atual,
+no mínimo o espaçamento de perseguição de 110 px, com uma margem para recuo
+e recuperação do avanço. O próximo intervalo reservado vem da mesma lista
+usada por `HypotheticalChaseSetpieces.reservesAttack`.
+
+Se não houver espaço para concluir a sequência, ela não começa; seu aviso
+nunca é encurtado para encaixá-la. A segunda rajada da combinação também
+reavalia a janela antes de começar. A colisão real com chão e cobertura
+continua podendo encerrar um projétil antes da estimativa. Essa proteção
+de agendamento não é uma simulação de todas as trajetórias possíveis.
+
+`gunplay.png` apresenta quatro poses preparadas da combinação final, usando
+as inclinações, velocidades e encaixes nativos da arma. O script de autoria
+`render_hypothetical_chase_counterplay.ts` calcula as posições da prancha
+sem avançar a simulação nem reproduzir controles. Os títulos ficam somente
+na apresentação; não foram acrescentadas instruções visíveis no jogo.
 
 ## Arte e limites da revisão
 

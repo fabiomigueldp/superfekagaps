@@ -6,6 +6,7 @@ import type {LauncherPose} from './HypotheticalTower';
 import {advanceRocketMotor,rocketTail,type ScenicRocket} from './HypotheticalRocketMotion';
 import {CHASE_PORTICO as P,CHASE_FALLEN_DECKS,CHASE_FLOOD as W,CHASE_LEAP as L} from './HypotheticalLayout';
 import {chaseCargoMotion,chasePorticoBeam,chaseFloodTravel,chaseFloodCap,CHASE_FLOOD_END} from './HypotheticalChaseChoreography';
+import {chaseAttackReserved} from './HypotheticalChaseGunplay';
 
 export type ChaseScenicCue='distant-metal'|'chase-launch'|'chase-rocket'|'chase-blast'|'chase-cable'|
     'distant-chain'|'distant-leak'|'chase-metal'|'collapse-water'|'slam'|'debris-land';
@@ -59,9 +60,7 @@ export class HypotheticalChaseSetpieces {
     }
     /** No incoming rifle or ram is scheduled on top of a new movement lesson. */
     reservesAttack(x:number){
-        return x>=1264&&x<1576 || x>=P.trigger&&x<P.end ||
-            x>=W.warningX&&x<W.endX+40 || x>=4900&&x<5304 ||
-            x>=L.trigger&&x<5952 || x>=6608&&x<6900;
+        return chaseAttackReserved(x);
     }
     update(tick:number,player:Rect,pursuerX:number){
         this.tick=tick;this.events=[];

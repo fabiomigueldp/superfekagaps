@@ -4,7 +4,6 @@ import {mkdirSync,writeFileSync} from 'node:fs';
 import {join,resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {sceneLifecycleBrowser} from '../tests/helpers/sceneLifecycleHarness';
-import {Renderer} from '../src/engine/Renderer';
 import {Player} from '../src/entities/Player';
 import {WorldLevel,WorldObjects} from '../src/adventure/WorldPhysics';
 import {HypotheticalModel} from '../src/adventure/hipotetico/HypotheticalModel';
@@ -12,6 +11,7 @@ import {hypotheticalStage} from '../src/adventure/hipotetico/HypotheticalStage';
 import {CHASE_COUNTERS,CHASE_BREAKS,CHASE_ATTACKS} from '../src/adventure/hipotetico/HypotheticalLayout';
 import {chaseCollapsedEdge} from '../src/adventure/hipotetico/HypotheticalChaseDetails';
 import {CHASE_STRIKE_REACH,chaseStrikeX} from '../src/adventure/hipotetico/HypotheticalChasePerformance';
+import {chaseRiflePitch,chaseShotSpeed} from '../src/adventure/hipotetico/HypotheticalChaseGunplay';
 import {drawHypotheticalBackground,drawHypotheticalTerrain,drawHypotheticalObjects,drawHypotheticalCombat} from '../src/adventure/hipotetico/HypotheticalArt';
 import {pixelText} from '../src/graphics/BitmapFont';
 
@@ -20,6 +20,11 @@ mkdirSync(join(out,'frames'),{recursive:true});
 const {createCanvas}=await import(pathToFileURL(resolve(canvasModule)).href);
 const clean:Array<()=>void>=[],h=sceneLifecycleBrowser({after:f=>clean.push(f as ()=>void)}),create=h.document.createElement;
 h.document.createElement=((tag:string)=>tag==='canvas'?createCanvas(1,1):create(tag)) as typeof create;
+// Control modules now read browser capabilities at import time. Establish the
+// native authoring boundaries first, with no saved player preferences.
+Object.defineProperty(globalThis,'localStorage',{configurable:true,value:{getItem:()=>null}});
+Object.assign(h.document,{documentElement:{dataset:{}}});
+const {Renderer}=await import('../src/engine/Renderer');
 const native=createCanvas(320,180),c=native.getContext('2d');c.imageSmoothingEnabled=false;
 const display=createCanvas(320,180);display.style={};const renderer=new Renderer(display);
 const plate=(w:number,h:number)=>{const canvas=createCanvas(w,h),context=canvas.getContext('2d');context.imageSmoothingEnabled=false;context.fillStyle='#122830';context.fillRect(0,0,w,h);return {canvas,context};};
@@ -45,6 +50,8 @@ const paint=(scene:ReturnType<typeof make>,cx:number,reduced=false)=>{
     o.bodies=o.bodies.filter(p=>p.x>=edge*16);level.bodies=o.bodies;
     b.chaseBreaks=CHASE_BREAKS.map(s=>chaseStrikeX(s)>b.x+CHASE_STRIKE_REACH?-1:b.tick-Math.floor((b.x+CHASE_STRIKE_REACH-chaseStrikeX(s))/3.5));
     b.chaseReactions=b.chaseReactions.map((_,i)=>i*400<b.x?b.tick-90:-1);
+    const shoulder=b.rifleShoulder,angle=chaseRiflePitch(b.pursuitKind);
+    b.targetX=shoulder.x+Math.cos(angle)*232;b.targetY=shoulder.y+Math.sin(angle)*232;
     drawHypotheticalBackground(c,b,cx,64,reduced);drawHypotheticalTerrain(c,level,b,cx,64);
     drawHypotheticalObjects(c,o,b,cx,64,reduced);drawHypotheticalCombat(c,b,cx,64,reduced);
     renderer.drawPlayer(hero,{x:cx,y:64,shakeTimer:0},c);
@@ -78,25 +85,35 @@ try{
             if(age===16){paint(scene,cx,true);writeFileSync(join(out,`load-${i}-reduced.png`),native.toBuffer('image/png'));}
         }
     }
-    const scene=make(),{b,hero}=scene,first=CHASE_ATTACKS[CHASE_ATTACKS.length-1],next=first.followup!,firstEnd=first.tell+first.duration,secondStart=firstEnd+next.tell;
+    const scene=make(),{b,hero}=scene,emitter=new HypotheticalModel('chase');
+    const first=CHASE_ATTACKS[CHASE_ATTACKS.length-1],next=first.followup!,firstEnd=first.tell+first.duration,secondStart=firstEnd+next.tell;
     for(let t=0;t<firstEnd+next.tell+next.duration;t++){
         b.tick=1400+t;b.x=first.x-110+t*3.5;b.travel=b.x+18;b.pursuitCount=2;b.pursuitStep=t<firstEnd?0:1;
         const local=t<firstEnd?t:t-firstEnd,v=t<firstEnd?first:next;
         b.pursuitKind=v.kind;b.pursuitTell=v.tell;b.state=local<v.tell?'tell':'attack';b.age=local<v.tell?local:local-v.tell;
-        b.targetX=b.x+240;b.targetY=v.kind==='high'?b.rifleShoulder.y-4:212;
+        const angle=chaseRiflePitch(v.kind),shoulder=b.rifleShoulder;
+        b.targetX=shoulder.x+Math.cos(angle)*232;b.targetY=shoulder.y+Math.sin(angle)*232;
         b.shots=[];b.muzzle=0;
         for(const [start,volley]of [[first.tell,first],[secondStart,next]] as const)for(const at of volley.shots){
             const since=t-start-at;if(since<0||since>30)continue;
-            const vy=volley.kind==='high'?-.12:1.8,vx=volley.kind==='high'?6.6:6.55;
-            const xx=b.x-since*3.5+36+since*vx,yy=146+since*vy;
+            const pitch=chaseRiflePitch(volley.kind),speed=chaseShotSpeed(volley),vy=Math.sin(pitch)*speed,vx=Math.cos(pitch)*speed;
+            // An explicitly authored firing pose supplies the native muzzle.
+            // This composes a trajectory; it does not update gameplay.
+            emitter.tick=b.tick-since;emitter.x=b.x-since*3.5;emitter.travel=emitter.x+18;
+            emitter.state='attack';emitter.attack='rifle';emitter.age=at;
+            emitter.velocity=emitter.motionSpeed=3.5;emitter.pursuitKind=volley.kind;emitter.muzzle=5;
+            emitter.chaseBreaks=CHASE_BREAKS.map(s=>chaseStrikeX(s)>emitter.x+CHASE_STRIKE_REACH?-1:
+                emitter.tick-Math.floor((emitter.x+CHASE_STRIKE_REACH-chaseStrikeX(s))/3.5));
+            const muzzle=emitter.aim,xx=muzzle.x+since*vx,yy=muzzle.y+since*vy;
+            if(yy>=219)continue;
             b.shots.push({x:xx,y:yy,px:xx-vx,py:yy-vy,width:5,height:5,vx,vy,age:since,life:100,kind:'bullet'});
             if(since<5)b.muzzle=5-since;
         }
-        const jump=Math.max(0,t-100);hero.position={x:first.x+t*3.5,y:200-Math.max(0,8*jump-.25*jump*jump)};
+        const jump=Math.max(0,t-112);hero.position={x:first.x+t*3.5,y:200-Math.max(0,8*jump-.25*jump*jump)};
         hero.isGrounded=jump===0||jump>=32;hero.animationFrame=Math.floor(t/5)%6;
         const cx=hero.position.x-150;
         if(!stills&&t%2===0){paint(scene,cx);film('PORTARIA / PREPARACAO E CONTINUIDADE DAS RAJADAS');}
-        const col=[28,49,82,107].indexOf(t);
+        const col=[28,52,84,118].indexOf(t);
         if(col>=0){paint(scene,cx);combo.context.drawImage(snapshot(),col*320,24);pixelText(combo.context,['PREPARACAO','PRIMEIRA SALVA','TROCA DE MIRA','SEGUNDA SALVA'][col],col*320+8,8,'#e2c28b');}
     }
     writeFileSync(join(out,'counterplay.png'),board.canvas.toBuffer('image/png'));

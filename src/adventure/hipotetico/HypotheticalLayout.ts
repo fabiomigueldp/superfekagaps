@@ -18,19 +18,30 @@ export function chaseDistrictAt(x:number){
     let index=0;for(let i=1;i<CHASE_DISTRICTS.length&&x>=CHASE_DISTRICTS[i].x;i++)index=i;return index;
 }
 export type ChaseStrike='high'|'low'|'ram';
-export interface ChaseVolley {kind:ChaseStrike;tell:number;duration:number;shots:readonly number[]}
+export interface ChaseVolley {kind:ChaseStrike;tell:number;duration:number;shots:readonly number[];speed?:number}
 export interface ChaseCue extends ChaseVolley {x:number;until:number;followup?:ChaseVolley}
 /** Every change of lane has its own tell. Expired cues cannot queue an attack
  * over the next gap after a long detour or an interrupted pursuit. */
 export const CHASE_ATTACKS:readonly ChaseCue[] = [
-    {x:600,until:728,kind:'high',tell:52,duration:36,shots:[1,7,13]},
+    // Start with a horizontal burst, then introduce the downward lane on the
+    // landing after the second gap. The upper cargo route can interrupt it.
+    {x:600,until:680,kind:'high',tell:48,duration:26,shots:[1,7,13,19],speed:6.8},
+    {x:912,until:944,kind:'low',tell:40,duration:28,shots:[1,6,11,16],speed:7.1},
     {x:1728,until:1840,kind:'ram',tell:48,duration:52,shots:[12]},
-    {x:3056,until:3136,kind:'low',tell:40,duration:34,shots:[1,6,11]},
-    {x:3376,until:3464,kind:'high',tell:46,duration:36,shots:[1,6,11]},
-    {x:6080,until:6176,kind:'high',tell:46,duration:36,shots:[1,6,11]},
+    // The first burst accompanies the portico exit gap. The second uses the
+    // broad bank before the reservoir, with a fresh tell and recovery.
+    {x:3056,until:3104,kind:'low',tell:40,duration:32,shots:[1,6,11,16,21],speed:7.1},
+    {x:3392,until:3464,kind:'low',tell:38,duration:32,shots:[1,6,11,16,21],speed:7.2},
+    // No new firing while the flood is live. This cue starts after its channel
+    // and is consumed by the checkpoint, so a retry gets the authored respite.
+    {x:4560,until:4592,kind:'low',tell:36,duration:28,shots:[1,6,11,16],speed:7.2},
+    // Pressure resumes after the leap recovery, then tightens on the straight
+    // before the next scout. The sequence must clear that scout's reservation.
+    {x:5984,until:6032,kind:'low',tell:38,duration:28,shots:[1,6,11,16],speed:7.2},
+    {x:6288,until:6320,kind:'low',tell:34,duration:30,shots:[1,5,9,13,17],speed:7.3},
     {x:6944,until:7040,kind:'ram',tell:44,duration:52,shots:[12]},
-    {x:7336,until:7432,kind:'high',tell:42,duration:22,shots:[1,6,11],
-        followup:{kind:'low',tell:34,duration:34,shots:[1,7,13]}},
+    {x:7336,until:7384,kind:'high',tell:40,duration:22,shots:[1,6,11,16],speed:7,
+        followup:{kind:'low',tell:34,duration:30,shots:[1,5,9,13,17],speed:7.3}},
 ];
 export const CHASE_BREAKS = [
     {x:976,kind:'pier'}, {x:1552,kind:'crane'}, {x:2112,kind:'crane'},
@@ -81,6 +92,16 @@ export const CHASE_FALLEN_DECKS=[
 ] as const;
 export const CHASE_FLOOD={warningX:3824,sourceX:3968,endX:4512,launchSpeed:4,speed:5.4,accelerate:14,grow:8,width:30,height:20} as const;
 export const CHASE_LEAP={trigger:5488,until:5704,prepare:30,flight:42,height:42,landingX:5672,recover:24,footRelease:16} as const;
+/** Shared by the scenery director and the rifle scheduler, including the time
+ * in which the final bullet must pass Feka before the next event begins. */
+export const CHASE_ATTACK_RESERVATIONS=[
+    {from:1264,to:1576},
+    {from:CHASE_PORTICO.trigger,to:CHASE_PORTICO.end},
+    {from:CHASE_FLOOD.warningX,to:CHASE_FLOOD.endX+40},
+    {from:4900,to:5304},
+    {from:CHASE_LEAP.trigger,to:5952},
+    {from:6608,to:6900},
+] as const;
 export const CHASE_PATROLS=[
     {id:'chase-scout-cargo',role:'scout',x:1440,y:224,trigger:1264},
     {id:'chase-loader',role:'loader',x:5184,y:168,trigger:4912},
