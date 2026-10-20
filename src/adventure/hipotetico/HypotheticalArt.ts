@@ -2,6 +2,7 @@ import { drawGunMuzzle, drawGunTracer, drawGunImpact, drawGunCasing } from './Hy
 import {drawChaseCollapse,drawChaseWave} from './HypotheticalChaseArt';
 import {chasePerformance,type ChaseGesture} from './HypotheticalChasePerformance';
 import {drawChaseFootfall} from './HypotheticalChaseImpactArt';
+import {drawCapturedHero,type HeldHero} from './HypotheticalCapturedHero';
 import { box, oval, pixelLine, polygon, type Point } from '../WorldPainting';
 import { pixelText } from '../../graphics/BitmapFont';
 import type { WorldLevel, WorldObjects } from '../WorldPhysics';
@@ -29,7 +30,7 @@ const P = { ink: '#172c36', deep: '#263f3d', shade: '#556047', hide: '#92845a', 
     suit: '#304659', lapel: '#607487', skin: '#c58d68', face: '#edbc8e', hair: '#3c3034',
     brass: '#d3a75c', mint: '#99e0cf', hot: '#ffb267', scute:'#6e7953', skinLight:'#f7d2a6',
     mouth:'#593b40', tongue:'#bc796a', leather:'#583f38', stitch:'#b8885d', clothShade:'#203644' };
-export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; headPitch?:number; jawHinge?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; swallow?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet; chaseGesture?:ChaseGesture }
+export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; headPitch?:number; jawHinge?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; swallow?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet; chaseGesture?:ChaseGesture; capturedHero?:HeldHero }
 const fogPalette=new Map<string,string>();
 function distantColor(color:string){
     if(!fogPalette.has(color)){
@@ -248,6 +249,14 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     poly([[30,neck+6],[65,neck+5],lowerJaw(61,neck+17+jaw),lowerJaw(37,neck+15+jaw),[27,neck+10]],P.ink);
     poly([[32,neck+8],[62,neck+7],lowerJaw(59,neck+12+jaw),lowerJaw(38,neck+11+jaw)],P.mouth);
     poly([lowerJaw(36,neck+11+jaw*.4),lowerJaw(55,neck+11+jaw*.7),lowerJaw(59,neck+13+jaw),lowerJaw(39,neck+12+jaw)],P.tongue);
+    if(pose.capturedHero){
+        const held=pose.capturedHero,anchor=dinosaurMouthPoint(neck,pose.jaw,0,pose.jawHinge);
+        // Feka is behind the near lip and teeth, attached to the very same
+        // skull/mandible anchor as the mouth. The throat hides him progressively.
+        drawCapturedHero(c,{x:anchor[0]-held.swallow*36,y:anchor[1],angle:-1.2,facing:held.facing,frame:held.frame},point=>{
+            const p=headPoint(point);return [x+d*p[0]*profile,y+p[1]];
+        },held.swallow>0?34:-Infinity);
+    }
     poly([[29,neck+10],lowerJaw(37,neck+12+jaw),lowerJaw(60,neck+14+jaw),lowerJaw(59,neck+16+jaw),lowerJaw(37,neck+14+jaw)],P.hide);
     line(...lowerJaw(37,neck+14+jaw),...lowerJaw(57,neck+15+jaw),P.cream);
     line(32,neck+7,63,neck+6,P.rust);
@@ -528,13 +537,13 @@ export function drawHypotheticalObjects(c:CanvasRenderingContext2D,o:WorldObject
     // Live projectiles stay readable in front of decorative braces and stores.
     for(const barrel of o.barrels)drawHypotheticalCanister(c,barrel,cx,cy);
 }
-export function drawHypotheticalCombat(c:CanvasRenderingContext2D,b:HypotheticalModel,cx:number,cy:number,reduced:boolean){
+export function drawHypotheticalCombat(c:CanvasRenderingContext2D,b:HypotheticalModel,cx:number,cy:number,reduced:boolean,actor?:DinosaurPose){
     const floor=HYPOTHETICAL.floor-cy;
     if(b.act==='chase')drawChaseCollapse(c,b,cx,cy,reduced);
     for(const mark of b.marks){const x=mark.x-cx,remain=Math.max(0,1-(b.tick-mark.born)/60);box(c,x-15,floor-2,30,2,P.hot);pixelLine(c,x-6,floor-8,x,floor-3,P.hot);pixelLine(c,x,floor-3,x+6,floor-8,P.hot);box(c,x-15,floor-4,30*remain,1,P.ivory);}
     if(b.act!=='siege'){
         const airborne=b.state==='attack'&&b.attack==='leap'&&b.age<58;
-        if(b.state==='tell'||b.state==='turn'||b.state==='reload'||airborne){
+        if(!actor&&(b.state==='tell'||b.state==='turn'||b.state==='reload'||airborne)){
             if(b.attack==='rifle'){
                 const from=b.aim,to={x:b.targetX,y:b.targetY},locked=b.age>=(b.state==='reload'?b.reloadTicks:b.warningTicks)-24;
                 const length=Math.hypot(to.x-from.x,to.y-from.y);
@@ -556,17 +565,17 @@ export function drawHypotheticalCombat(c:CanvasRenderingContext2D,b:Hypothetical
         }
         // A fixed ground shadow locates the body during the jump; it never suggests a platform.
         oval(c,b.x-cx-26,floor-4,52,5,P.deep);
-        if(b.attack==='tail'&&b.state==='attack'&&b.age>=12&&b.age<=32){
+        if(!actor&&b.attack==='tail'&&b.state==='attack'&&b.age>=12&&b.age<=32){
             const path=dinosaurTail(-43,hypotheticalMotion(b).tail);
             pixelLine(c,b.x+b.facing*path[1][0]-cx,b.y+path[1][1]-cy-5,b.x+b.facing*path[2][0]-cx,b.y+path[2][1]-cy-5,P.cream);
         }
-        drawHypotheticalDinosaur(c,dinosaurPose(b,cx,cy,reduced));
-        if(b.heat>.55&&!reduced&&!b.won&&b.pivotAge>=12){
+        drawHypotheticalDinosaur(c,actor?{...actor,x:actor.x-cx,y:actor.y-cy}:dinosaurPose(b,cx,cy,reduced));
+        if(!actor&&b.heat>.55&&!reduced&&!b.won&&b.pivotAge>=12){
             const a=b.weaponAngle,s=b.rifleShoulder;
             const x=s.x-cx+b.facing*28*Math.cos(a),y=s.y-cy+28*Math.sin(a);
             for(let i=0;i<2;i++){const t=(b.tick+i*13)%32,dx=Math.sin((t+i*5)/7)*2;box(c,x+dx,y-3-t*.35,1,2,'#c0b2a1');}
         }
-        if(b.muzzle>0){
+        if(!actor&&b.muzzle>0){
             const p=b.aim,a=b.rifleAngle;
             drawGunMuzzle(c,p.x-cx,p.y-cy,b.facing*Math.cos(a),Math.sin(a),b.muzzle,reduced);
         }

@@ -1159,7 +1159,7 @@ export class WorldGame {
         }
         if (this.state === 'playing') {
             this.renderer.drawTouchControls();
-            this.renderer.drawPlayerTransition(this.player.data, this.camera);
+            this.renderPlayerTransition(this.camera);
         }
         this.renderer.present();
     }
@@ -1226,10 +1226,14 @@ export class WorldGame {
         else if (this.player.data.hasHelmet && !this.hudAccessibility?.showsReadableStrip)
             this.renderer.drawHelmet(WORLD_HUD_HELMET.x, WORLD_HUD_HELMET.y, c);
         if (this.state === 'paused')
-            this.renderer.drawPlayerTransition(this.player.data, view, c);
+            this.renderPlayerTransition(view, c);
     }
     protected renderPlayer(view: CameraData) {
         this.renderer.drawPlayer(this.player.data, view);
+    }
+    /** Encounters can frame a staged defeat while retaining the native respawn. */
+    protected renderPlayerTransition(view: CameraData, ctx?: CanvasRenderingContext2D) {
+        this.renderer.drawPlayerTransition(this.player.data, view, ctx);
     }
     protected renderEncounterHud(c: CanvasRenderingContext2D) {
         if (!this.boss) return;

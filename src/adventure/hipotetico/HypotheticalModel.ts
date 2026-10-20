@@ -16,6 +16,7 @@ export type HypotheticalAct = 'chase' | 'siege' | 'duel';
 export type HypotheticalState = 'arrival' | 'rest' | 'tell' | 'reload' | 'attack' | 'turn' | 'recover' | 'hurt' | 'roar' | 'won';
 export type HypotheticalAttack = 'rifle' | 'charge' | 'bite' | 'leap' | 'tail';
 export interface Shot extends Rect { vx: number; vy: number; age: number; life: number; kind: 'bullet' | 'wave' | 'rubble'; px: number; py: number }
+export interface ChaseContact { kind:'caught'|'shot'|'wave'; x:number; y:number; direction:number }
 export interface Dust { x: number; y: number; born: number; kind: 'step' | 'stone' | 'hit' | 'shell' | 'clasp' | 'skid'; direction?: number }
 export interface FallingMark { x: number; born: number }
 export interface BulletImpact extends GunImpact {}
@@ -70,6 +71,8 @@ export class HypotheticalModel {
     motionFrom?:DinosaurMotion; motionSpeed=0; riderSway=0; private previousVelocity=0;
     pivotAge=12; pivotFrom:-1|1=-1; turnFacing:-1|1=1;
     private remainder = 0; private frameHazards: Rect[] = []; private sequence = 0;
+    private chaseThreats=new Map<Rect,ChaseContact>();
+    lastChaseContact:ChaseContact|null=null;
     private bowFrom = 0;
     private weaponFrom=-.15;
     pursuitIndex=0; pursuitKind:'high'|'low'|'ram'='high'; pursuitTell=52;
@@ -174,7 +177,7 @@ export class HypotheticalModel {
             this.particle('step',this.x+this.facing*(foot[0]+3),this.y+foot[1]);this.emit('step');
         }
     }
-    cancelAttacks() { this.shots = []; this.marks = []; this.frameHazards = []; this.events = [];this.muzzle=0;this.followup=null;this.adaptiveFinisher=false; this.backdrop.cancel(); }
+    cancelAttacks() { this.shots = []; this.marks = []; this.frameHazards = []; this.chaseThreats.clear();this.lastChaseContact=null;this.events = [];this.muzzle=0;this.followup=null;this.adaptiveFinisher=false; this.backdrop.cancel(); }
     arm(index: number) {
         if (this.act !== 'duel' || this.won || index < 0 || index > 1 || this.armed[index] > 0) return;
         this.armed[index] = 240; this.particle('shell', index ? 278 : 38, HYPOTHETICAL.floor - 8);
@@ -241,7 +244,7 @@ export class HypotheticalModel {
         if(Math.abs(this.targetX-this.x)>18)this.face(this.targetX<this.x?-1:1);
     }
     update(dt: number, player: Rect, livingGuards = 0) {
-        this.events = []; this.frameHazards = [];
+        this.events = []; this.frameHazards = [];this.chaseThreats.clear();this.lastChaseContact=null;
         if (!Number.isFinite(dt) || dt <= 0) return;
         // The host already uses 60 Hz. Bound exceptional catch-up to avoid an invisible salvo.
         this.remainder += Math.min(dt, 100);
@@ -388,7 +391,9 @@ export class HypotheticalModel {
         // overtake halfway through the burst. The whole tell remains on screen.
         this.targetX=this.x+240;this.targetY=this.pursuitKind==='high'?this.rifleShoulder.y-4:HYPOTHETICAL.floor-12;
         this.footstep(oldTravel);
-        this.frameHazards.push(this.body);
+        const body=this.body;
+        this.frameHazards.push(body);
+        this.chaseThreats.set(body,{kind:'caught',x:this.x,y:this.y-36,direction:this.facing});
         for(const [i,site] of CHASE_BREAKS.entries())if(this.chaseBreaks[i]===-1&&this.x+CHASE_STRIKE_REACH>=site.x){
             this.chaseBreaks[i]=this.tick;this.emit('break');
             this.emit(site.kind==='sluice'||site.kind==='gantry'?'chase-metal':'chase-wood');
@@ -458,18 +463,24 @@ export class HypotheticalModel {
                     if (this.impacts.length > 24) this.impacts.shift();
                     this.emit(hit.water?'splash':'impact');
                     // Preserve danger in front of the cover, never beyond its surface.
-                    this.frameHazards.push(sweep({ ...s, x: s.px, y: s.py }, { ...s, x, y }));
+                    this.projectileHazard(s,sweep({ ...s, x: s.px, y: s.py }, { ...s, x, y }));
                     s.life = 0; continue;
                 }
             }
             if (s.y + s.height >= HYPOTHETICAL.floor && s.kind !== 'wave' && !(s.kind==='bullet'&&this.act==='chase')) {
                 s.life = 0; this.particle('stone', s.x, HYPOTHETICAL.floor); continue;
             }
-            this.frameHazards.push(swept);
+            this.projectileHazard(s,swept);
         }
         this.shots = this.shots.filter(s => s.life > 0 && s.x > -150 && s.x < (this.act === 'chase' ? CHASE_WIDTH+120 : this.act === 'siege' ? SIEGE_WIDTH + 120 : 440));
     }
+    private projectileHazard(shot:Shot,rect:Rect) {
+        this.frameHazards.push(rect);
+        if(this.act==='chase')this.chaseThreats.set(rect,{kind:shot.kind==='wave'?'wave':'shot',
+            x:shot.px+shot.width/2,y:shot.py+shot.height/2,direction:Math.sign(shot.vx)||1});
+    }
     contact(player: Rect, previous: Rect, falling: boolean): 'none' | 'hurt' | 'bounce' | 'hit' {
+        this.lastChaseContact=null;
         if (this.won || this.nextAct) return 'none';
         const weak = this.weakpoint;
         if (this.vulnerable && falling && player.x + player.width > weak.x && player.x < weak.x + weak.width
@@ -484,7 +495,14 @@ export class HypotheticalModel {
             return 'hit';
         }
         if (this.state === 'hurt' || this.state === 'roar' || this.state === 'recover' || this.state === 'arrival') return 'none';
-        if (this.frameHazards.some(r => overlaps(player, r))) return 'hurt';
+        const hazard=this.frameHazards.find(r=>overlaps(player,r));
+        if(hazard){
+            // Preserve collision order: a swept bullet in front of the body is
+            // still a bullet, including its last segment before hitting cover.
+            const threat=this.chaseThreats.get(hazard);
+            if(threat)this.lastChaseContact={...threat,x:clamp(threat.x,player.x,player.x+player.width),y:clamp(threat.y,player.y,player.y+player.height)};
+            return 'hurt';
+        }
         // Attack-specific swept boxes above are the whole contact contract.
         // An animation changing state cannot invent an extra body hit on tick zero.
         return 'none';

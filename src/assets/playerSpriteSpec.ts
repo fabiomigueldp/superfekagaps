@@ -17,7 +17,7 @@ export const PLAYER_HITBOX_H = 24;
 export const PLAYER_RENDER_OFFSET_X = -1;
 export const PLAYER_RENDER_OFFSET_Y = -2;
 
-type Pose = 'idle' | 'walk' | 'jump' | 'fall' | 'windup' | 'sit' | 'land' | 'hurt' | DeathPose | 'celebrate';
+type Pose = 'idle' | 'walk' | 'jump' | 'fall' | 'windup' | 'sit' | 'land' | 'hurt' | 'caught' | DeathPose | 'celebrate';
 function hero(pose: Pose, frame = 0): string[] {
   const g = new PixelGrid(16, 26);
   const dying = pose.startsWith('death');
@@ -33,6 +33,10 @@ function hero(pose: Pose, frame = 0): string[] {
     g.rect(3,19+landingBend,5,5-landingBend,'K').rect(4,20+landingBend,3,3-landingBend,'D');
     g.rect(10,19+landingBend,5,5-landingBend,'K').rect(11,20+landingBend,3,3-landingBend,'B');
     g.rect(3,24,5,2,'K').rect(10,24,6,2,'K').rect(4,24,3,1,'G').rect(11,24,3,1,'G');
+  } else if (pose === 'caught') {
+    const kick=[0,2,1,-1][frame%4];
+    g.rect(3,18,5,5,'K').rect(4,19,3,3,'D').rect(1,21-kick,6,3,'K').rect(2,21-kick,4,1,'G');
+    g.rect(9,18,5,4,'K').rect(10,19,3,2,'B').rect(11,20+kick,4,4,'K').rect(12,21+kick,3,1,'G');
   } else if (pose === 'deathRecoil') {
     g.rect(3,20,5,4,'K').rect(4,21,3,2,'D').rect(2,24,6,2,'K').rect(3,24,4,1,'G');
     g.rect(9,20,5,4,'K').rect(10,21,3,2,'B').rect(9,24,6,2,'K').rect(10,24,4,1,'G');
@@ -64,7 +68,11 @@ function hero(pose: Pose, frame = 0): string[] {
   g.rect(4,bodyY,9,hipY-bodyY+2,'K').rect(5,bodyY+1,7,hipY-bodyY,'B');
   g.rect(5,bodyY+1,5,2,'b').rect(10,bodyY+3,2,Math.max(1,hipY-bodyY-2),'D');
   g.rect(5,hipY,7,1,'D').dot(8,hipY,'y');
-  if (pose === 'deathImpact') {
+  if (pose === 'caught') {
+    const reach=[1,-1,0,2][frame%4];
+    g.rect(0,bodyY-1+reach,5,4,'K').rect(1,bodyY+reach,3,2,'D').rect(0,bodyY-3+reach,3,4,'K').rect(1,bodyY-2+reach,2,2,'S');
+    g.rect(12,bodyY-reach,4,4,'K').rect(13,bodyY+1-reach,2,2,'B').rect(13,bodyY-3-reach,3,4,'K').rect(14,bodyY-2-reach,2,2,'L');
+  } else if (pose === 'deathImpact') {
     g.rect(0,bodyY+1,5,3,'K').rect(1,bodyY+1,3,1,'D').rect(0,bodyY+3,2,2,'s');
     g.rect(12,bodyY+1,4,3,'K').rect(13,bodyY+1,2,1,'B').rect(14,bodyY+3,2,2,'L');
   } else if (pose === 'deathLaunch') {
@@ -107,6 +115,10 @@ function hero(pose: Pose, frame = 0): string[] {
   } else if(pose!=='hurt' && !(pose==='idle'&&frame===1)) { g.rect(6,headY+7,2,1,'W').dot(7,headY+7,'K').rect(11,headY+7,2,1,'W').dot(12,headY+7,'K'); }
   g.rect(6,headY+9,7,2,'S').rect(7,headY+11,4,1,'s').rect(10,headY+10,3,1,pose==='hurt'?'K':'s');
   if (dying) g.rect(6,headY+9,7,3,'S').rect(9,headY+9,3,3,'K').dot(10,headY+10,'s');
+  if (pose==='caught') {
+    g.rect(6,headY+6,2,2,'W').dot(7,headY+6,'K').rect(11,headY+6,2,2,'W').dot(12,headY+6,'K');
+    g.rect(10,headY+9,3,2,'K').dot(11,headY+10,'s');
+  }
   return g.finish();
 }
 const helmet = new PixelGrid(16,8).rect(5,0,6,1,'K').rect(3,1,10,5,'K').rect(4,1,8,4,'Y')
@@ -124,3 +136,5 @@ export const PLAYER_SPRITES = {
   celebrate: hero('celebrate'), helmet,
 };
 export const PLAYER_WALK = [PLAYER_SPRITES.walk1,PLAYER_SPRITES.walk2,PLAYER_SPRITES.walk3,PLAYER_SPRITES.walk4,PLAYER_SPRITES.walk5,PLAYER_SPRITES.walk6];
+/** Native silhouette and palette, with alternating reaching arms and tucked knees. */
+export const PLAYER_CAPTURE = [hero('caught',0),hero('caught',1),hero('caught',2),hero('caught',3)];

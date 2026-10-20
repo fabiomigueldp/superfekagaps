@@ -5,7 +5,7 @@ import { HypotheticalVanguard } from './HypotheticalVanguard';
 import {drawBastionEdgeCue} from './HypotheticalGuardCues';
 import type { HypotheticalBackdrop } from './HypotheticalBackdrop';
 import type { WorldLevel, WorldObjects } from '../WorldPhysics';
-import type { Rect } from '../../types';
+import type { Rect,CameraData } from '../../types';
 import { TileType } from '../../constants';
 import type { AdventureStage } from '../types';
 import { clamp } from '../types';
@@ -15,9 +15,10 @@ import { workshopPanel, workshopButton, WORKSHOP_UI } from '../WorldWorkshopUI';
 import { HYPOTHETICAL, HypotheticalModel, type HypotheticalAct } from './HypotheticalModel';
 import { hypotheticalStage } from './HypotheticalStage';
 import { SIEGE_SECTORS, SIEGE_WIDTH, siegeGarrison } from './HypotheticalSiege';
-import { drawHypotheticalBackground, drawHypotheticalCombat, drawHypotheticalGuard, drawHypotheticalObjects, drawHypotheticalTerrain } from './HypotheticalArt';
+import { drawHypotheticalBackground, drawHypotheticalCombat, drawHypotheticalGuard, drawHypotheticalObjects, drawHypotheticalTerrain,dinosaurPose } from './HypotheticalArt';
 import { HypotheticalAudio } from './HypotheticalAudio';
-import {chaseCollapsedEdge} from './HypotheticalChaseDetails';
+import {chaseCollapsedEdge,CHASE_WATER_Y} from './HypotheticalChaseDetails';
+import {CHASE_CAPTURE,HypotheticalChaseDefeat,drawChasePlayerSplash} from './HypotheticalChaseDefeat';
 import {CHASE_STRIKE_REACH,chasePerformance} from './HypotheticalChasePerformance';
 import { CHASE_WIDTH, CHASE_CHECKPOINT, CHASE_DISTRICTS } from './HypotheticalLayout';
 import {ARRIVAL,arrivalFade,arrivalDeployment,arrivalLookAhead} from './HypotheticalArrival';
@@ -102,25 +103,33 @@ export class HypotheticalGame extends WorldGame {
     private attemptDeaths=0;
     private totalTicks=0;
     private exiting=false;
+    private chaseDefeat:HypotheticalChaseDefeat|null=null;
+    private defeatCueTime=-1;
+    private riverEntry:{x:number;born:number}|null=null;
     private readonly guardImpacts=new WeakMap<HypotheticalGuard,number>();
     private readonly vanguardSounds=new WeakMap<HypotheticalVanguard,{swing:number;parry:number}>();
     private readonly weaponAudio=new HypotheticalAudio(()=>{
         const route=this.audio.getEffectsRoute();
         return route?{...route,enabled:route.enabled&&this.audio.preferences.effects>0&&this.state==='playing'&&!this.player.data.isDead}:null;
     });
+    private readonly defeatAudio=new HypotheticalAudio(()=>{
+        const route=this.audio.getEffectsRoute();
+        return route?{...route,enabled:route.enabled&&this.audio.preferences.effects>0&&this.state==='playing'}:null;
+    });
     readonly status:HTMLElement;
     constructor(canvas:HTMLCanvasElement,private readonly exitEncounter:()=>void=()=>{}) {
         super(canvas,true);
         this.addCleanup(()=>this.weaponAudio.dispose());
+        this.addCleanup(()=>this.defeatAudio.dispose());
         this.status=document.createElement('p');this.status.setAttribute('role','status');this.status.setAttribute('aria-live','polite');
         this.status.style.cssText='position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap';
         document.body.append(this.status);this.addCleanup(()=>this.status.remove());
         try {
             this.art.arena=()=>{};this.art.genericStructures=false;
-            this.art.background=(c,_island,cx,cy)=>drawHypotheticalBackground(c,this.fight,cx,cy,this.renderer.reducedMotion);
-            this.art.terrain=(c,l,_island,cx,cy)=>drawHypotheticalTerrain(c,l,this.fight,cx,cy);
-            this.art.objects=(c,o,cx,cy)=>drawHypotheticalObjects(c,o,this.fight,cx,cy,this.renderer.reducedMotion);
-            this.art.boss=(c,_b,cx,cy)=>drawHypotheticalCombat(c,this.fight,cx,cy,this.renderer.reducedMotion);
+            this.art.background=(c,_island,cx,cy)=>drawHypotheticalBackground(c,this.scenicFight,cx,cy,this.renderer.reducedMotion);
+            this.art.terrain=(c,l,_island,cx,cy)=>drawHypotheticalTerrain(c,l,this.scenicFight,cx,cy);
+            this.art.objects=(c,o,cx,cy)=>drawHypotheticalObjects(c,o,this.scenicFight,cx,cy,this.renderer.reducedMotion);
+            this.art.boss=(c,_b,cx,cy)=>drawHypotheticalCombat(c,this.scenicFight,cx,cy,this.renderer.reducedMotion,this.chaseDefeat?.poseAt(this.defeatElapsed,this.renderer.reducedMotion));
             this.art.foe=(c,e,cx,cy)=>{
                 const deployment=this.act==='siege'?arrivalDeployment(this.fight.arrivalTime,this.fight.arrivalSkipped):1;
                 if(deployment===0)return;
@@ -148,8 +157,17 @@ export class HypotheticalGame extends WorldGame {
         } catch(error) {this.dispose();throw error;}
     }
     get fight(){return this.encounter.model;}
+    private get defeatElapsed(){return Math.max(0,this.player.data.deathTimerMax-this.player.data.deathTimer);}
+    private get scenicFight():HypotheticalModel {
+        // Only presentation time advances after defeat: no collision update,
+        // new shot, collapsing collision tile or attack event can run here.
+        return this.chaseDefeat?.scenery(this.fight,this.defeatElapsed)??this.fight;
+    }
     private get encounterHint(){
+        if(this.chaseDefeat&&this.player.data.isDead)return this.chaseDefeat.hint;
         const b=this.fight;
+        if(this.act==='chase'&&!this.player.data.hasHelmet&&b.state==='rest'&&this.player.data.position.x-b.x<82)
+            return this.player.data.invincibleTimer>0?'SEM CAPACETE! APROVEITE PARA SE AFASTAR':'ELE ESTA PERTO! CORRA: SHIFT + DIREITA';
         if(this.act==='siege'&&!b.arrival.ready){
             const t=b.arrivalTime;
             if(b.backdrop.helicopter.active)return b.backdrop.helicopter.age<HELICOPTER_SEQUENCE.fire
@@ -206,6 +224,7 @@ export class HypotheticalGame extends WorldGame {
     override load(_id:string,resume=false,_custom?:AdventureStage) {
         if(this.isDisposed)return;
         this.weaponAudio?.cancel();
+        this.defeatAudio?.cancel();this.chaseDefeat=null;this.riverEntry=null;this.defeatCueTime=-1;
         if(!resume){this.act='chase';this.arrivalSeen=false;this.retryHealth=HYPOTHETICAL.health;this.siegeCheckpoint=0;this.chaseCheckpoint=0;}
         const stage=hypotheticalStage(this.act);
         const backdrop=resume&&this.arrivalSeen&&this.act==='siege'&&this.encounter?.model.act==='siege'?this.encounter.model.backdrop:undefined;
@@ -243,13 +262,42 @@ export class HypotheticalGame extends WorldGame {
         if(this.state==='map'||this.state==='title'||this.state==='intro'){
             if(!this.exiting){this.exiting=true;this.exitEncounter();}return;
         }
-        const before=this.fight.tick,beforeArrival=this.fight.arrivalTime,dead=this.player.data.isDead,wasWon=this.fight.won;
+        const model=this.fight,previous=this.player.getRect(),clockBefore=this.elapsed;
+        const before=model.tick,beforeArrival=model.arrivalTime,dead=this.player.data.isDead,wasWon=model.won;
+        if(!dead)model.lastChaseContact=null;
         this.encounter.livingGuards=this.foes.filter(e=>!e.dead).length;
         super.update(dt);
         this.weaponAudio.sync();
+        this.defeatAudio.sync();
+        // Native restart dispatches through load(), replacing both model and presentation.
+        if(this.fight!==model)return;
         if(wasWon&&this.resultReady&&this.state==='playing'&&this.input.getState().jumpPressed){this.replay();return;}
-        if(!dead&&this.player.data.isDead){this.attemptDeaths++;this.fight.cancelAttacks();}
-        if(this.player.data.isDead||this.state!=='playing')return;
+        if(!dead&&this.player.data.isDead){
+            this.attemptDeaths++;
+            if(this.act==='chase'){
+                this.chaseDefeat=new HypotheticalChaseDefeat(dinosaurPose(model,0,0,this.renderer.reducedMotion),this.player.data,this.camera,model.lastChaseContact,model.tick);
+                if(this.chaseDefeat.kind==='caught')this.player.data.deathTimer=this.player.data.deathTimerMax=CHASE_CAPTURE.duration;
+                this.defeatCueTime=-1;
+            }
+            this.fight.cancelAttacks();
+        }
+        if(this.state!=='playing')return;
+        const p=this.player.data;
+        if(this.act==='chase'&&!dead&&previous.y+previous.height<=CHASE_WATER_Y&&p.position.y+p.height>CHASE_WATER_Y&&p.position.y>previous.y){
+            const crossing=clamp((CHASE_WATER_Y-previous.y-previous.height)/(p.position.y-previous.y),0,1);
+            this.riverEntry={x:previous.x+(p.position.x-previous.x)*crossing+p.width/2,born:(clockBefore+(this.elapsed-clockBefore)*crossing)*1000};
+            this.defeatAudio.play('collapse-water');
+        }
+        if(this.player.data.isDead){
+            if(this.chaseDefeat){
+                const elapsed=this.defeatElapsed,[x,y]=this.chaseDefeat.cameraAt(elapsed,this.renderer.reducedMotion);
+                this.camera.x=clamp(x,0,CHASE_WIDTH-320);this.camera.y=y;this.camera.shakeTimer=0;
+                if(this.chaseDefeat.kind==='caught')for(const [at,cue]of [[90,'chase-scoop'],[CHASE_CAPTURE.catch,'chase-catch'],[960,'chase-gulp']] as const)
+                    if(this.defeatCueTime<at&&elapsed>=at)this.defeatAudio.play(cue);
+                this.defeatCueTime=elapsed;
+            }
+            return;
+        }
         const steps=Math.max(0,this.fight.tick-before);
         if(!steps)return;
         if(this.act==='siege'&&this.fight.arrivalTime>=ARRIVAL.release)this.arrivalSeen=true;
@@ -309,6 +357,26 @@ export class HypotheticalGame extends WorldGame {
         const headroom=this.act==='siege'&&this.fight.route.entered===3?32:38;
         this.camera.y=clamp(Math.min(64,this.player.data.position.y-headroom),0,64);
     }
+    protected override renderPlayer(view:CameraData) {
+        const c=this.renderer.getContext(),defeat=this.chaseDefeat;
+        if(defeat?.kind!=='caught'){
+            c.save();
+            // Enter the painted river rather than drawing the legs over its surface.
+            if(this.act==='chase'&&!this.player.data.isDead){c.beginPath();c.rect(0,0,320,Math.max(0,CHASE_WATER_Y-view.y));c.clip();}
+            super.renderPlayer(view);c.restore();
+        }
+        if(defeat)defeat.drawForeground(c,this.defeatElapsed,view.x,view.y,this.renderer.reducedMotion);
+        if(this.riverEntry)drawChasePlayerSplash(c,this.riverEntry.x,this.elapsed*1000-this.riverEntry.born,view.x,view.y,this.renderer.reducedMotion);
+    }
+    protected override renderPlayerTransition(view:CameraData,c?:CanvasRenderingContext2D) {
+        const defeat=this.chaseDefeat;
+        if(!defeat||!this.player.data.isDead||defeat.kind==='shot'||defeat.kind==='wave'){super.renderPlayerTransition(view,c);return;}
+        const ms=this.defeatElapsed,caught=defeat.kind==='caught';
+        const focus=caught?defeat.mouthAt(ms):[this.riverEntry?.x??defeat.origin[0],CHASE_WATER_Y-3];
+        const progress=caught?(ms-CHASE_CAPTURE.fade)/(CHASE_CAPTURE.black-CHASE_CAPTURE.fade)
+            :(ms-300)/Math.max(1,this.player.data.deathTimerMax-500);
+        this.renderer.drawSceneIris(progress,focus[0]-view.x,focus[1]-view.y,c);
+    }
     protected override renderEncounterHud(c:CanvasRenderingContext2D) {
         const b=this.fight;
         workshopPanel(c,0,0,320,31,false,true);
@@ -349,14 +417,14 @@ export class HypotheticalGame extends WorldGame {
                 drawWorldResult(c,'HIPOTESE DERRUBADA','FLAVIO BOLSONARO HIPOTETICO',`${Math.floor(this.totalTicks/60)}S · ${this.attemptDeaths} QUEDAS`,'ENTER: REJOGAR · ESC: MENU');
                 workshopButton(c,'REJOGAR',80,151,160,22,true);
                 this.renderer.present();
-            }else if(b.tick<(this.act==='siege'?54:110)&&(this.act!=='siege'||!b.arrivalSkipped)){
+            }else if(!this.player.data.isDead&&b.tick<(this.act==='siege'?54:110)&&(this.act!=='siege'||!b.arrivalSkipped)){
                 if(this.act==='chase')pixelText(c,'FLAVIO BOLSONARO HIPOTETICO',160,60,'#ffedbf',1,'center');
                 pixelText(c,this.act==='chase'?'I · A PONTE DO IMPOSSIVEL':this.act==='siege'?'II · A TRAVESSIA DO ARSENAL':'III · O ULTIMO LACRE',160,this.act==='siege'?39:72,'#ffedbf',1,'center');
                 if(this.act==='chase')pixelText(c,'FANTASIA SATIRICA',160,83,'#d2c6b1',1,'center');
                 this.renderer.present();
             }
             const fade=arrivalFade(this.act,b.tick,this.transitionTicks,b.arrivalSkipped);
-            if(fade>0){c.save();c.globalAlpha=fade;c.fillStyle='#122630';c.fillRect(0,0,320,180);c.restore();this.renderer.present();}
+            if(fade>0&&!this.player.data.isDead){c.save();c.globalAlpha=fade;c.fillStyle='#122630';c.fillRect(0,0,320,180);c.restore();this.renderer.present();}
         }
         const status=`Flávio Bolsonaro Hipotético. ${this.act==='chase'?'Perseguição':this.act==='siege'?`Cerco, ${b.route.currentSector.name}, ${b.route.remaining[b.route.entered]} de ${b.route.currentSector.guards.length} guardas restantes`:`Confronto, fase ${b.phaseNumber}`}. ${this.state==='paused'?'Pausado.':this.encounterHint} ${b.health} lacres. Setas: mover; Shift: correr; Espaço: pular; baixo no ar: sentada; Esc: pausa; R: retomar o trecho.`;
         if(this.status.textContent!==status)this.status.textContent=status;

@@ -258,19 +258,23 @@ export class Renderer {
   }
   drawPlayerTransition(p:PlayerData,camera:CameraData,ctx?:CanvasRenderingContext2D):void {
     if(!p.isDead && !(p.respawnRevealTimer && p.respawnRevealTimer>0))return;
+    const elapsed=this.deathElapsed(p);
+    const amount=p.isDead
+      ? deathIrisProgress(elapsed,p.deathKind??'hit',p.deathTimerMax)
+      : Math.max(0,Math.min(1,((p.respawnRevealTimer??0)-(this.interpolationMs??0))/PLAYER_RESPAWN_REVEAL_MS));
+    const position=p.isDead?(p.deathOrigin??p.position):p.position;
+    const motion=p.isDead&&p.deathKind!=='fall'
+      ? playerDeathMotion(elapsed,p.deathWasGrounded??p.isGrounded,p.deathDirection??-1) : {x:0,y:0};
+    this.drawSceneIris(amount,position.x+motion.x+p.width/2-camera.x,position.y+motion.y+p.height/2-camera.y,ctx);
+  }
+  /** Scene-relative focus, composited in the same pass as the native death iris. */
+  drawSceneIris(amount:number,x:number,y:number,ctx?:CanvasRenderingContext2D):void {
+    if(amount<=0)return;
     const draw=(c:CanvasRenderingContext2D)=>{
-      const elapsed=this.deathElapsed(p);
-      const amount=p.isDead
-        ? deathIrisProgress(elapsed,p.deathKind??'hit',p.deathTimerMax)
-        : Math.max(0,Math.min(1,((p.respawnRevealTimer??0)-(this.interpolationMs??0))/PLAYER_RESPAWN_REVEAL_MS));
-      if(amount<=0)return;
-      const eased=amount*amount*(3-2*amount);
+      const progress=Math.min(1,amount),eased=progress*progress*(3-2*progress);
       // Native scanlines keep the iris smooth without introducing antialiasing.
-      const position=p.isDead?(p.deathOrigin??p.position):p.position;
-      const motion=p.isDead&&p.deathKind!=='fall'
-        ? playerDeathMotion(elapsed,p.deathWasGrounded??p.isGrounded,p.deathDirection??-1) : {x:0,y:0};
-      const centerX=Math.max(20,Math.min(GAME_WIDTH-20,Math.round((position.x+motion.x+p.width/2-camera.x)*this.zoom)));
-      const centerY=Math.max(24,Math.min(GAME_HEIGHT-24,Math.round((position.y+motion.y+p.height/2-camera.y)*this.zoom)));
+      const centerX=Math.max(20,Math.min(GAME_WIDTH-20,Math.round(x*this.zoom)));
+      const centerY=Math.max(24,Math.min(GAME_HEIGHT-24,Math.round(y*this.zoom)));
       const farthestCorner=Math.max(
         Math.hypot(centerX,centerY),Math.hypot(GAME_WIDTH-centerX,centerY),
         Math.hypot(centerX,GAME_HEIGHT-centerY),Math.hypot(GAME_WIDTH-centerX,GAME_HEIGHT-centerY)

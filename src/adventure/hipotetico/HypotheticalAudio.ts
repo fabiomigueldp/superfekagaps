@@ -1,5 +1,5 @@
 import type {ChaseSound} from './HypotheticalChasePerformance';
-export type WeaponCue = ChaseSound | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash' | 'distant-debris' | 'distant-thud'
+export type WeaponCue = ChaseSound | 'chase-scoop' | 'chase-catch' | 'chase-gulp' | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash' | 'distant-debris' | 'distant-thud'
     | 'guard-swipe' | 'guard-sweep' | 'guard-parry' | 'guard-stomp' | 'distant-roar' | 'distant-flutter' | 'distant-soft-hit'
     | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell' | 'distant-rotor' | 'distant-engine-fail';
 interface Route { context: BaseAudioContext; destination: AudioNode; enabled: boolean }
@@ -18,7 +18,10 @@ export class HypotheticalAudio {
         const route=this.route();
         if(this.disposed||!route?.enabled||route.context.state!=='running')return false;
         const {context:c,destination}=route,now=c.currentTime,distant=kind.startsWith('distant'),shot=kind.endsWith('shot'),crash=kind==='distant-crash',splash=kind==='splash';
-        const contact=kind==='chase-step'?{duration:.12,filter:'lowpass' as BiquadFilterType,cutoff:560,tail:110,noise:.075,pitch:88,end:34,body:.14,wave:'triangle' as OscillatorType}:
+        const contact=kind==='chase-scoop'?{duration:.22,filter:'bandpass' as BiquadFilterType,cutoff:750,tail:1700,noise:.1,pitch:115,end:170,body:.06,wave:'triangle' as OscillatorType}:
+            kind==='chase-catch'?{duration:.15,filter:'lowpass' as BiquadFilterType,cutoff:1250,tail:230,noise:.16,pitch:158,end:55,body:.2,wave:'triangle' as OscillatorType}:
+            kind==='chase-gulp'?{duration:.25,filter:'bandpass' as BiquadFilterType,cutoff:480,tail:180,noise:.035,pitch:180,end:65,body:.16,wave:'sine' as OscillatorType}:
+            kind==='chase-step'?{duration:.12,filter:'lowpass' as BiquadFilterType,cutoff:560,tail:110,noise:.075,pitch:88,end:34,body:.14,wave:'triangle' as OscillatorType}:
             kind==='chase-wood'?{duration:.24,filter:'bandpass' as BiquadFilterType,cutoff:1800,tail:320,noise:.23,pitch:142,end:44,body:.17,wave:'triangle' as OscillatorType}:
             kind==='chase-metal'?{duration:.34,filter:'bandpass' as BiquadFilterType,cutoff:2350,tail:510,noise:.14,pitch:510,end:155,body:.13,wave:'sine' as OscillatorType}:
             kind==='chase-cable'?{duration:.18,filter:'highpass' as BiquadFilterType,cutoff:2600,tail:800,noise:.12,pitch:1100,end:330,body:.035,wave:'sine' as OscillatorType}:
