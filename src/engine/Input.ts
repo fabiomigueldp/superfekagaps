@@ -4,6 +4,7 @@ import { InputState } from '../types';
 import { DisposalScope } from './DisposalScope';
 import { controlCode, keyAction, type ControlAction } from './ControlPreferences';
 import { touchControlsEnabled } from './TouchMode';
+import { heldKeyboardMovement, rememberMovementKey } from './KeyboardMovement';
 
 export type InputAction = 'left' | 'right' | 'jump' | 'run' | 'down';
 type HeldAction = InputAction;
@@ -129,6 +130,7 @@ export class Input {
     const code = controlCode(event);
     if (!code) return;
     const action = heldAction(code), command = keyAction(code);
+    rememberMovementKey(event);
 
     if (command || code === 'Enter' || code === 'Escape') {
       event.preventDefault();
@@ -179,9 +181,11 @@ export class Input {
 
   private refreshHeldActions(captureEdges = true): void {
     const held = new Set(this.touchActions);
+    const movement = heldKeyboardMovement();
+    for (const action of movement.values()) held.add(action);
     this.pressedKeys.forEach((code) => {
       const action = heldAction(code);
-      if (action) held.add(action);
+      if (action === 'jump' || action === 'down') held.add(action);
     });
 
     const jump = held.has('jump');
@@ -194,8 +198,7 @@ export class Input {
     // The most recently pressed horizontal key wins. Releasing it restores any
     // older held key, including an arrow-key alias, without a dead frame.
     let keyboardDirection: HorizontalAction | null = null;
-    this.pressedKeys.forEach((code) => {
-      const action = heldAction(code);
+    movement.forEach((action) => {
       if (action === 'left' || action === 'right') keyboardDirection = action;
     });
     const touchLeft = this.touchActions.has('left');

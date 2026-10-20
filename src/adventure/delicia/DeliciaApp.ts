@@ -3,6 +3,7 @@ import { DeliciaStore, completeDeliciaStage, deliciaUnlocked, awardDeliciaMedals
 import { DeliciaSimulation, type DeliciaInput } from './DeliciaSimulation';
 import { DeliciaAudio } from './DeliciaAudio';
 import { touchControlsEnabled } from '../../engine/TouchMode';
+import { heldKeyboardMovement, rememberMovementKey } from '../../engine/KeyboardMovement';
 import { DeliciaArt } from './DeliciaArt';
 import { DELICIA_STEP } from './DeliciaNative';
 import { DELICIA_MAP_IMAGE, DELICIA_MAP_METADATA } from './DeliciaIsland';
@@ -116,7 +117,10 @@ export class DeliciaApp {
         }
         const editable=(event.target as HTMLElement)?.closest('input,textarea,select');if(editable){if(key==='tab')this.menuKeyboard(event);return;}
         const active=(this.screen==='playing'&&!(event.target as HTMLElement)?.closest('button,a,summary'))||event.target===this.canvas;
-        if(action&&LOGICAL_KEYS[action]&&active){event.preventDefault();this.holdInput(`key:${this.physicalKey(event)}`,LOGICAL_KEYS[action]);}
+        if(action&&LOGICAL_KEYS[action]&&active){
+            event.preventDefault();rememberMovementKey(event);
+            if(!['left','right','run'].includes(action))this.holdInput(`key:${this.physicalKey(event)}`,LOGICAL_KEYS[action]);
+        }
         if((key==='enter'||key===' ')&&event.target===this.canvas&&this.screen==='dialogue'){event.preventDefault();this.advanceDialogue();}
         if(this.screen==='map'&&!this.listOpen){
             if(['arrowleft','arrowright','arrowup','arrowdown'].includes(key)){
@@ -231,6 +235,10 @@ export class DeliciaApp {
         if(this.disposed||document.hidden)return;
         if(this.controlsHelp.isOpen){this.requestFrame();return;}
         if(this.screen==='playing'&&this.sim){
+            const movement=heldKeyboardMovement();
+            for(const source of this.sources.keys())
+                if(source.startsWith('movement:')&&!movement.has(source.slice(9)))this.releaseInput(source);
+            for(const [code,action] of movement)this.holdInput(`movement:${code}`,LOGICAL_KEYS[action]);
             if(this.hitStop>0){this.hitStop=Math.max(0,this.hitStop-dt);this.accumulator=0;}else this.accumulator+=dt;
             let first=true;while(this.accumulator+1e-9>=DELICIA_STEP){this.step(DELICIA_STEP,first?this.input():{...this.input(),jumpPressed:false,jumpReleased:false,dash:false,pound:false,seed:false,parry:false,interact:false});this.accumulator=Math.max(0,this.accumulator-DELICIA_STEP);first=false;if(this.screen!=='playing'||this.hitStop>0){this.accumulator=0;break;}}
             if(!first){this.pressed.clear();this.released.clear();}this.renderGame();

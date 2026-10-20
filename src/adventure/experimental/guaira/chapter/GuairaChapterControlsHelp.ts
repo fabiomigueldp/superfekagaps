@@ -39,7 +39,7 @@ export class GuairaChapterControlsHelp {
             footerHint: '↑/↓ rola o texto · Esc ou B/○ volta',
             navigation: [
                 'Controle padrão: direcional ou analógico para andar; A/× pula; X/□ ou RT/R2 corre; LB/L1 ou baixo no ar faz a sentada; Menu pausa.',
-                'Menus: direcional escolhe; A/× confirma; B/○ volta. Na ajuda, ↑/↓ rola o texto e B/○ fecha. Solte os botões ao trocar de tela.',
+                'Menus: direcional escolhe; A/× confirma; B/○ volta. Na ajuda, ↑/↓ rola o texto e B/○ fecha.',
                 'Esc fecha a ajuda. Na pausa, Esc continua a partida.',
                 'Recomeçar reinicia o trecho atual. Trechos concluídos permanecem salvos.',
                 optional ? 'Voltar ao mapa encerra o percurso opcional.' : 'Voltar ao mapa encerra a tentativa atual.',

@@ -24,7 +24,9 @@ export class GamepadDevice {
     private mode = '';
     private revision = -1;
     private selectionVersion = -1;
-    private armed = false;
+    private needsBaseline = true;
+    private readonly blocked = new Set<PadAction>();
+    private observed = new Set<PadAction>();
     private blurred = false;
     private hidden = false;
     private connected = false;
@@ -50,7 +52,8 @@ export class GamepadDevice {
         });
     }
     reset(): void {
-        this.armed = false; this.held.clear(); this.edges.clear(); this.direction = null; this.repeatAt = 0;
+        this.needsBaseline = true; this.blocked.clear(); this.observed.clear();
+        this.held.clear(); this.edges.clear(); this.direction = null; this.repeatAt = 0;
         this.onReset();
     }
     private sample(mode: string): boolean {
@@ -88,10 +91,23 @@ export class GamepadDevice {
                 const threshold = 'axis' in binding ? directional ? (mode.startsWith('menu:') ? Math.max(.45, profile.deadzone) : action === 'up' || action === 'down' ? .62 : profile.deadzone) : profile.trigger
                     : binding.button === 6 || binding.button === 7 ? profile.trigger : .5;
                 const release = Math.max(.06, threshold - .08);
-                return readBinding(pad, binding) > (this.held.has(action) ? release : threshold);
+                return readBinding(pad, binding) > (this.observed.has(action) ? release : threshold);
             })) next.add(action);
         }
-        if (!this.armed) { this.armed = next.size === 0; return false; }
+        this.observed = new Set(next);
+        if (this.needsBaseline) {
+            // Motion is a continuous state. Respawns and chapter handoffs must
+            // resume it immediately, even if an unrelated button stays held.
+            for (const action of next)
+                if (mode !== 'playing' || !['left', 'right', 'run'].includes(action)) this.blocked.add(action);
+            this.needsBaseline = false;
+        }
+        // Only the held action waits for release, never the entire controller.
+        // A carried A/Start cannot confirm the next menu or jump on respawn.
+        for (const action of this.blocked) {
+            if (!next.has(action)) this.blocked.delete(action);
+            else next.delete(action);
+        }
         for (const action of next) if (!this.held.has(action)) this.edges.add(action);
         this.held = next;
         return true;

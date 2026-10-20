@@ -60,7 +60,7 @@ export class WorldControlsHelp {
                 'Menus: Tab ou ↑/↓ para escolher; Enter ou Espaço para confirmar; Esc para voltar.',
                 'Controle: direcional/analógico escolhe; A/× confirma; B/○ volta; Menu pausa/continua.',
                 'Mapa: ←/→ fases; ↑/↓ regiões; X/□ ilhas; Y/△ mundo. A/× usa a ação selecionada ou pula a viagem.',
-                'A sentada é usada no ar. Solte os botões ao trocar de tela.',
+                'A sentada é usada no ar. Direção e corrida continuam enquanto estiverem pressionadas.',
             ])
                 .map(text => { const paragraph = document.createElement('p'); paragraph.textContent = text; return paragraph; });
             const touchTitle = document.createElement('h3'); touchTitle.textContent = 'NA TELA DE TOQUE';

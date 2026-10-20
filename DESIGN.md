@@ -7,6 +7,7 @@ O jogador abre a partida no navegador e precisa enxergar o cenário, o personage
 - O site apresenta a coleção e abre o jogo. Durante a partida, oferece apenas voltar à coleção e tela cheia.
 - O jogo controla pausa, opções, som, ajuda, reinício, progresso e retorno ao mapa.
 - Uma ação não deve aparecer simultaneamente no site, numa barra de capítulo e no jogo.
+- No player do site, a entrada em tela cheia pertence à barra do portal. O botão interno aparece apenas para sair da tela cheia; no acesso direto, ele também permite entrar.
 - Menus de desenvolvimento e editores não são padrões para a campanha.
 
 ## Estados
