@@ -84,6 +84,7 @@ export class HypotheticalModel {
     terraceDebris:Array<{x:number;y:number;width:number;born:number}>=[];
     bridgeDebris:Array<{x:number;born:number;material:number}>=[];
     chaseBreaks:number[]=CHASE_BREAKS.map(()=>-1);
+    chaseAlerts:number[]=CHASE_BREAKS.map(()=>-1);
     chaseReactions:number[]=chaseReactionStarts(0);
     chaseCover:readonly Rect[]=[];
     constructor(readonly act: HypotheticalAct = 'chase', health: number = HYPOTHETICAL.health, cleared = 0, readonly chaseStart=0, readonly arrivalSeen=false, previousBackdrop?:HypotheticalBackdrop) {
@@ -100,6 +101,7 @@ export class HypotheticalModel {
         this.health = health;
         if (act === 'chase') { this.x = chaseStart?chaseStart-114:-18; this.facing = 1;const next=CHASE_ATTACKS.findIndex(a=>a.x>=chaseStart);this.pursuitIndex=next<0?CHASE_ATTACKS.length:next;this.chaseBreaks=CHASE_BREAKS.map(s=>s.x<this.x?-1000:-1);if(chaseStart)this.state='rest'; }
         if (act === 'chase') this.chaseReactions=chaseReactionStarts(chaseStart);
+        if (act === 'chase') this.chaseAlerts=CHASE_BREAKS.map(s=>s.x<this.x?-1000:-1);
         if (act === 'siege') this.state = 'rest';
     }
     get arrivalSkipped(){return this.arrivalSeen||this.route.cleared>0&&this.backdropOffset>0;}
@@ -410,6 +412,10 @@ export class HypotheticalModel {
         const body=this.body;
         this.frameHazards.push(body);
         this.chaseThreats.set(body,{kind:'caught',x:this.x,y:this.y-36,direction:this.facing});
+        for(const [i,site]of CHASE_BREAKS.entries())if(this.chaseAlerts[i]===-1&&this.x+128>=site.x){
+            this.chaseAlerts[i]=this.tick;
+            this.emit(site.kind==='sluice'?'distant-leak':site.kind==='pier'?'distant-creak':'distant-chain');
+        }
         for(const [i,site] of CHASE_BREAKS.entries())if(this.chaseBreaks[i]===-1&&this.x+CHASE_STRIKE_REACH>=site.x){
             this.chaseBreaks[i]=this.tick;this.emit('break');
             this.emit(site.kind==='sluice'||site.kind==='gantry'?'chase-metal':'chase-wood');

@@ -51,8 +51,9 @@ export function chaseWorkerAt(age:number){
 }
 export function chaseBirdAt(age:number,index:number){
     const t=age<0?-1:age-17-index*6,fly=Math.max(0,t-5),travel=fly<12?fly*fly*.025:.6*fly-3.6;
+    const beat=fly%15/15,wing=beat<.38?3-6*ease(beat/.38):-3+6*ease((beat-.38)/.62);
     return {flying:t>=5,crouch:t>=0&&t<5?Math.sin(t/5*Math.PI):0,
-        x:travel,y:Math.min(70,fly*.48),wing:Math.sin(fly*.34+index)*3,visible:t<150};
+        x:travel,y:Math.min(70,fly*.48),wing,visible:t<150};
 }
 export function chaseQuayReaction(age:number,reduced:boolean){
     const t=Math.max(0,age);
@@ -66,4 +67,27 @@ export function chaseOutflowAt(age:number,breakAge:number){
     const valve=1-.65*ease((age-8)/34);
     const surge=breakAge>=0&&breakAge<54?Math.sin(unit(breakAge/10)*Math.PI/2)*(1-ease((breakAge-14)/40)):0;
     return {flow:valve+surge*.7,surge};
+}
+
+/** The worker is already occluded by the jamb before the door moves. */
+export function chaseDoorAt(age:number,index:number){
+    const start=64+index%3*5,t=age-start,close=ease(t/22),after=t-22;
+    return {close:Math.max(0,close-(after>=0&&after<14?Math.sin(after/14*Math.PI)*.035:0)),latched:after>=14};
+}
+
+/** A short roll ends against the quay stop. Wheels turn by distance travelled;
+ * the cargo settles after the chassis, never in an endless tremor. */
+export function chaseCartAt(age:number){
+    const t=Math.max(0,age-15),travel=8*ease(t/32),land=t-32;
+    return {travel,wheel:travel/3,
+        cargo:land>=0&&land<18?-Math.sin(land/18*Math.PI)*1.2:0,
+        rope:land>=0&&land<30?Math.sin(land/4)*Math.exp(-land/12)*1.2:0};
+}
+
+/** Integrate the slowing flywheel rather than multiplying the current angle
+ * by speed, which would make it rotate backwards while shutting down. */
+export function chasePumpAt(tick:number,index:number,age:number){
+    const t=Math.max(0,age),u=unit(t/58),coast=58*(u-u*u*u+.5*u*u*u*u);
+    return {angle:(age<0?tick:tick-t+coast)/26+index,speed:age<0?1:1-ease(u),
+        relief:age>=8&&age<64?Math.sin(unit((age-8)/12)*Math.PI/2)*(1-ease((age-24)/40)):0};
 }

@@ -1,6 +1,6 @@
 import {box,oval,pixelLine,polygon} from '../WorldPainting';
 import type {HypotheticalModel} from './HypotheticalModel';
-import {CHASE_QUAYS,chaseQuayReaction,chaseWindAt} from './HypotheticalChaseLife';
+import {CHASE_QUAYS,chaseQuayReaction,chaseWindAt,chaseCartAt,chasePumpAt} from './HypotheticalChaseLife';
 import {drawScenicShadow} from './HypotheticalSceneShadow';
 
 const P={ink:'#607d78',shade:'#7b9183',stone:'#a1ac95',edge:'#b5b69b',wood:'#9a967b',
@@ -49,14 +49,14 @@ function ropeCoil(c:CanvasRenderingContext2D,x:number,y:number){
     pixelLine(c,x+5,y-1,x+11,y-1,P.wood);pixelLine(c,x+11,y-1,x+13,y-3,P.wood);
 }
 
-function steam(c:CanvasRenderingContext2D,x:number,y:number,tick:number,worldX:number,reduced:boolean){
+function steam(c:CanvasRenderingContext2D,x:number,y:number,tick:number,worldX:number,reduced:boolean,strength=1){
     if(reduced)return;
     // At most four packets, each born at the vent before spreading and fading.
     for(let j=0;j<4;j++){
         const age=((tick+worldX*.17-j*23)%92+92)%92,fade=Math.sin(Math.PI*age/92)*.3;
         const wind=chaseWindAt(tick-age,worldX,false),px=x+age*.04+wind*age*.025,py=y-age*.15;
         const w=2+age*.045;
-        c.save();c.globalAlpha*=fade;
+        c.save();c.globalAlpha*=fade*strength;
         polygon(c,[[px-w,py],[px-w,py-2],[px-1,py-3],[px+w*.7,py-2],[px+w,py],[px+w*.4,py+1]],'#c2c5ae');
         c.restore();
     }
@@ -76,16 +76,20 @@ export function drawChaseDressing(c:CanvasRenderingContext2D,b:HypotheticalModel
         for(const yy of [top+16,base-10])box(c,x+71,yy,4,1,P.edge);
         box(c,x+72,base-4,6,4,P.wet);box(c,x+76,base,8,1,P.shade);
         // A small shop sign hangs from an actual bracket on the side wall.
-        const sway=wind*.65,sx=x+78+sway,sy=base-34;
+        const sway=wind*.09,sy=base-34;
         pixelLine(c,x+68,sy-6,x+89,sy-6,P.ink,2);
         pixelLine(c,x+69,sy-12,x+79,sy-6,P.shade);
-        for(const dx of [2,9])pixelLine(c,x+78+dx,sy-5,sx+dx,sy,P.shade);
-        box(c,sx-1,sy,15,11,P.ink);box(c,sx,sy+1,13,8,index===1?'#8da391':'#a59f81');
-        pixelLine(c,sx+1,sy+1,sx+11,sy+1,P.edge);
+        const sx=x+84+Math.sin(sway)*7,yy=sy-6+Math.cos(sway)*7;
+        const p=(u:number,v:number):[number,number]=>[sx+u*Math.cos(sway)-v*Math.sin(sway),yy+u*Math.sin(sway)+v*Math.cos(sway)];
+        const line=(u:number,v:number,uu:number,vv:number,color:string,n=1)=>pixelLine(c,...p(u,v),...p(uu,vv),color,n);
+        pixelLine(c,x+84,sy-6,...p(0,0),P.shade);
+        polygon(c,[p(-7,0),p(7,0),p(7,10),p(-7,10)],P.ink);
+        polygon(c,[p(-6,1),p(6,1),p(6,8),p(-6,8)],index===1?'#8da391':'#a59f81');
+        line(-5,1,5,1,P.edge);
         if(index===0){
-            oval(c,sx+2,sy+4,7,3,P.shade);polygon(c,[[sx+8,sy+5],[sx+11,sy+3],[sx+11,sy+7]],P.shade);box(c,sx+3,sy+4,1,1,P.edge);
-        }else if(index===1){pixelLine(c,sx+3,sy+3,sx+8,sy+7,P.ink,2);box(c,sx+2,sy+2,5,2,P.edge);}
-        else{box(c,sx+3,sy+3,7,5,P.shade);pixelLine(c,sx+6,sy+3,sx+6,sy+7,P.edge);}
+            polygon(c,[p(-5,5),p(-2,3),p(2,5),p(5,3),p(5,7),p(2,5),p(-2,7)],P.shade);line(-3,4,-3,5,P.edge);
+        }else if(index===1){line(-3,3,2,7,P.ink,2);line(-4,2,0,2,P.edge,2);}
+        else{polygon(c,[p(-3,3),p(3,3),p(3,7),p(-3,7)],P.shade);line(0,3,0,7,P.edge);}
         // Small exposed brick clusters follow the lower plaster and corner,
         // instead of turning the entire wall into visual noise.
         const brick=index===1?'#8c9989':'#a3937f';
@@ -117,27 +121,44 @@ export function drawChaseDressing(c:CanvasRenderingContext2D,b:HypotheticalModel
             box(c,x+dx,top+29,6,3,P.shade);box(c,x+dx+1,top+29,1,1,P.edge);
         }
         // A low handcart sits beneath the canopy, aligned with the loading stair.
-        drawScenicShadow(c,x+90,base-1,30,2,.15);
-        for(const dx of [96,115]){oval(c,x+dx-3,base-5,6,6,P.ink);box(c,x+dx-1,base-3,2,2,P.stone);}
-        box(c,x+91,base-8,29,3,P.grain);box(c,x+92,base-9,27,2,P.wood);
-        pixelLine(c,x+119,base-7,x+127,base-14,P.ink,2);
-        for(let j=0;j<3;j++){
-            box(c,x+95+j*7,base-16,6,7,j%2?'#929b81':'#a6a285');
-            pixelLine(c,x+97+j*7,base-15,x+97+j*7,base-10,P.grain);
+        const cart=chaseCartAt(age),cartX=x+cart.travel;
+        drawScenicShadow(c,cartX+90,base-1,30,2,.15);
+        for(const dx of [96,115]){
+            oval(c,cartX+dx-3,base-5,6,6,P.ink);box(c,cartX+dx-1,base-3,2,2,P.stone);
+            for(let spoke=0;spoke<3;spoke++){
+                const a=cart.wheel+spoke*Math.PI*2/3;
+                pixelLine(c,cartX+dx,base-2,cartX+dx+Math.cos(a)*2,base-2+Math.sin(a)*2,P.shade);
+            }
         }
-        ropeCoil(c,x+109,base-17);
+        box(c,cartX+91,base-8,29,3,P.grain);box(c,cartX+92,base-9,27,2,P.wood);
+        pixelLine(c,cartX+119,base-7,cartX+127,base-14,P.ink,2);
+        for(let j=0;j<3;j++){
+            box(c,cartX+95+j*7,base-16+cart.cargo,6,7,j%2?'#929b81':'#a6a285');
+            pixelLine(c,cartX+97+j*7,base-15+cart.cargo,cartX+97+j*7,base-10+cart.cargo,P.grain);
+        }
+        ropeCoil(c,cartX+109+cart.rope,base-17+cart.cargo);
+        box(c,x+127,base-4,4,4,P.shade);pixelLine(c,x+127,base-4,x+130,base-4,P.edge);
         box(c,x+30,top+8,16,4,P.shade);box(c,x+33,top+9,9,1,P.edge);
         // Pinned ventilation slats and worn frame corners distinguish the shed.
         for(let j=0;j<3;j++)box(c,x+31+j*5,top-1,3,1,'#7c9487');
         for(const dx of [17,58]){pixelLine(c,x+dx,top+27,x+dx+4,top+27,'#b3b093');box(c,x+dx,base-7,2,3,'#85947f');}
     }else if(site.kind==='water'){
-        const top=base-52;
+        const top=base-52,pump=chasePumpAt(b.tick,index,age);
         // A capped vent connects to the roof main, with a finite, low-contrast plume.
         box(c,x+45,top-23,5,12,P.ink);box(c,x+46,top-22,2,10,P.stone);
-        box(c,x+43,top-24,9,3,P.shade);box(c,x+44,top-24,7,1,P.edge);
-        steam(c,x+47,top-25,b.tick+index*31,site.x,reduced);
+        box(c,x+43,top-24-pump.relief,9,3,P.shade);box(c,x+44,top-24-pump.relief,7,1,P.edge);
+        steam(c,x+47,top-25,b.tick+index*31,site.x,reduced,.3+pump.speed*.7);
+        if(age>=8&&age<68){
+            const packets=reduced?2:4;
+            for(let j=0;j<packets;j++){
+                const t=age-8-j*5;if(t<0||t>44)continue;
+                const drift=t*.12,r=1+t*.08,py=top-25-t*.24;
+                c.save();c.globalAlpha*=Math.sin(t/44*Math.PI)*.4;
+                polygon(c,[[x+47+drift-r,py],[x+46+drift,py-2],[x+47+drift+r,py],[x+48+drift,py+2]],'#c2c5ae');c.restore();
+            }
+        }
         if(index!==8){
-            const motorX=x+117,motorY=base-14,angle=(reduced?0:b.tick/26)+index;
+            const motorX=x+117,motorY=base-14,angle=reduced?index:pump.angle;
             box(c,x+105,base-5,26,5,P.shade);box(c,x+107,base-5,22,1,P.edge);
             box(c,x+108,base-17,18,12,P.ink);box(c,x+110,base-16,14,10,P.stone);
             pixelLine(c,x+97,base-18,motorX,base-18,P.ink,3);

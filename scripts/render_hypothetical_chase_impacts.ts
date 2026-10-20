@@ -40,6 +40,7 @@ try{
             const age=frame-24,tick=720+frame;b.tick=tick;
             b.x=origin+age*speed;b.travel=b.x+18;
             b.chaseBreaks=CHASE_BREAKS.map((_,i)=>i<scene.index?-1000:i===scene.index&&age>=0?impactAt:-1);
+            b.chaseAlerts=CHASE_BREAKS.map((_,i)=>i<scene.index?-1000:i===scene.index&&age>=-20?impactAt-20:-1);
             b.chaseReactions=b.chaseReactions.map((_,i)=>i*400<site.x?680:-1);
             b.bridgeDebris=[];b.dust=[];
             const edge=chaseCollapsedEdge(b.x)/16;
@@ -105,6 +106,7 @@ try{
         for(let frame=0;frame<120;frame++){
             const age=frame-24;b.tick=720+frame;b.x=site.x-CHASE_STRIKE_REACH+age*3.5;
             b.chaseBreaks=CHASE_BREAKS.map((_,i)=>i<index?-1000:i===index&&age>=0?744:-1);
+            b.chaseAlerts=CHASE_BREAKS.map((_,i)=>i<index?-1000:i===index&&age>=-20?724:-1);
             c.fillStyle='#263f48';c.fillRect(0,0,320,180);
             c.fillStyle='#365b60';c.fillRect(0,158,320,22);c.fillStyle='#78998c';c.fillRect(0,157,320,1);
             drawChaseLandmarks(c,b,site.x-55,64,false);

@@ -383,7 +383,10 @@ export class HypotheticalGame extends WorldGame {
     }
     protected override renderEncounterHud(c:CanvasRenderingContext2D) {
         const b=this.fight;
-        workshopPanel(c,0,0,320,31,false,true);
+        // Chase telegraphs belong to the weapon and scene. Keep the compact
+        // progress HUD; the detailed hint remains in the accessible status.
+        const showHint=this.act!=='chase'||this.player.data.isDead;
+        workshopPanel(c,0,0,320,showHint?31:16,false,true);
         pixelText(c,'FLAVIO HIPOTETICO',7,5,WORKSHOP_UI.paper);
         const district=Math.min(3,Math.floor(this.player.data.position.x/1120));
         pixelText(c,this.act==='chase'?`${district+1}/4 ${CHASE_DISTRICTS[district].name}`:this.act==='siege'&&!b.arrival.ready?'CHEGADA AO ARSENAL':this.act==='siege'?`${b.route.entered+1}/${SIEGE_SECTORS.length} ${b.route.currentSector.name}`:`FASE ${b.phaseNumber}/3`,121,5,WORKSHOP_UI.light);
@@ -407,7 +410,7 @@ export class HypotheticalGame extends WorldGame {
         }
         if(this.player.data.hasHelmet)this.renderer.drawHelmet(280,3,c);
         pixelText(c,'II',306,5,WORKSHOP_UI.paper);
-        pixelText(c,this.encounterHint,7,20,WORKSHOP_UI.paper);
+        if(showHint)pixelText(c,this.encounterHint,7,20,WORKSHOP_UI.paper);
         if(this.act==='siege'&&b.route.entered===3&&!this.player.data.isDead)
             drawBastionEdgeCue(c,this.foes,this.camera.x,this.camera.y);
     }

@@ -2,7 +2,7 @@ import { drawGunMuzzle, drawGunTracer, drawGunImpact, drawGunCasing } from './Hy
 import {drawChaseCollapse,drawChaseWave} from './HypotheticalChaseArt';
 import {chasePerformance,type ChaseGesture} from './HypotheticalChasePerformance';
 import {drawChaseFootfall} from './HypotheticalChaseImpactArt';
-import {drawChaseCounters,drawChaseCounterEffects,drawChaseVolleyCue} from './HypotheticalChaseCounterplayArt';
+import {drawChaseCounters,drawChaseCounterEffects} from './HypotheticalChaseCounterplayArt';
 import {drawCapturedHero,type HeldHero,type CapturedHeroPose} from './HypotheticalCapturedHero';
 import {captureNeck} from './HypotheticalCaptureAnatomy';
 import { box, oval, pixelLine, polygon, type Point } from '../WorldPainting';
@@ -571,7 +571,7 @@ export function drawHypotheticalTerrain(c:CanvasRenderingContext2D,level:WorldLe
 
 export function drawHypotheticalObjects(c:CanvasRenderingContext2D,o:WorldObjects,b:HypotheticalModel,cx:number,cy:number,reduced=false){
     drawHypotheticalFittings(c,o,b,cx,cy,reduced);
-    if(b.act==='chase')drawChaseCounters(c,b,o,cx,cy,reduced);
+    if(b.act==='chase')drawChaseCounters(c,b,o,cx,cy);
     // Live projectiles stay readable in front of decorative braces and stores.
     for(const barrel of o.barrels)drawHypotheticalCanister(c,barrel,cx,cy);
 }
@@ -635,7 +635,6 @@ export function drawHypotheticalCombat(c:CanvasRenderingContext2D,b:Hypothetical
     }
     if(b.act==='chase'){
         drawChaseCounterEffects(c,b,cx,cy,reduced);
-        if(!actor)drawChaseVolleyCue(c,b,cx,cy);
     }
     for(const p of b.impacts)drawGunImpact(c,p,b.tick,-cx,-cy,reduced);
     for(const p of b.dust){

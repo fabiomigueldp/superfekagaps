@@ -1,6 +1,6 @@
 import {box,oval,pixelLine,polygon} from '../WorldPainting';
 import type {HypotheticalModel} from './HypotheticalModel';
-import {CHASE_QUAYS,CHASE_SHORE,chaseQuayX,chaseQuaySection,chaseWorkerAt,chaseBirdAt,chaseQuayReaction,chaseOutflowAt,chaseOarAt,chaseWindAt,chaseWorkAt} from './HypotheticalChaseLife';
+import {CHASE_QUAYS,CHASE_SHORE,chaseQuayX,chaseQuaySection,chaseWorkerAt,chaseBirdAt,chaseQuayReaction,chaseOutflowAt,chaseOarAt,chaseWindAt,chaseWorkAt,chaseDoorAt} from './HypotheticalChaseLife';
 import {drawScenicShadow} from './HypotheticalSceneShadow';
 
 const P={shade:'#607e7b',dark:'#597471',stone:'#9ca797',light:'#b8b79d',wood:'#9c9278',seam:'#7b8878',water:'#79aaa2'};
@@ -177,6 +177,17 @@ export function drawChaseQuayLife(c:CanvasRenderingContext2D,b:HypotheticalModel
         if(site.kind==='cargo')crate(c,x+78,base-8+pose.crateDrop+(work.bend*.6+work.breath)*(1-pose.notice),7,5);
         // Occlusion by the jamb, rather than a fade, takes the worker inside.
         c.save();c.beginPath();c.rect(x+47,base-28,45,30);c.clip();worker(c,x+75,base,age,index,b.tick,reduced);c.restore();
+        const door=chaseDoorAt(age,index),width=9.5*door.close;
+        if(width>0){
+            for(const [left,dir]of [[x+29,1],[x+48,-1]]){
+                const edge=left+dir*width,from=Math.min(left,edge);
+                box(c,from,base-23,width,23,'#738c7e');
+                pixelLine(c,edge,base-22,edge,base-2,'#a2ad91');
+                for(const yy of [base-18,base-8])pixelLine(c,left,yy,edge,yy,'#889d87');
+                if(width>6)box(c,edge-dir*3,base-11,1,2,'#b6b294');
+            }
+            if(door.latched)pixelLine(c,x+36,base-10,x+41,base-10,'#9ba68d');
+        }
     }
     if(site.birds){
         for(let j=0;j<3;j++){
@@ -187,9 +198,11 @@ export function drawChaseQuayLife(c:CanvasRenderingContext2D,b:HypotheticalModel
             const peck=age<0&&!reduced?Math.max(0,Math.sin(b.tick/31+j*2+index)-.65)*4:0;
             box(c,bx,by,4,2,'#aeb9a4');box(c,bx+3+peck*.4,by-1+peck,2,2,'#bec3ab');
             box(c,bx+5+peck*.4,by+peck,1,1,'#9f9e81');pixelLine(c,bx,by+1,bx-2,by,'#8da598');
-            if(bird.flying&&!reduced){
-                pixelLine(c,bx+1,by,bx-3,by-bird.wing,'#849f94');pixelLine(c,bx+2,by,bx+6,by-bird.wing,'#b4c1a9');
-                box(c,bx-4,by-bird.wing,2,1,'#92aba0');
+            if(bird.flying){
+                const wing=reduced?1.5:bird.wing;
+                polygon(c,[[bx+1,by],[bx-2,by-wing*.5],[bx-5,by-wing],[bx-2,by+1]],'#849f94');
+                polygon(c,[[bx+2,by],[bx+5,by-wing*.6],[bx+8,by-wing],[bx+5,by+1]],'#b4c1a9');
+                pixelLine(c,bx+4,by-wing*.3,bx+7,by-wing,'#9fbaa3');
             }
             else if(!bird.flying)box(c,bx+1,by+2,2,1,'#708b82');
         }

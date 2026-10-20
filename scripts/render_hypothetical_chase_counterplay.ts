@@ -47,7 +47,7 @@ const paint=(scene:ReturnType<typeof make>,cx:number,reduced=false)=>{
     drawHypotheticalBackground(c,b,cx,64,reduced);drawHypotheticalTerrain(c,level,b,cx,64);
     drawHypotheticalObjects(c,o,b,cx,64,reduced);drawHypotheticalCombat(c,b,cx,64,reduced);
     renderer.drawPlayer(hero,{x:cx,y:64,shakeTimer:0},c);
-    c.fillStyle='#122830';c.fillRect(0,0,320,31);pixelText(c,'FLAVIO HIPOTETICO',7,5,'#e2c28b');pixelText(c,b.hint,7,20,'#eae1ca');
+    c.fillStyle='#122830';c.fillRect(0,0,320,16);pixelText(c,'FLAVIO HIPOTETICO',7,5,'#e2c28b');
 };
 try{
     for(const [i,s]of CHASE_COUNTERS.entries()){
@@ -63,7 +63,7 @@ try{
             b.x=s.pad.x-108+directedTravel;b.travel=b.x+18;b.velocity=b.motionSpeed=3.5*b.counters.speedScale(b.tick);
             const px=s.pad.x+age*3.5,fall=Math.max(0,(px-(s.pad.x+30))/3.5);
             hero.position={x:px,y:Math.min(200,s.pad.y-24+fall*fall*.25)};
-            hero.animationFrame=Math.floor(frame/5)%6;b.counters.playerX=px;
+            hero.animationFrame=Math.floor(frame/5)%6;
             const cx=s.pad.x-152;
             const column=[-10,6,16,42].indexOf(age);
             if(!stills&&frame%2===0){paint(scene,cx);film(['CAIS / MADEIRA','COMPORTAS / CONTRAPESO','PORTARIA / CARGA'][i]);}
@@ -92,11 +92,11 @@ try{
             if(since<5)b.muzzle=5-since;
         }
         const jump=Math.max(0,t-100);hero.position={x:first.x+t*3.5,y:200-Math.max(0,8*jump-.25*jump*jump)};
-        hero.isGrounded=jump===0||jump>=32;hero.animationFrame=Math.floor(t/5)%6;b.counters.playerX=hero.position.x;
+        hero.isGrounded=jump===0||jump>=32;hero.animationFrame=Math.floor(t/5)%6;
         const cx=hero.position.x-150;
-        if(!stills&&t%2===0){paint(scene,cx);film('PORTARIA / MIRA ALTA - NOVO AVISO - MIRA BAIXA');}
+        if(!stills&&t%2===0){paint(scene,cx);film('PORTARIA / PREPARACAO E CONTINUIDADE DAS RAJADAS');}
         const col=[28,49,82,107].indexOf(t);
-        if(col>=0){paint(scene,cx);combo.context.drawImage(snapshot(),col*320,24);pixelText(combo.context,['AVISO ALTO','PRIMEIRA SALVA','NOVO AVISO','RAJADA BAIXA'][col],col*320+8,8,'#e2c28b');}
+        if(col>=0){paint(scene,cx);combo.context.drawImage(snapshot(),col*320,24);pixelText(combo.context,['PREPARACAO','PRIMEIRA SALVA','TROCA DE MIRA','SEGUNDA SALVA'][col],col*320+8,8,'#e2c28b');}
     }
     writeFileSync(join(out,'counterplay.png'),board.canvas.toBuffer('image/png'));
     writeFileSync(join(out,'counterplay-details.png'),details.canvas.toBuffer('image/png'));

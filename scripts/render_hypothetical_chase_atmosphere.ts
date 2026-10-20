@@ -47,9 +47,13 @@ try{
                 writeFileSync(join(out,'frames',String(outputFrame++).padStart(5,'0')+'.png'),film.toBuffer('image/png'));
             }
             if([60,170,202,232,300].includes(frame))writeFileSync(join(out,scene.name+'-'+frame+'.png'),screen.toBuffer('image/png'));
+            const moment=[60,202,232,300].indexOf(frame);
+            if(moment>=0){
+                const x=moment*320,y=i*204;
+                bc.drawImage(screen,x,y+24);
+                pixelText(bc,scene.name.toUpperCase()+' / '+['ROTINA','ALERTA','RESPOSTA','REPOUSO'][moment],x+8,y+8,'#e2c28b');
+            }
             if(frame===60){
-                const x=i%2*640,y=Math.floor(i/2)*408;
-                bc.drawImage(screen,x,y+48,640,360);pixelText(bc,scene.label,x+12,y+17,'#e2c28b',2);
                 const dx=i%2*580,dy=Math.floor(i/2)*472;
                 dc.drawImage(screen,48,40,145,108,dx,dy+40,580,432);pixelText(dc,scene.name.toUpperCase()+' / DETALHE 4X',dx+12,dy+14,'#e2c28b',2);
                 paint(b,scene.camera,64,true);writeFileSync(join(out,scene.name+'-reduced.png'),screen.toBuffer('image/png'));

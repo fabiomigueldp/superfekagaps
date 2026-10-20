@@ -10,12 +10,11 @@ export class HypotheticalChaseCounterplay {
     readonly loads:ChaseLoadState[];
     releasedThisTick=-1;struckThisTick=-1;waterThisTick=-1;
     private previousBottom:number|null=null;
-    playerX=0;
     constructor(start=0){
         this.loads=CHASE_COUNTERS.map(s=>({released:-1,struck:-1,hitX:0,hitY:0,spent:s.pad.x<start,supported:true,washed:-1,washedY:0,washedVelocity:0}));
     }
     update(tick:number,player:Rect,pursuer:Rect,decks:readonly Rect[]){
-        this.releasedThisTick=this.struckThisTick=this.waterThisTick=-1;this.playerX=player.x;
+        this.releasedThisTick=this.struckThisTick=this.waterThisTick=-1;
         const bottom=player.y+player.height,descending=this.previousBottom===null||bottom>=this.previousBottom-.1;
         for(const [i,s]of CHASE_COUNTERS.entries()){
             const state=this.loads[i];if(state.spent)continue;
@@ -60,10 +59,9 @@ export class HypotheticalChaseCounterplay {
     speedScale(tick:number){return 1-this.reaction(tick).weight*.68;}
     hint(tick:number){
         if(this.reaction(tick).weight>0)return 'CARGA ACERTOU! APROVEITE A FREADA';
-        for(const [i,s]of CHASE_COUNTERS.entries()){
-            const state=this.loads[i];if(state.spent)continue;
+        for(const state of this.loads){
+            if(state.spent)continue;
             if(state.released>=0&&tick-state.released<36)return 'CARGA SOLTA! CONTINUE CORRENDO';
-            if(state.supported&&state.released<0&&this.playerX>s.pad.x-130&&this.playerX<s.pad.x+s.pad.width)return 'ROTA ALTA: PISE NO PEDAL DA CARGA';
         }
         return null;
     }

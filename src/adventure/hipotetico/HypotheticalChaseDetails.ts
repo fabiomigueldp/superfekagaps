@@ -84,13 +84,15 @@ function landedPiece(age:number,delay:number,height:number,length:number,depth:n
 /** Small fragments inherit an impulse from the struck joint, land once and
  * settle on the same rear bank as the large rigid parts. No render-time RNG. */
 export function chaseFragmentAt(kind:ChaseStructureKind,index:number,age:number){
-    const born=index%3,t=Math.max(0,age-born),metal=kind==='sluice'||kind==='gantry';
+    const score=chaseStructureTiming(kind),height=kind==='crane'?78:kind==='sluice'?58:69;
+    const group=index%3,originX=group===0?0:group===1?58:17+index%4*7,originY=group===2?33-height+3:8;
+    const born=(group===0?score.left:group===1?score.right:score.beam)+Math.floor(index/3),t=Math.max(0,age-born),metal=kind==='sluice'||kind==='gantry';
     const vx=-.9+(index*7%11)*.24,vy=-1.2-(index*3%5)*.29,g=.07;
-    const land=(-vy+Math.sqrt(vy*vy+4*g*31))/(2*g),after=Math.max(0,t-land);
+    const land=(-vy+Math.sqrt(vy*vy+4*g*(31-originY)))/(2*g),after=Math.max(0,t-land);
     const turn=(index*.73+t*(index%2?-.13:.1))*(1-ease(after/16));
     return {visible:age>=born,metal,landed:t>=land,
-        x:vx*Math.min(t,land)+vx*6*ease(after/16),
-        y:t<land?vy*t+g*t*t:31-(after<10?Math.sin(after/10*Math.PI)*1.8:0),turn};
+        x:originX+vx*Math.min(t,land)+vx*6*ease(after/16),
+        y:t<land?originY+vy*t+g*t*t:31-(after<10?Math.sin(after/10*Math.PI)*1.8:0),turn};
 }
 
 export interface ChaseTerrace {x:number;y:number;width:number}

@@ -3,7 +3,7 @@ import {pixelText} from '../../graphics/BitmapFont';
 import type {HypotheticalModel,Shot} from './HypotheticalModel';
 import {CHASE_BREAKS,CHASE_CHECKPOINT,CHASE_DISTRICTS} from './HypotheticalLayout';
 import {chaseRuinAt,chaseDebrisAt,chaseMaterialAt,chaseTerraceFeet,chaseTerraceFall,chaseSplashAt,CHASE_DECK_Y,CHASE_WATER_Y,type ChaseMaterial,type ChaseTerrace} from './HypotheticalChaseDetails';
-import {drawChaseStructureEffects,drawChaseLandingDust} from './HypotheticalChaseImpactArt';
+import {drawChaseStructureEffects,drawChaseLandingDust,drawChaseApproachEffects} from './HypotheticalChaseImpactArt';
 
 const materials = {
     stone: {dark:'#586e72',mid:'#8b9990',light:'#b8b499',grain:'#77877f'},
@@ -30,6 +30,11 @@ function beam(c:CanvasRenderingContext2D,x:number,y:number,length:number,angle:n
             const bolt=at(u,-width/2+1);box(c,bolt[0],bolt[1],1,1,p.light);
         }
         if(material==='iron')pixelLine(c,...at(length*.4,width/2-1),...at(length*.4+4,width/2-1),'#829184');
+        else if(material==='timber'){
+            pixelLine(c,...at(length*.45,-1),...at(length*.45+4,0),p.grain);
+            pixelLine(c,...at(length*.45+4,0),...at(length*.45+1,1),p.grain);
+            pixelLine(c,...at(length*.45-3,-2),...at(length*.45+2,-2),p.light);
+        }
     }
 }
 
@@ -58,6 +63,7 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
     for(const [i,site] of CHASE_BREAKS.entries()){
         const x=site.x-cx;if(x<-160||x>410)continue;
         const at=b.chaseBreaks[i],age=at===-1?-1:b.tick-at,broken=age>=0;
+        const alert=b.chaseAlerts[i],approach=alert===-1?-1:b.tick-alert;
         const pressure=Math.max(0,Math.min(1,(b.x+96-site.x)/40));
         const metal=site.kind==='gantry'||site.kind==='sluice',mat:ChaseMaterial=metal?'iron':'timber',p=materials[mat];
         const height=site.kind==='crane'?78:site.kind==='sluice'?58:69,pose=chaseRuinAt(age,height,site.kind);
@@ -88,7 +94,8 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
                 pixelLine(c,x+dx,base-24,x+dx+3,base-19,p.light);
             }
         }
-        const bx=x-26+(broken?pose.beamX:0),by=base-height+(broken?pose.beamDrop:0),turn=broken?pose.beamTurn:0;
+        const tremor=reduced||approach<0||broken?0:Math.sin(approach*.7)*Math.exp(-approach/25)*.8;
+        const bx=x-26+(broken?pose.beamX:tremor),by=base-height+(broken?pose.beamDrop:0),turn=broken?pose.beamTurn:0;
         beam(c,bx,by,66,turn,mat,6);
         for(const [j,dx]of [-25,33].entries()){
             const part=j?pose.rightBrace:pose.leftBrace;
@@ -135,7 +142,6 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
         }
         if(!broken&&pressure>.2){
             pixelLine(c,x-25,base-25,x-22,base-20,p.light);pixelLine(c,x+35,base-28,x+33,base-22,p.light);
-            if(!reduced&&pressure>.65){const t=(b.tick+i)%12;box(c,x-22+t*.4,base-19+t*.6,1,2,p.light);}
         }
         // The aftermath consists of the pieces that actually detached. Keep
         // only the exposed socket scars here; no mound or extra beam appears.
@@ -144,6 +150,7 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
             pixelLine(c,x+dx+2,base-21,x+dx+5,base-23,p.light);
         }
         c.restore();
+        drawChaseApproachEffects(c,x,base,approach,site.kind,reduced);
         drawChaseStructureEffects(c,x,base,age,site.kind,reduced);
         if(broken&&pose.dust>0&&!reduced){
             for(let j=0;j<5;j++){

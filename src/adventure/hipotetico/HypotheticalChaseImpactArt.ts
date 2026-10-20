@@ -2,6 +2,24 @@ import {box,pixelLine,polygon} from '../WorldPainting';
 import {chaseFragmentAt,CHASE_DECK_Y,CHASE_WATER_Y,chaseMaterialAt,type ChaseMaterial} from './HypotheticalChaseDetails';
 import {chaseStructureTiming,type ChaseStructureKind} from './HypotheticalChasePerformance';
 
+/** A finite fall starts at the shaken upper joint before the main collision.
+ * Its clock is recorded by the pursuit, independent of frame rate or camera. */
+export function drawChaseApproachEffects(c:CanvasRenderingContext2D,x:number,base:number,age:number,kind:ChaseStructureKind,reduced:boolean){
+    if(age<0||age>110)return;
+    const height=kind==='crane'?78:kind==='sluice'?58:69,metal=kind==='sluice'||kind==='gantry';
+    for(let j=0;j<(reduced?2:4);j++){
+        const t=age-4-j*4;if(t<0)continue;
+        const origin=base-height+7+j%2*3,g=.05,land=Math.sqrt((base-2-origin)/g),after=t-land;
+        const xx=x+(j%2?32:-21)+(j%2?.22:-.25)*Math.min(t,land);
+        if(after<0){
+            box(c,xx,origin+g*t*t,1,j%2?1:2,metal?'#9ba99c':'#b4a387');
+        }else if(after<13){
+            c.save();c.globalAlpha*=1-after/13;
+            pixelLine(c,xx-after*.15,base-2,xx+after*.2+1,base-2,metal?'#748c85':'#918e78');c.restore();
+        }
+    }
+}
+
 /** These effects occupy the struck structure's plane, behind the dinosaur.
  * Sparks are local to the joint; the escape corridor never gets a full flash. */
 export function drawChaseStructureEffects(c:CanvasRenderingContext2D,x:number,base:number,age:number,kind:ChaseStructureKind,reduced:boolean){
@@ -14,10 +32,11 @@ export function drawChaseStructureEffects(c:CanvasRenderingContext2D,x:number,ba
         pixelLine(c,px,py,px+dx,py+dy,ink,2);
         pixelLine(c,px,py-1,px+dx,py+dy-1,light);
     }
-    if(!reduced&&age<14&&metal){
-        for(let j=0;j<5;j++){
-            const t=age-j;if(t<0||t>9)continue;
-            const px=x-23+t*(.6+j*.25),py=base-33-t*(.9+j%3*.4)+t*t*.045;
+    if(!reduced&&age<27&&metal){
+        const score=chaseStructureTiming(kind);
+        for(let j=0;j<6;j++){
+            const right=j%2,t=age-(right?score.right:score.left)-Math.floor(j/2);if(t<0||t>9)continue;
+            const px=x+(right?35:-23)+t*(.6+j*.2),py=base-25-t*(.9+j%3*.4)+t*t*.045;
             pixelLine(c,px,py,px-2,py+1,t<4?'#e3c78e':'#b49e79');
         }
     }
