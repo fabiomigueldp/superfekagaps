@@ -18,6 +18,8 @@ export class GlobalScoreboard {
   private durationMs = 0;
   private canSubmit = false;
   private returnFocus: HTMLElement | null = null;
+  private sessionVersion = 0;
+  private requestVersion = 0;
 
   constructor() {
     this.root = document.createElement('section');
@@ -59,6 +61,7 @@ export class GlobalScoreboard {
   get isOpen(): boolean { return this.panel.open; }
 
   showEnding(score: number, durationMs: number, canSubmit: boolean): void {
+    this.sessionVersion++;
     this.score = score;
     this.durationMs = durationMs;
     this.canSubmit = canSubmit;
@@ -130,28 +133,38 @@ export class GlobalScoreboard {
     }
   }
 
+  /** A publication supersedes the initial GET; a new ending retires both. */
+  private isCurrentRequest(session: number, request: number): boolean {
+    return session === this.sessionVersion && request === this.requestVersion;
+  }
+
   private async refresh(): Promise<void> {
+    const session = this.sessionVersion, request = ++this.requestVersion;
     try {
       const response = await fetch(ENDPOINT, { cache: 'no-store' });
+      if (!this.isCurrentRequest(session, request)) return;
       if (!response.ok) throw new Error();
       const data = await response.json() as RankingResponse;
+      if (!this.isCurrentRequest(session, request)) return;
       this.render(data.entries);
       // A loaded ranking can grow above the focused control on short screens.
       if (this.panel.open) this.panel.querySelector<HTMLElement>(':focus')?.scrollIntoView({ block: 'nearest' });
       this.status.textContent = '';
     } catch {
+      if (!this.isCurrentRequest(session, request)) return;
       this.status.textContent = 'Placar indisponível. Seu recorde local continua salvo.';
     }
   }
 
   private async publish(): Promise<void> {
-    if (!this.canSubmit || !this.nameInput.validity.valid) return;
+    const button = this.form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    if (this.root.hidden || !this.canSubmit || button.disabled || !this.nameInput.validity.valid) return;
     const name = this.nameInput.value.trim().replace(/\s+/g, ' ');
     if (!/^[\p{L}\p{N}][\p{L}\p{N} ._-]{1,15}$/u.test(name)) {
       this.status.textContent = 'Use 2 a 16 letras, números, espaços, ponto, _ ou -.';
       return;
     }
-    const button = this.form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const session = this.sessionVersion, request = ++this.requestVersion;
     // Keep Escape and Tab inside the dialog while the submit button is disabled.
     if (document.activeElement === button) this.nameInput.focus();
     button.disabled = true;
@@ -163,7 +176,9 @@ export class GlobalScoreboard {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ playerId, name, score: this.score, durationMs: this.durationMs })
       });
+      if (!this.isCurrentRequest(session, request)) return;
       const data = await response.json() as RankingResponse;
+      if (!this.isCurrentRequest(session, request)) return;
       if (!response.ok) throw new Error(data.error || 'Falha ao publicar. Tente novamente.');
       localStorage.setItem(PLAYER_NAME_KEY, name);
       this.render(data.entries);
@@ -177,6 +192,7 @@ export class GlobalScoreboard {
       this.form.hidden = true;
       this.canSubmit = false;
     } catch (error) {
+      if (!this.isCurrentRequest(session, request)) return;
       this.status.textContent = error instanceof Error ? error.message : 'Falha ao publicar. Tente novamente.';
       button.disabled = false;
     }
