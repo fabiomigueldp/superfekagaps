@@ -5,7 +5,8 @@ export class ScoreManager {
     static getHighScore(): number {
         try {
             const stored = localStorage.getItem(this.HIGH_SCORE_KEY);
-            return stored ? parseInt(stored, 10) : 0;
+            const score = Number(stored);
+            return Number.isSafeInteger(score) && score >= 0 ? score : 0;
         } catch (e) {
             console.warn('Failed to retrieve high score', e);
             return 0;
@@ -13,6 +14,7 @@ export class ScoreManager {
     }
 
     static saveHighScore(score: number): boolean {
+        if (!Number.isSafeInteger(score) || score < 0) return false;
         const currentHigh = this.getHighScore();
         if (score > currentHigh) {
             try {
@@ -29,7 +31,8 @@ export class ScoreManager {
     static getBestTime(): number {
         try {
             const stored = localStorage.getItem(this.BEST_TIME_KEY);
-            return stored ? parseFloat(stored) : Infinity;
+            const time = Number(stored);
+            return Number.isFinite(time) && time > 0 ? time : Infinity;
         } catch (e) {
             console.warn('Failed to retrieve best time', e);
             return Infinity;
@@ -37,6 +40,7 @@ export class ScoreManager {
     }
 
     static saveBestTime(time: number): boolean {
+        if (!Number.isFinite(time) || time <= 0) return false;
         const currentBest = this.getBestTime();
         if (time < currentBest) {
             try {
