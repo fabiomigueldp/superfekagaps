@@ -737,7 +737,7 @@ export class WorldMapHud {
         }
         // Resizing can replace a focused terrain sign with the drawer fallback.
         // Keep focus visible on its persistent entry, without opening a menu by itself.
-        if (fallback && [...this.overviewButtons, this.guairaOverview].includes(document.activeElement as HTMLButtonElement))
+        if (fallback && [...this.overviewButtons, this.guairaOverview, this.deliciaOverview].includes(document.activeElement as HTMLButtonElement))
             this.regionButton.focus({ preventScroll: true });
         this.overviewButtons.forEach((button, index) => this.position(button, this.state?.overview ? points[index] : null));
         this.position(this.guairaOverview, this.state?.overview && this.callbacks.selectGuaira ? points[6] : null);
@@ -926,7 +926,7 @@ export class WorldMapHud {
         if (this.chapter || !this.state?.overview) return;
         if (event.key === 'Escape') {
             event.preventDefault(); event.stopPropagation();
-            const focusedIsland = [...this.overviewButtons, this.guairaOverview].includes(document.activeElement as HTMLButtonElement);
+            const focusedIsland = [...this.overviewButtons, this.guairaOverview, this.deliciaOverview].includes(document.activeElement as HTMLButtonElement);
             this.run(() => { this.callbacks.overview(); if (focusedIsland) this.overviewButton.focus({ preventScroll: true }); });
             return;
         }
