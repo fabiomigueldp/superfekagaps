@@ -9,7 +9,7 @@ import {CHASE_WATER_Y,chaseDeckSpans,chaseMaterialAt} from './HypotheticalChaseD
 import type {WeaponCue} from './HypotheticalAudio';
 import {drawCaptureEffects} from './HypotheticalCaptureEffects';
 
-export const CHASE_CAPTURE=Object.freeze({launch:65,entry:225,catch:390,clamp:445,hold:500,lift:740,swallow:850,gulp:1010,hidden:1150,breath:1240,settle:1360,fade:1410,black:1710,duration:1910});
+export const CHASE_CAPTURE=Object.freeze({launch:65,catch:390,clamp:445,hold:500,lift:740,swallow:850,gulp:1010,hidden:1150,breath:1240,settle:1360,fade:1410,black:1710,duration:1910});
 const ramp=(time:number,start:number,end:number)=>smoothMotion((time-start)/(end-start));
 const mix=(a:number,b:number,t:number)=>a+(b-a)*t;
 const pulse=(time:number,start:number,peak:number,end:number)=>ramp(time,start,peak)*(1-ramp(time,peak,end));
@@ -76,11 +76,11 @@ export class HypotheticalChaseDefeat {
         const lean=captured?track(t,[[0,a.riderLean??0],[65,a.riderLean??0],[195,-6],[score.catch,-3],
             [score.clamp+28,-6],[score.hold+60,-2.5],[score.lift+45,3],[score.hidden,1],[score.settle,0]]):mix(a.riderLean??0,0,settle);
         const p:DinosaurPose={...a,x:a.x+a.facing*brake,y:a.y,
-            gait:a.gait,stride:a.stride*(1-settle),breath:0,bow:mix(a.bow,0,settle),
+            gait:a.gait,stride:a.stride*(1-settle),breath:a.breath*(1-settle),bow:mix(a.bow,0,settle),
             compression:mix(a.compression,2.8*pulse(t,65,175,365)+planting*1.2+catchWeight*1.7,settle),
             neckDrop:neck,headPitch:head,
             jaw:mix(a.jaw,.12,settle),jawHinge:hinge,
-            recoil:a.recoil*(1-settle),aim:mix(a.aim,.38,settle),reload:0,tuck:0,brace:0,
+            recoil:a.recoil*(1-settle),aim:mix(a.aim,.38,settle),reload:a.reload*(1-settle),tuck:a.tuck*(1-settle),brace:a.brace*(1-settle),
             tail:track(t,[[0,a.tail],[65,a.tail],[300,-.10],[660,.045],[1120,0]]),
             cloth:reduced?0:a.cloth*(1-settle)+1.5*pulse(t,95,210,450)+1.2*pulse(t,score.clamp+35,score.clamp+100,800),
             riderDrop:mix(a.riderDrop??0,1.5*open*(1-lift)+catchWeight*1.4,settle),riderLean:lean,
@@ -96,7 +96,7 @@ export class HypotheticalChaseDefeat {
         };
         if(captured&&t>=score.catch&&t<score.hidden)p.capturedHero={frame:captureFrameAt(t),swallow:gulp,facing:this.facing*a.facing,
             angle:track(t,[[score.catch,-1.2],[score.clamp,-1.24],[score.hold,-1.24],[645,-1.06],[score.swallow,-1.2],[score.hidden,-1.3]])};
-        if(captured&&t>=score.entry&&t<score.catch){
+        if(captured&&t>=score.launch&&t<score.catch){
             const hero=this.heroAt(t)!,neck=-59+p.bow*25+p.breath+p.neckDrop+p.compression;
             const local=dinosaurHeadPoint([(hero.x-p.x)*p.facing,hero.y-p.y],neck,-(p.headPitch??0));
             p.captureApproach={...hero,x:local[0],y:local[1],angle:hero.angle*p.facing-(p.headPitch??0),facing:hero.facing*p.facing};
@@ -136,7 +136,7 @@ export class HypotheticalChaseDefeat {
     }
     drawForeground(c:CanvasRenderingContext2D,ms:number,cx:number,cy:number,reduced:boolean) {
         const hero=this.heroAt(ms);
-        if(hero&&ms<CHASE_CAPTURE.entry)drawCapturedHero(c,{...hero,x:hero.x-cx,y:hero.y-cy});
+        if(hero&&ms<CHASE_CAPTURE.launch)drawCapturedHero(c,{...hero,x:hero.x-cx,y:hero.y-cy});
         if(this.kind==='caught'){
             drawCaptureEffects(c,this,ms,cx,cy,reduced);
         }else if(this.kind!=='fall'&&ms<240){

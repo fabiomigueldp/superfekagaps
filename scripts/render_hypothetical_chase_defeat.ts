@@ -25,9 +25,10 @@ const display=createCanvas(320,180);display.style={};const renderer=new Renderer
 const film=createCanvas(960,588),fc=film.getContext('2d');fc.imageSmoothingEnabled=false;
 const board=createCanvas(1280,416),bc=board.getContext('2d');bc.imageSmoothingEnabled=false;
 const close=createCanvas(1280,464),cc=close.getContext('2d');cc.imageSmoothingEnabled=false;
+const contact=createCanvas(1280,696),hc=contact.getContext('2d');hc.imageSmoothingEnabled=false;
 const causes=createCanvas(960,204),dc=causes.getContext('2d');dc.imageSmoothingEnabled=false;
-for(const [ctx,w,height]of [[bc,1280,416],[cc,1280,464],[dc,960,204]] as const){ctx.fillStyle='#122830';ctx.fillRect(0,0,w,height);}
-const moments=[0,160,310,390,560,790,970,1170],labels=['IMPACTO','ALCANCE','BOCA ABERTA','CAPTURA','LEVANTAR','PAUSA','ENGOLIR','ASSENTAR'];
+for(const [ctx,w,height]of [[bc,1280,416],[cc,1280,464],[hc,1280,696],[dc,960,204]] as const){ctx.fillStyle='#122830';ctx.fillRect(0,0,w,height);}
+const moments=[0,225,390,445,610,740,1010,1240],labels=['IMPACTO','ALCANCE','CONTATO','MANDIBULA','SUSTENTAR E ERGUER','CABECA ERGUIDA','ENGOLIR','EXPIRAR'];
 // Freeze the pixels for a plate before reusing the source canvas for the next pose.
 const snapshot=()=>{const copy=createCanvas(320,180);copy.getContext('2d').putImageData(c.getImageData(0,0,320,180),0,0);return copy;};
 let movieFrame=0;
@@ -68,7 +69,13 @@ try{
             paint(ms,false,true);cc.drawImage(snapshot(),120,52,160,104,(i%4)*320,Math.floor(i/4)*232+24,320,208);
             pixelText(cc,labels[i],(i%4)*320+8,Math.floor(i/4)*232+8,'#e2c28b');
         }
-        if(index===1){paint(389,false,true);writeFileSync(join(out,'before-mouth.png'),native.toBuffer('image/png'));paint(390,false,true);writeFileSync(join(out,'in-mouth.png'),native.toBuffer('image/png'));}
+        for(const ms of [224,225,389,390]){
+            paint(ms,false,true);writeFileSync(join(out,`contact-${index}-${ms}.png`),native.toBuffer('image/png'));
+        }
+        for(const [i,ms]of [225,390,500,1010].entries()){
+            paint(ms,false,true);hc.drawImage(snapshot(),120,52,160,104,i*320,index*232+24,320,208);
+            pixelText(hc,[scene.name.split(' ').slice(-1)[0],ms+'MS'].join(' / '),i*320+8,index*232+8,'#e2c28b');
+        }
         if(!stills)for(let frame=0;frame<60;frame++){paint(frame*1000/30);writeMovie(scene.name);}
         paint(560,true);writeFileSync(join(out,`capture-reduced-${index}.png`),native.toBuffer('image/png'));
     }
@@ -92,6 +99,7 @@ try{
     }
     writeFileSync(join(out,'capture-sequence.png'),board.toBuffer('image/png'));
     writeFileSync(join(out,'capture-details.png'),close.toBuffer('image/png'));
+    writeFileSync(join(out,'capture-contact.png'),contact.toBuffer('image/png'));
     writeFileSync(join(out,'death-causes.png'),causes.toBuffer('image/png'));
     console.log(`Composed native art plates; ${movieFrame} directed frames.`);
 }finally{renderer.dispose();for(const dispose of clean.reverse())dispose();}

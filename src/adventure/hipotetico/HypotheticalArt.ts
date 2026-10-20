@@ -224,7 +224,7 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     const capture=pose.captureDetail!==undefined?captureNeck(body,neck,pose.headPitch??0,pose.captureDetail,pose.swallow??0):null;
     if(capture){
         poly(capture.outer,P.ink);poly(capture.skin,P.hide);poly(capture.throat,P.cream);
-        for(const fold of capture.folds){line(...fold.from,...fold.to,P.shade);line(fold.from[0]+1,fold.from[1]-1,fold.to[0],fold.to[1]-1,P.light);}
+        if((pose.captureDetail??0)>.3)for(const fold of capture.folds){line(...fold.from,...fold.to,P.shade);line(fold.from[0]+1,fold.from[1]-1,fold.to[0],fold.to[1]-1,P.light);}
     }else{
         poly([[1,body+5],[19,body-10],[29,neck-7],[45,neck-7],[47,neck+17],[25,body+19],[12,body+23]],P.ink);
         poly([[5,body+5],[22,body-10],[30,neck-4],[41,neck-3],[42,neck+14],[23,body+16],[12,body+19]],P.hide);
@@ -246,19 +246,22 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     }
     for(let i=0;i<3;i++){
         line(19+i*4,body+2-i*5,24+i*4,body+3-i*5,P.shade);
-        if(!capture)line(25+i*4,neck+11+i*3,33+i*2,neck+13+i*3,P.light);
+        if(!capture||(pose.captureDetail??0)<=.3)line(25+i*4,neck+11+i*3,33+i*2,neck+13+i*3,P.light);
     }
     // Hinged lower jaw, teeth and palate. The eye keeps a readable 1px pupil.
     skull=(pose.headPitch??0)!==0;
     const jaw = pose.jawHinge===undefined?pose.jaw*13:0;
     const lowerJaw=(xx:number,yy:number):Point=>dinosaurJawPoint([xx,yy],neck,pose.jawHinge??0);
-    poly([[26,neck-11],[47,neck-16],[66,neck-10],[70,neck+3],[61,neck+9],[30,neck+8]],P.ink);
-    poly([[29,neck-9],[48,neck-13],[64,neck-8],[66,neck+2],[59,neck+5],[31,neck+5]],P.hide);
-    poly([[31,neck-8],[48,neck-11],[62,neck-7],[57,neck-5],[38,neck-4]],P.light);
-    poly([[31,neck-2],[39,neck-5],[44,neck-2],[42,neck+4],[36,neck+6],[31,neck+3]],P.shade);
-    poly([[33,neck-1],[38,neck-3],[40,neck],[38,neck+3],[34,neck+3]],P.scute);
-    line(43,neck+3,59,neck+2,P.light);line(32,neck-7,40,neck-9,P.cream);
-    for(const [sx,sy] of [[43,-10],[57,-7],[60,-2],[45,0],[33,4]]){rect(sx,neck+sy,3,1,P.shade);rect(sx,neck+sy-1,2,1,P.light);}
+    const skullSurface=()=>{
+        poly([[26,neck-11],[47,neck-16],[66,neck-10],[70,neck+3],[61,neck+9],[30,neck+8]],P.ink);
+        poly([[29,neck-9],[48,neck-13],[64,neck-8],[66,neck+2],[59,neck+5],[31,neck+5]],P.hide);
+        poly([[31,neck-8],[48,neck-11],[62,neck-7],[57,neck-5],[38,neck-4]],P.light);
+        poly([[31,neck-2],[39,neck-5],[44,neck-2],[42,neck+4],[36,neck+6],[31,neck+3]],P.shade);
+        poly([[33,neck-1],[38,neck-3],[40,neck],[38,neck+3],[34,neck+3]],P.scute);
+        line(43,neck+3,59,neck+2,P.light);line(32,neck-7,40,neck-9,P.cream);
+        for(const [sx,sy] of [[43,-10],[57,-7],[60,-2],[45,0],[33,4]]){rect(sx,neck+sy,3,1,P.shade);rect(sx,neck+sy-1,2,1,P.light);}
+    };
+    if(!pose.captureApproach&&!pose.capturedHero)skullSurface();
     poly([[30,neck+6],[65,neck+5],lowerJaw(61,neck+17+jaw),lowerJaw(37,neck+15+jaw),[27,neck+10]],P.ink);
     poly([[32,neck+8],[62,neck+7],lowerJaw(59,neck+12+jaw),lowerJaw(38,neck+11+jaw)],P.mouth);
     poly([lowerJaw(36,neck+11+jaw*.4),lowerJaw(55,neck+11+jaw*.7),lowerJaw(59,neck+13+jaw),lowerJaw(39,neck+12+jaw)],P.tongue);
@@ -269,17 +272,22 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
         line(30,neck+8,...lowerJaw(33,neck+12),P.shade,2);
         line(31,neck+8,...lowerJaw(34,neck+11),P.light);
     }
-    if(pose.captureApproach)drawCapturedHero(c,pose.captureApproach,point=>{
-        const p=headPoint(point);return [x+d*p[0]*profile,y+p[1]];
-    },-Infinity,neck+6);
+    if(pose.captureApproach){
+        drawCapturedHero(c,pose.captureApproach,point=>{
+            const p=headPoint(point);return [x+d*p[0]*profile,y+p[1]];
+        });
+    }
     if(pose.capturedHero){
         const held=pose.capturedHero,anchor=dinosaurMouthPoint(neck,pose.jaw,0,pose.jawHinge);
         // Feka is behind the near lip and teeth, attached to the very same
         // skull/mandible anchor as the mouth. The throat hides him progressively.
         drawCapturedHero(c,{x:anchor[0]-held.swallow*36,y:anchor[1]-Math.sin(held.swallow*Math.PI)*1.2,angle:held.angle,facing:held.facing,frame:held.frame},point=>{
             const p=headPoint(point);return [x+d*p[0]*profile,y+p[1]];
-        },held.swallow>0?34:-Infinity,neck+6);
+        },held.swallow>0?34:-Infinity);
     }
+    // Both the approach and the held pose share the same occluding skull.
+    // Their contact boundary cannot reveal/hide the hero's head in one frame.
+    if(pose.captureApproach||pose.capturedHero)skullSurface();
     poly([[29,neck+10],lowerJaw(37,neck+12+jaw),lowerJaw(60,neck+14+jaw),lowerJaw(59,neck+16+jaw),lowerJaw(37,neck+14+jaw)],P.hide);
     line(...lowerJaw(37,neck+14+jaw),...lowerJaw(57,neck+15+jaw),P.cream);
     if(capture)for(const x of [39,46,53]){

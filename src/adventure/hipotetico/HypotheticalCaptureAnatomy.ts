@@ -4,6 +4,7 @@ import {dinosaurHeadPoint} from './HypotheticalMotion';
 /** Neck anchors stay attached to the rotating skull. The throat's displacement
  * belongs to the silhouette and scale rows, rather than an overlaid rectangle. */
 export function captureNeck(body:number,neck:number,pitch:number,detail:number,swallow:number) {
+    const blend=(from:Point,to:Point):Point=>[from[0]+(to[0]-from[0])*detail,from[1]+(to[1]-from[1])*detail];
     const joint=(x:number,y:number):Point=>{
         const p=dinosaurHeadPoint([x,neck+y],neck,pitch);
         return [x+(p[0]-x)*detail,neck+y+(p[1]-neck-y)*detail];
@@ -18,11 +19,19 @@ export function captureNeck(body:number,neck:number,pitch:number,detail:number,s
     const inside=(t:number)=>path(joint(38,13),[17,body+17],t);
     const outer:Point[]=[[1,body+5],[19,body-10],joint(29,-7),joint(45,-7),...Array.from({length:9},(_,i)=>outside(i/8)),[12,body+23]];
     const skin:Point[]=[[5,body+5],[22,body-10],joint(30,-4),joint(41,-3),...Array.from({length:9},(_,i)=>{
-        const p=outside(i/8);return[p[0]-2,p[1]-2] as Point;
+        const t=i/8,p=outside(t);
+        return blend([42-19*t,neck+14+(body+16-neck-14)*t],[p[0]-2,p[1]-2]);
     }),[12,body+19]];
     const throat:Point[]=[joint(33,7),joint(40,9),...Array.from({length:9},(_,i)=>{
-        const p=outside(i/8);return[p[0]-3,p[1]-1.5] as Point;
-    }),...Array.from({length:8},(_,i)=>inside(1-i/8))];
+        const t=i/8,p=outside(t);
+        return blend([38-15*t,neck+18+(body-neck)*t],[p[0]-3,p[1]-1.5]);
+    }),...Array.from({length:9},(_,i)=>{
+        const t=1-i/8;
+        // These first-pose points lie on the existing throat polygon. Opening
+        // the mouth morphs that skin into the articulated strip without a pop.
+        const from:Point=i===0?[12,body+19]:[22+11*(i-1)/7,body+10+(neck+7-body-10)*(i-1)/7];
+        return blend(from,inside(t));
+    })];
     const folds=Array.from({length:5},(_,i)=>{
         const t=.12+i*.17,a=inside(t),b=outside(t);
         return {from:[a[0]+1,a[1]+1] as Point,to:[b[0]-4,b[1]-2] as Point};
