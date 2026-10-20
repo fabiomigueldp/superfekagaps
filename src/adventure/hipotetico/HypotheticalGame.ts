@@ -42,6 +42,10 @@ export class HypotheticalEncounter extends BossEncounter {
     override update(dt:number,p:Rect,o:WorldObjects,level:WorldLevel) {
         for(const e of o.events)if(e.kind==='switch')this.model.arm(e.x<160?0:1);
         const cleared = this.model.route.cleared;
+        // Use the same live decks for feet, cover and drawing. Destroyed decks
+        // leave this list on the next native step, just like their collision.
+        if(this.model.act==='chase')this.model.chaseCover=o.bodies.filter(b=>b.id.startsWith('chase-terrace-'))
+            .map(({x,y,width,height})=>({x,y,width,height}));
         if(this.model.act==='siege')this.livingGuards=this.garrison.filter(e=>!e.dead&&e.wave===cleared+1).length;
         this.model.update(dt,p,this.livingGuards);this.sync();
         if(this.model.act==='siege'){

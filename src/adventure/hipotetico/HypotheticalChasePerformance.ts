@@ -17,7 +17,7 @@ export function chaseStructureTiming(kind:ChaseStructureKind){
         {left:7,right:15,beam:11,panel:8,release:16,gravity:.06,turn:.64,turnTime:38};
 }
 
-interface Pursuer {x:number;tick:number;travel:number;velocity:number;motionSpeed:number;chaseBreaks:readonly number[]}
+interface Pursuer {x:number;tick:number;travel:number;velocity:number;motionSpeed:number;chaseBreaks:readonly number[];counters?:{reaction(tick:number):{age:number;weight:number}}}
 
 /** Anticipation is measured to the actual fracture threshold, not to the camera.
  * Contact releases through the neck first, then the rider and the distal tail. */
@@ -44,23 +44,25 @@ export function chasePerformance(b:Pursuer,reduced=false){
     // Two weight transfers per complete stride. Feet retain their world-locked
     // gait; the ribcage and seated hips absorb the landing above them.
     const weight=reduced?0:(1-Math.cos(phase*2))*.7*moving;
-    const effort=(prepare*1.4+hit*2.1-follow*.8)*strength;
-    const tension=unit(prepare*.8+hit*.9);
+    const counterAge=b.counters?.reaction(b.tick).age??Infinity;
+    const counterHit=pulse(counterAge,0,4,19),counterFollow=pulse(counterAge,3,10,38);
+    const effort=(prepare*1.4+hit*2.1-follow*.8)*strength+counterHit*4;
+    const tension=unit(prepare*.8+hit*.9+counterHit);
     const gesture:ChaseGesture={
         armSwing:reduced?0:Math.sin(phase-.45)*.16*moving*(1-prepare*.75),
-        armFold:unit(prepare*.55+hit*.8+follow*.2),
+        armFold:unit(prepare*.55+hit*.8+follow*.2+counterHit*.8),
         reinSag:(2.7+(reduced?0:Math.sin(phase-.4)*.35*moving))*(1-tension),
         reinFlutter:reduced?0:Math.sin(phase*2-.8)*.5*moving*(1-tension),
     };
-    return {site,kind,prepare,hit,follow,settle,framing,
+    return {site,kind,prepare,hit,follow,settle,framing,counterHit,
         gesture,
         compression:weight+effort,
-        neckDrop:(prepare*3.8+hit*4.3-follow*2.4)*strength+(reduced?0:Math.sin(phase*2-.6)*.65*moving),
-        headPitch:(prepare*.075-hit*.08+follow*.055)*strength+(reduced?0:Math.sin(phase-.5)*.016*moving),
-        jawHinge:.065+prepare*.07+follow*.05,
-        riderDrop:prepare*1.8+follow*2.3-settle*.9+(reduced?0:Math.sin(phase*2-.8)*.5*moving),
-        riderLean:prepare*1.8-hit*2.4+follow*1.4-settle*.7,
-        tail:-prepare*.018+follow*.065-settle*.045+(reduced?0:Math.sin(phase-1.1)*.028*moving),
-        cloth:prepare*.5+follow*1.8-settle*.5,
+        neckDrop:(prepare*3.8+hit*4.3-follow*2.4)*strength-counterHit*5+(reduced?0:Math.sin(phase*2-.6)*.65*moving),
+        headPitch:(prepare*.075-hit*.08+follow*.055)*strength-counterHit*.12+counterFollow*.06+(reduced?0:Math.sin(phase-.5)*.016*moving),
+        jawHinge:.065+prepare*.07+follow*.05+counterHit*.13,
+        riderDrop:prepare*1.8+follow*2.3-settle*.9+counterFollow*2+(reduced?0:Math.sin(phase*2-.8)*.5*moving),
+        riderLean:prepare*1.8-hit*2.4+follow*1.4-settle*.7-counterFollow*4.5,
+        tail:-prepare*.018+follow*.065-settle*.045+counterFollow*.065+(reduced?0:Math.sin(phase-1.1)*.028*moving),
+        cloth:prepare*.5+follow*1.8-settle*.5+counterFollow*1.8,
     };
 }

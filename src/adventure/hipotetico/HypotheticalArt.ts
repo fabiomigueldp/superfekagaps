@@ -2,6 +2,7 @@ import { drawGunMuzzle, drawGunTracer, drawGunImpact, drawGunCasing } from './Hy
 import {drawChaseCollapse,drawChaseWave} from './HypotheticalChaseArt';
 import {chasePerformance,type ChaseGesture} from './HypotheticalChasePerformance';
 import {drawChaseFootfall} from './HypotheticalChaseImpactArt';
+import {drawChaseCounters,drawChaseCounterEffects,drawChaseVolleyCue} from './HypotheticalChaseCounterplayArt';
 import {drawCapturedHero,type HeldHero,type CapturedHeroPose} from './HypotheticalCapturedHero';
 import {captureNeck} from './HypotheticalCaptureAnatomy';
 import { box, oval, pixelLine, polygon, type Point } from '../WorldPainting';
@@ -473,9 +474,9 @@ export function dinosaurPose(b: HypotheticalModel, cx: number, cy: number, reduc
         aim:b.weaponAngle,
         armor:b.health,heat:b.heat,cloth:reduced?0:Math.min(5,Math.abs(b.motionSpeed)*.7)+Math.sin(b.travel/11-.8)*m.stride*.9+Math.sin(b.tick/9)*.25+(pursuit?.cloth??0),
         chaseGesture:pursuit?.gesture,
-        focus,eyeClose:(pursuit?.hit??0)>.9||!reduced&&b.state==='rest'&&b.tick%137<4?1:0,
+        focus,eyeClose:Math.max(pursuit?.hit??0,pursuit?.counterHit??0)>.9||!reduced&&b.state==='rest'&&b.tick%137<4?1:0,
         voice:b.state==='roar'?Math.max(0,Math.sin(b.age/9))*(1-smoothMotion((b.age-75)/30)):0,
-        blink:(pursuit?.hit??0)>.92||b.state==='rest'&&b.tick%160<4,daze:reduced?0:b.age/14,
+        blink:Math.max(pursuit?.hit??0,pursuit?.counterHit??0)>.92||b.state==='rest'&&b.tick%160<4,daze:reduced?0:b.age/14,
         flash:b.state==='hurt'&&b.age<12, defeated:b.won };
 }
 
@@ -570,6 +571,7 @@ export function drawHypotheticalTerrain(c:CanvasRenderingContext2D,level:WorldLe
 
 export function drawHypotheticalObjects(c:CanvasRenderingContext2D,o:WorldObjects,b:HypotheticalModel,cx:number,cy:number,reduced=false){
     drawHypotheticalFittings(c,o,b,cx,cy,reduced);
+    if(b.act==='chase')drawChaseCounters(c,b,o,cx,cy,reduced);
     // Live projectiles stay readable in front of decorative braces and stores.
     for(const barrel of o.barrels)drawHypotheticalCanister(c,barrel,cx,cy);
 }
@@ -630,6 +632,10 @@ export function drawHypotheticalCombat(c:CanvasRenderingContext2D,b:Hypothetical
             box(c,px(-3),y+11,3,1,P.shade);box(c,px(-6),y+11,2,1,P.cream);
         }
         else {polygon(c,[[x-3,y],[x+3,y-3],[x+9,y+1],[x+8,y+7],[x+1,y+8]],P.ink);polygon(c,[[x-1,y],[x+3,y-1],[x+7,y+2],[x+2,y+5]],P.cream);}
+    }
+    if(b.act==='chase'){
+        drawChaseCounterEffects(c,b,cx,cy,reduced);
+        if(!actor)drawChaseVolleyCue(c,b,cx,cy);
     }
     for(const p of b.impacts)drawGunImpact(c,p,b.tick,-cx,-cy,reduced);
     for(const p of b.dust){

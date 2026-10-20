@@ -19,7 +19,7 @@ export function hypotheticalStage(act: HypotheticalAct): AdventureStage {
     s.level.goalPosition = { x: s.level.width - 2, y: 14 }; s.level.isBossLevel = false;
     s.foes = []; s.exits = []; s.checkpoints = []; s.dialogues = []; s.pickups = []; s.mechanisms = []; s.landmarks = []; s.route = [];
     if (act === 'chase') {
-        // Continuous lower route with three optional loading/scaffold routes.
+        // Lower route plus four optional loading/scaffold routes.
         for (const col of CHASE_STEPS) s.level.tiles[13][col] = TileType.GROUND;
         for (const [from,to] of CHASE_GAPS) for(let col=from;col<to;col++) for(let y=14;y<18;y++) s.level.tiles[y][col]=TileType.EMPTY;
         s.mechanisms=CHASE_TERRACES.map(p=>({...p}));
