@@ -1,5 +1,9 @@
 # Chegada ao salão Calabrezzo — contrato de arte
 
+As capturas históricas em `output/` citadas abaixo foram removidas na limpeza do
+projeto. As que eram versionadas continuam no histórico do Git; consulte a
+[política de arquivos gerados](../../../cleanup.md).
+
 Base remota verificada: `main` em `1fad188374d84b46acfec50bbd5a0753e07171a7`.
 Branch isolada: `art/turbosuco-factory-arrival`. `vercel.json` permanece com
 `git.deploymentEnabled=false`. Nenhuma alteração de campanha, física, saves,

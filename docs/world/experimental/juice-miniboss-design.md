@@ -1,5 +1,9 @@
 # Turbosuco: isolated experimental juice miniboss
 
+Historical `output/` captures referenced below were removed during repository
+cleanup. Previously tracked captures remain in Git history; see the
+[generated-file policy](../../cleanup.md).
+
 Status: playable at `/juice-lab.html` and through the optional Factory salon in campaign stage `3-3`. `FactorySalonSession` reuses this encounter, introduction, pixel material and fluid effects. The standalone lab remains ephemeral; the campaign host owns the return journey and optional victory record. This revision is prepared for GitHub integration and publication to the Oracle-hosted game at `https://superfekagaps.torbware.space/`.
 
 ## Calabrezzo championship introduction

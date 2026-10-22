@@ -76,6 +76,6 @@ env/
 /docs/world/diorama/porto-prototype-initial-clearance.json
 
 # Generated local review captures; production assets and editable sources live
-# under public/, docs/ and tools/. Existing tracked review files remain tracked.
+# under public/, docs/ and tools/. Review captures must remain untracked.
 /output/
 *.blend[0-9]
