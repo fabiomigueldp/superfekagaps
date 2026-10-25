@@ -39,7 +39,7 @@ const make=(x:number,px:number,py:number)=>{
     for(let col=0;col<edge;col++)for(let y=13;y<18;y++)level.data.tiles[y][col]=0;
     const player=new Player(0,0).data;player.position={x:px,y:py};player.deathOrigin={...player.position};player.deathKind='hit';
     player.isDead=true;player.isGrounded=player.deathWasGrounded=py>=200;player.deathTimerMax=player.deathTimer=CHASE_CAPTURE.duration;
-    const view={x:px-150,y:64,shakeTimer:0};
+    const view={x:px-150,y:64,targetX:px-150,targetY:64,shakeTimer:0,shakeMagnitude:0,bounds:level.getBounds()};
     return {b,level,player,view};
 };
 const writeMovie=(name:string)=>{

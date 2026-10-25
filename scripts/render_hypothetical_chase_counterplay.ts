@@ -54,7 +54,7 @@ const paint=(scene:ReturnType<typeof make>,cx:number,reduced=false)=>{
     b.targetX=shoulder.x+Math.cos(angle)*232;b.targetY=shoulder.y+Math.sin(angle)*232;
     drawHypotheticalBackground(c,b,cx,64,reduced);drawHypotheticalTerrain(c,level,b,cx,64);
     drawHypotheticalObjects(c,o,b,cx,64,reduced);drawHypotheticalCombat(c,b,cx,64,reduced);
-    renderer.drawPlayer(hero,{x:cx,y:64,shakeTimer:0},c);
+    renderer.drawPlayer(hero,{x:cx,y:64,targetX:cx,targetY:64,shakeTimer:0,shakeMagnitude:0,bounds:level.getBounds()},c);
     c.fillStyle='#122830';c.fillRect(0,0,320,16);pixelText(c,'FLAVIO HIPOTETICO',7,5,'#e2c28b');
 };
 try{

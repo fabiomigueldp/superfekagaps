@@ -155,14 +155,19 @@ test('a running lunge releases its neck and rider before the next preparation, w
 
 test('destruction keeps its pieces through contact and settles the crane load before the dust clears',()=>{
     const first=chaseRuinAt(0);assert.equal(first.beamDrop,0);assert.equal(first.leftTurn,0);
-    let prior=first;
+    assert.ok(first.suspended);
+    let prior=first,priorLoad=first.suspended;
     for(let age=1;age<100;age++){
-        const p=chaseRuinAt(age);
-        assert.ok(Math.abs(p.loadDrop-prior.loadDrop)<3.4);assert.ok(Math.abs(p.leftTurn-prior.leftTurn)<.08);
-        assert.ok(p.loadDrop>=0&&p.loadDrop<=31);assert.ok(p.dust>=0&&p.dust<=1);
-        if(age>=43)assert.equal(p.loadDrop,31);
-        prior=p;
+        const p=chaseRuinAt(age),load=p.suspended;assert.ok(load);
+        assert.ok(Math.abs(load.y-priorLoad.y)<3.4);assert.ok(Math.abs(load.x-priorLoad.x)<3.4);
+        assert.ok(Math.abs(p.leftTurn-prior.leftTurn)<.08);assert.ok(p.dust>=0&&p.dust<=1);
+        assert.equal(load.released,age>=p.score.release);
+        // The rotating crate's bottom corner stays above the deck at local y=0.
+        assert.ok(load.y+14*Math.sin(load.turn)+18*Math.cos(load.turn)<=.002);
+        if(age>=59){assert.equal(load.y,-18);assert.equal(load.turn,0);assert.equal(load.x,priorLoad.x);}
+        prior=p;priorLoad=load;
     }
+    assert.ok(chaseRuinAt(59).dust>0);
     assert.equal(chaseRuinAt(90).dust,0);
     let contact=-1;
     for(let age=0;age<25;age++){

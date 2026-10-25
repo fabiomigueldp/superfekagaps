@@ -13,7 +13,7 @@ import {drawHypotheticalBackground,drawHypotheticalTerrain,drawHypotheticalObjec
 import {HypotheticalChasePatrol} from '../src/adventure/hipotetico/HypotheticalChasePatrol';
 import {drawChasePatrol} from '../src/adventure/hipotetico/HypotheticalChasePatrolArt';
 import {launcherGeometry} from '../src/adventure/hipotetico/HypotheticalTower';
-import {hypotheticalMotion,smoothMotion,dinosaurFootAnchor} from '../src/adventure/hipotetico/HypotheticalMotion';
+import {hypotheticalMotion,dinosaurFootAnchor} from '../src/adventure/hipotetico/HypotheticalMotion';
 import {CHASE_BREAKS,CHASE_FALLEN_DECKS,CHASE_LEAP,CHASE_PATROLS,CHASE_PORTICO} from '../src/adventure/hipotetico/HypotheticalLayout';
 import {CHASE_QUAYS} from '../src/adventure/hipotetico/HypotheticalChaseLife';
 import {chaseCollapsedEdge} from '../src/adventure/hipotetico/HypotheticalChaseDetails';
@@ -54,7 +54,7 @@ function paint(s:Scene,cx:number,patrol?:HypotheticalChasePatrol,reduced=false){
     drawHypotheticalObjects(c,objects,b,cx,64,reduced);
     if(patrol)drawChasePatrol(c,patrol,cx,64,reduced);
     drawHypotheticalCombat(c,b,cx,64,reduced);
-    renderer.drawPlayer(hero,{x:cx,y:64,shakeTimer:0},c);
+    renderer.drawPlayer(hero,{x:cx,y:64,targetX:cx,targetY:64,shakeTimer:0,shakeMagnitude:0,bounds:level.getBounds()},c);
     c.fillStyle='#132b34';c.fillRect(0,0,320,16);pixelText(c,'FLAVIO HIPOTETICO',8,5,'#e6c390');
 }
 function film(title:string){

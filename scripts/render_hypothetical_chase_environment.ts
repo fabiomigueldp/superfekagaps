@@ -62,7 +62,7 @@ function paint(s:ReturnType<typeof scene>,cx:number,reduced=false){
     const {c}=native,{b,hero,level,objects}=s;
     drawHypotheticalBackground(c,b,cx,64,reduced);drawHypotheticalTerrain(c,level,b,cx,64);
     drawHypotheticalObjects(c,objects,b,cx,64,reduced);drawHypotheticalCombat(c,b,cx,64,reduced);
-    renderer.drawPlayer(hero,{x:cx,y:64,shakeTimer:0},c);
+    renderer.drawPlayer(hero,{x:cx,y:64,targetX:cx,targetY:64,shakeTimer:0,shakeMagnitude:0,bounds:level.getBounds()},c);
 }
 try{
     for(const [row,views]of cameras.entries())for(const [col,cx]of views.entries()){
