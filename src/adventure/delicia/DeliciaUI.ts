@@ -1,5 +1,18 @@
 import { pixelText, textWidth, wrapText } from '../../graphics/BitmapFont';
 import { ART } from '../../graphics/palette';
+import { controlPreferences, keyAction, keyLabel } from '../../engine/ControlPreferences';
+
+/** One effective keyboard binding per gameplay action keeps the canvas name brief. */
+export function deliciaCanvasLabel(): string {
+    const actions = [['left', 'Esquerda'], ['right', 'Direita'], ['jump', 'Pular'], ['run', 'Correr'],
+        ['down', 'Sentada'], ['seed', 'Sementes'], ['parry', 'Rebater'], ['interact', 'Válvulas próximas']] as const;
+    const controls = actions.flatMap(([action, label]) => {
+        // Escape always goes back in this host, even if a saved binding says otherwise.
+        const code = controlPreferences.keys[action].find(code => code !== 'Escape' && keyAction(code) === action);
+        return code ? [`${label}: ${keyLabel(code)}`] : [];
+    });
+    return `Feka na ilha da Delícia.${controls.length ? ` ${controls.join('; ')}.` : ''}`;
+}
 
 export const element = <K extends keyof HTMLElementTagNameMap>(tag: K, className = '', text = ''): HTMLElementTagNameMap[K] => {
     const node = document.createElement(tag);

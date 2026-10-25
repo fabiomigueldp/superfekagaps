@@ -12,7 +12,7 @@ import { wrapText } from '../../graphics/BitmapFont';
 import { WORLD_DIALOGUE_ACTION, WORLD_PAUSE_ACTIONS } from '../WorldSceneUI';
 import { DeliciaPresentation, DELICIA_TOUCH_BUTTONS, type DeliciaMenu, type DeliciaMenuChoice } from './DeliciaPresentation';
 import type { Preferences } from '../types';
-import { button, element, formatTime, heading, lettering, worldLink } from './DeliciaUI';
+import { button, deliciaCanvasLabel, element, formatTime, heading, lettering, worldLink } from './DeliciaUI';
 import './delicia.css';
 import { GamepadDevice } from '../../engine/GamepadDevice';
 import { DomGamepadMenu, closeGamepadDialog, menuId } from '../../engine/DomGamepadMenu';
@@ -51,7 +51,7 @@ export class DeliciaApp {
     constructor(host:HTMLElement=document.body, private readonly options:DeliciaAppOptions={}){
         this.root.classList.toggle('dl-has-touch',touchControlsEnabled());
         let storage:Storage|null=null;try{storage=localStorage;}catch{}this.store=options.store??new DeliciaStore(storage);this.mapSelection=this.store.save.selected;
-        this.canvas.width=960;this.canvas.height=540;this.canvas.tabIndex=0;this.canvas.setAttribute('aria-label','Feka na ilha da Delícia. Setas movem, Espaço pula, Shift corre, S dá sentada, J lança sementes, Q rebate e E abre válvulas.');
+        this.canvas.width=960;this.canvas.height=540;this.canvas.tabIndex=0;this.canvas.setAttribute('aria-label',deliciaCanvasLabel());
         this.status.setAttribute('role','status');this.status.setAttribute('aria-live','polite');
         this.hud.hidden=true;this.touch.hidden=true;this.playfield.append(this.canvas,this.hud,this.touch);this.surface.append(this.playfield,this.panel);this.root.append(this.surface,this.status);host.append(this.root);
         this.presentation=new DeliciaPresentation(this.canvas,this.root,{
@@ -68,7 +68,7 @@ export class DeliciaApp {
             'Semente, rebatida e interação ficam disponíveis conforme os equipamentos e a fase.',
         ],touch:'Use os botões na tela. É possível correr e pular ao mesmo tempo; soltar o pulo encurta o salto.'});
         this.cleanups.push(()=>{this.controlsHelp.dispose();this.gamepad.dispose();this.controllerMenu.dispose();});
-        this.listen(window,'feka-controls-change',()=>this.resetInput());
+        this.listen(window,'feka-controls-change',()=>{this.resetInput();this.canvas.setAttribute('aria-label',deliciaCanvasLabel());});
         this.applyVolume();this.canvas.hidden=true;this.buildTouch();
         if(options.initialStage){if(!this.loadStage(options.initialStage))queueMicrotask(()=>{if(!this.disposed)this.showMap();});}else this.showTitle();
         this.listen(window,'keydown',this.keyDown);this.listen(window,'keyup',this.keyUp);this.listen(window,'blur',()=>{this.windowFocused=false;this.loseFocus();});
