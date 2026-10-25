@@ -46,6 +46,19 @@ test('each full-size terrace meets the water before its cap splash, and keeps al
 test('beams and gate panels land on the bank, bounce and settle instead of sinking through the masonry',()=>{
     for(const height of [58,69,78]){
         let before=chaseRuinAt(0,height);
+        for(const [phase,at]of [['release',before.score.beam],['contact',before.beamContact]] as const){
+            const x=chaseRuinAt(at,height).beamX;
+            for(const side of [-1,1]){
+                const wideStep=.1,narrowStep=.001;
+                const wideGap=Math.abs(chaseRuinAt(at+side*wideStep,height).beamX-x);
+                const narrowGap=Math.abs(chaseRuinAt(at+side*narrowStep,height).beamX-x);
+                // Faster continuous motion still converges to the boundary from
+                // both sides; a position jump persists as the interval shrinks.
+                // Allow local curvature and floating-point roundoff, not a speed cap.
+                assert.ok(narrowGap<=wideGap*(narrowStep/wideStep)*2+1e-9,
+                    `beam ${phase} at height ${height}, side ${side}: gap ${wideGap} -> ${narrowGap}`);
+            }
+        }
         for(let age=.25;age<120;age+=.25){
             const p=chaseRuinAt(age,height),bottom=p.beamDrop+66*Math.sin(p.beamTurn)+4*Math.cos(p.beamTurn);
             const panel=p.panelDrop+46*Math.sin(p.panelTurn)+29*Math.cos(p.panelTurn);
@@ -54,7 +67,7 @@ test('beams and gate panels land on the bank, bounce and settle instead of sinki
                 const lowest=-22+drop+3.5*Math.sin(turn);assert.ok(lowest<.002);
                 if(age>90)assert.ok(Math.abs(lowest)<.002,'fallen posts stay on top of the foundation');
             }
-            assert.ok(Math.abs(p.beamX-before.beamX)<.25);assert.ok(Math.abs(p.beamDrop-before.beamDrop)<1.2);
+            assert.ok(Math.abs(p.beamDrop-before.beamDrop)<1.2);
             if(age>90){assert.ok(Math.abs(bottom-height)<.002);assert.ok(Math.abs(panel-(height-9))<.002);}
             before=p;
         }
