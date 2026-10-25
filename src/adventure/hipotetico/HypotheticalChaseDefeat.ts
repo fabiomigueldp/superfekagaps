@@ -43,10 +43,10 @@ export class HypotheticalChaseDefeat {
         this.camera=[view.x,view.y];
         this.feet=[dinosaurFootAnchor(initial.gait,true,(1-initial.bow)*initial.stride,initial.tuck,initial.brace),
             dinosaurFootAnchor(initial.gait,false,(1-initial.bow)*initial.stride,initial.tuck,initial.brace)];
-        this.cues=this.kind==='caught'?[{at:90,cue:'chase-scoop'},{at:CHASE_CAPTURE.clamp,cue:'chase-catch'},
+        this.cues=this.kind==='caught'?([{at:90,cue:'chase-scoop'},{at:CHASE_CAPTURE.clamp,cue:'chase-catch'},
             {at:CHASE_CAPTURE.gulp,cue:'chase-gulp'},{at:CHASE_CAPTURE.breath,cue:'chase-exhale'},
             ...([0,1] as const).filter(i=>this.feet[i][1]<-1&&this.footPlant(i).supported)
-                .map(i=>({at:this.footPlant(i).at,cue:'chase-step' as const}))].sort((a,b)=>a.at-b.at):[];
+                .map(i=>({at:this.footPlant(i).at,cue:'chase-step' as const}))] satisfies Array<{at:number;cue:WeaponCue}>).sort((a,b)=>a.at-b.at):[];
     }
     get hint(){
         return this.kind==='caught'?'ALCANCADO! R: RETOMAR O TRECHO':this.kind==='fall'?'CAIU NO RIO! R: RETOMAR O TRECHO'
@@ -66,7 +66,7 @@ export class HypotheticalChaseDefeat {
         const score=CHASE_CAPTURE,open=captured?ramp(t,65,310):settle,close=captured?ramp(t,score.catch,score.clamp):0;
         const lift=captured?ramp(t,score.hold,score.lift):0,gulp=captured?ramp(t,score.swallow,score.hidden):0;
         const rest=ramp(t,1180,score.settle),catchWeight=captured?pulse(t,score.clamp,score.clamp+38,score.hold+115):0;
-        const planting=([0,1] as const).reduce((sum,i)=>sum+(this.feet[i][1]<-1?pulse(t,this.footPlant(i).at,this.footPlant(i).at+42,this.footPlant(i).at+170):0),0);
+        const planting=([0,1] as const).reduce<number>((sum,i)=>sum+(this.feet[i][1]<-1?pulse(t,this.footPlant(i).at,this.footPlant(i).at+42,this.footPlant(i).at+170):0),0);
         const neck=captured?track(t,[[0,a.neckDrop],[65,a.neckDrop],[310,reach],[score.clamp,reach+1.4],[score.hold,reach+1.4],
             [score.lift,-8.5],[score.swallow,-8.5],[score.hidden,-5],[score.settle,0]]):mix(a.neckDrop,0,settle);
         const head=captured?track(t,[[0,a.headPitch??0],[65,a.headPitch??0],[310,.08],[score.clamp,.12],[score.hold,.12],

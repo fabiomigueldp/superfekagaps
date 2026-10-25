@@ -1,5 +1,5 @@
 import { drawGunTracer, drawGunImpact } from './HypotheticalGunfire';
-import { box, oval, pixelLine } from '../WorldPainting';
+import { box, pixelLine } from '../WorldPainting';
 import type { Bystander, HypotheticalBackdrop } from './HypotheticalBackdrop';
 import { bystanderPose,bystanderFall } from './HypotheticalBystanderMotion';
 import { bystanderTexture,drawBystanderTexture,type BystanderTexture } from './HypotheticalBystanderPixels';

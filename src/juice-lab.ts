@@ -39,7 +39,7 @@ if (skipButton) listen(skipButton, 'click', () => {
 if (replayButton) listen(replayButton, 'click', () => { resetFeedback(); game.replayIntro(); reflectPause(); focusCanvas(); });
 if (presentButton) listen(presentButton, 'click', () => { game.presentIntro(); focusCanvas(); });
 const pauseButton = document.getElementById('lab-pause')!;
-game.addCleanup(installStandaloneControls(game, canvas, () => game.victorious));
+game.addCleanup(installStandaloneControls(game, canvas, () => game.labMode === 'result'));
 const pauseAction = new LabToolbarAction(pauseButton);
 listen(pauseButton, 'click', () => { game.toggleLabPause(); reflectPause(); focusCanvas(); });
 function showControl(control: HTMLElement | null, visible: boolean) {

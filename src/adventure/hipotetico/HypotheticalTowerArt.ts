@@ -1,4 +1,4 @@
-import {box,oval,pixelLine,polygon,type Point} from '../WorldPainting';
+import {box,pixelLine,polygon,type Point} from '../WorldPainting';
 import {BASTION_TOWER,type HypotheticalTower} from './HypotheticalTower';
 import {towerBodyPoint,TOWER_RELEASE,type TowerPart} from './HypotheticalTowerPhysics';
 import {smoothMotion} from './HypotheticalMotion';
