@@ -160,7 +160,7 @@ test('run and pound keyboard and touch cues fit their World guidance panel', () 
             const player = new Player(button.x / 16, (button.y + button.height) / 16);
             const pound = tutorial.cue(authored, player.data, touch)!;
             assert.equal(pound.lesson, 'pound');
-            assert.equal(pound.lines[0].includes('S /'), !touch);
+            assert.equal(pound.lines[0].includes('ESPAÇO'), !touch);
             assert.ok(pound.lines.every(line => textWidth(line) <= 272));
             player.data.position.x -= 200;
             assert.equal(tutorial.cue(authored, player.data, touch), null);
