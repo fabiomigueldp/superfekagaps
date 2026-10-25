@@ -25,6 +25,7 @@ import {HypotheticalChasePatrol} from './HypotheticalChasePatrol';
 import {drawChasePatrol} from './HypotheticalChasePatrolArt';
 import {ARRIVAL,arrivalFade,arrivalDeployment,arrivalLookAhead} from './HypotheticalArrival';
 import {arrivalStoryTime,HELICOPTER_SEQUENCE} from './HypotheticalHelicopterTiming';
+import {controlCode,keyAction} from '../../engine/ControlPreferences';
 
 export class HypotheticalEncounter extends BossEncounter {
     readonly model: HypotheticalModel;
@@ -157,10 +158,12 @@ export class HypotheticalGame extends WorldGame {
             this.tutorial.observe=()=>{};
             this.load('hipotetico-chase');
             this.listen(window,'keydown',e=>{
-                if(e.repeat||this.isDisposed)return;
+                if(e.repeat||this.isDisposed||e.ctrlKey||e.metaKey||e.altKey||e.isComposing||e.keyCode===229)return;
+                if(e.target instanceof HTMLElement&&e.target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"]), dialog[open]'))return;
                 if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' ','Shift','a','d','w','s','x','z','r','R','Enter','m','M'].includes(e.key))this.audio.unlock();
                 if(e.key==='Enter'&&this.fight.won&&this.state==='playing'){this.replay();e.preventDefault();}
-                if((e.key==='r'||e.key==='R')&&this.state==='playing'&&!this.fight.won){this.load(this.stage.id,true);e.preventDefault();}
+                const code=controlCode(e);
+                if(code==='KeyR'&&!keyAction(code)&&!e.defaultPrevented&&this.state==='playing'&&!this.fight.won){this.load(this.stage.id,true);e.preventDefault();}
             });
             this.listen(canvas,'pointerdown',e=>{
                 if(!this.resultReady||this.state!=='playing')return;
@@ -179,7 +182,10 @@ export class HypotheticalGame extends WorldGame {
         return this.chaseDefeat?.scenery(this.fight,this.defeatElapsed)??this.fight;
     }
     private get encounterHint(){
-        if(this.chaseDefeat&&this.player.data.isDead)return this.chaseDefeat.hint;
+        if(this.chaseDefeat&&this.player.data.isDead){
+            const hint=this.chaseDefeat.hint;
+            return keyAction('KeyR')?hint.replace(/ R: RETOMAR(?: O TRECHO)?$/,''):hint;
+        }
         const b=this.fight;
         if(this.act==='chase'&&!this.player.data.hasHelmet&&b.state==='rest'&&this.player.data.position.x-b.x<82)
             return this.player.data.invincibleTimer>0?'SEM CAPACETE! APROVEITE PARA SE AFASTAR':'ELE ESTA PERTO! CORRA: SHIFT + DIREITA';
@@ -458,7 +464,8 @@ export class HypotheticalGame extends WorldGame {
             const fade=arrivalFade(this.act,b.tick,this.transitionTicks,b.arrivalSkipped);
             if(fade>0&&!this.player.data.isDead){c.save();c.globalAlpha=fade;c.fillStyle='#122630';c.fillRect(0,0,320,180);c.restore();this.renderer.present();}
         }
-        const status=`Flávio Bolsonaro Hipotético. ${this.act==='chase'?'Perseguição':this.act==='siege'?`Cerco, ${b.route.currentSector.name}, ${b.route.remaining[b.route.entered]} de ${b.route.currentSector.guards.length} guardas restantes`:`Confronto, fase ${b.phaseNumber}`}. ${this.state==='paused'?'Pausado.':this.encounterHint} ${b.health} lacres. Setas: mover; Shift: correr; Espaço: pular; baixo no ar: sentada; Esc: pausa; R: retomar o trecho.`;
+        const retryHint=keyAction('KeyR')?'':'; R: retomar o trecho';
+        const status=`Flávio Bolsonaro Hipotético. ${this.act==='chase'?'Perseguição':this.act==='siege'?`Cerco, ${b.route.currentSector.name}, ${b.route.remaining[b.route.entered]} de ${b.route.currentSector.guards.length} guardas restantes`:`Confronto, fase ${b.phaseNumber}`}. ${this.state==='paused'?'Pausado.':this.encounterHint} ${b.health} lacres. Setas: mover; Shift: correr; Espaço: pular; baixo no ar: sentada; Esc: pausa${retryHint}.`;
         if(this.status.textContent!==status)this.status.textContent=status;
     }
 }
