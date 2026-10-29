@@ -43,8 +43,13 @@ function browser(t: TestContext, reducedMotion = false) {
     const key = (key: string, target = h.canvas, repeat = false) => h.window.dispatch('keydown', {
         target, key, code: key === ' ' ? 'Space' : key.length === 1 ? `Key${key.toUpperCase()}` : key, repeat
     });
-    const startWithKey = () => h.canvas.dispatch('keydown', { key: 'e', code: 'KeyE', repeat: false });
-    return { ...h, game, doc, writes, entrance, session, shell, tick, key, startWithKey };
+    const releaseKey = (key: string, target = h.canvas) => h.window.dispatch('keyup', {
+        target, key, code: key === ' ' ? 'Space' : key.length === 1 ? `Key${key.toUpperCase()}` : key
+    });
+    // Native canvas events reach Input's window capture listener. This EventTarget
+    // fixture has no DOM propagation, and queued interactions need one update.
+    const startWithKey = () => { key('e'); tick(1); };
+    return { ...h, game, doc, writes, entrance, session, shell, tick, key, releaseKey, startWithKey };
 }
 function snapshot(game: ReturnType<typeof browser>['game']) {
     return JSON.stringify({ player: game.player.data, elapsed: game.elapsed, time: game.time,
@@ -104,8 +109,9 @@ test('ordinary running approach exposes the cue for at least twenty consecutive 
 
 test('real E entry, repeat suppression and a fresh skip never skip the salon presentation', t => {
     const h = browser(t); h.startWithKey(); assert.equal(h.session(), undefined);
+    assert.equal(h.entrance.hidden, true, 'the queued interaction starts the departure');
     h.key('e', h.canvas, true); assert.equal(h.session(), undefined, 'held E cannot skip');
-    h.key('e'); const salon = h.session()!;
+    h.releaseKey('e'); h.key('e'); const salon = h.session()!;
     assert.ok(salon); assert.equal(salon.labMode, 'intro');
     const canvas = h.shell()!.children.find(child => child.tagName === 'CANVAS')!;
     h.key('Enter', canvas); h.tick(1);
@@ -119,8 +125,9 @@ test('real E entry, repeat suppression and a fresh skip never skip the salon pre
 test('modified E shortcuts do not begin a salon entry or consume browser activation', t => {
     const h = browser(t), before = snapshot(h.game), writes = h.writes.length;
     for (const modifier of ['ctrlKey', 'metaKey', 'altKey']) {
-        const event = h.canvas.dispatch('keydown', { key: 'e', code: 'KeyE', repeat: false, [modifier]: true });
+        const event = h.window.dispatch('keydown', { target: h.canvas, key: 'e', code: 'KeyE', repeat: false, [modifier]: true });
         assert.equal(event.defaultPrevented, false, `${modifier}+E remains a browser shortcut`);
+        assert.equal(h.game.input.consumeCommand('interact'), false, `${modifier}+E queues no interaction`);
         assert.equal(h.entrance.hidden, false, 'No transition hides the available entrance');
         assert.equal(h.session(), undefined);
         assert.equal((h.game as unknown as { entry?: unknown }).entry, undefined);

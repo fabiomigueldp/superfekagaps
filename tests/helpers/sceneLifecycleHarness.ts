@@ -52,14 +52,32 @@ class LifecycleText extends LifecycleNode {
     get textContent(): string { return this.data; }
     set textContent(value: string | null) { this.data = value ?? ''; }
 }
+const dataAttribute = (key: string) => `data-${key.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`)}`;
 export class LifecycleElement extends LifecycleNode {
     readonly nodeType = 1;
     get nodeName() { return this.tagName; }
     id = ''; className = ''; title = ''; type = ''; width = 640; height = 360;
     hidden = false; disabled = false; tabIndex = 0; isContentEditable = false;
     readonly style: Record<string, string> = {};
-    readonly dataset: DOMStringMap = {};
     readonly attributes = new Map<string, string>();
+    // ControlSettings writes dataset; selectors read the same HTML attribute.
+    readonly dataset = new Proxy<DOMStringMap>({}, {
+        get: (target, key) => typeof key === 'string' ? this.attributes.get(dataAttribute(key)) ?? Reflect.get(target, key) : Reflect.get(target, key),
+        set: (target, key, value) => {
+            if (typeof key !== 'string') return Reflect.set(target, key, value);
+            this.attributes.set(dataAttribute(key), String(value)); return true;
+        },
+        deleteProperty: (target, key) => {
+            if (typeof key !== 'string') return Reflect.deleteProperty(target, key);
+            this.attributes.delete(dataAttribute(key)); return true;
+        },
+        has: (target, key) => typeof key === 'string' && this.attributes.has(dataAttribute(key)) || Reflect.has(target, key),
+        ownKeys: () => [...this.attributes.keys()].filter(name => name.startsWith('data-'))
+            .map(name => name.slice(5).replace(/-([a-z])/g, (_match, letter: string) => letter.toUpperCase())),
+        getOwnPropertyDescriptor: (target, key) => typeof key === 'string' && this.attributes.has(dataAttribute(key))
+            ? { value: this.attributes.get(dataAttribute(key)), configurable: true, enumerable: true, writable: true }
+            : Reflect.getOwnPropertyDescriptor(target, key),
+    });
     readonly captures = new Set<number>();
     readonly children: LifecycleElement[] = [];
     drawCalls = 0;
@@ -85,9 +103,9 @@ export class LifecycleElement extends LifecycleNode {
         this.append(...children);
     }
     get classList() { return { contains: (name: string) => this.className.split(/\s+/).includes(name), toggle: () => {} }; }
-    setAttribute(name: string, value: string) { this.attributes.set(name, value); }
-    getAttribute(name: string) { return this.attributes.get(name) ?? null; }
-    removeAttribute(name: string) { this.attributes.delete(name); }
+    setAttribute(name: string, value: string) { this.attributes.set(name.toLowerCase(), String(value)); }
+    getAttribute(name: string) { return this.attributes.get(name.toLowerCase()) ?? null; }
+    removeAttribute(name: string) { this.attributes.delete(name.toLowerCase()); }
     getBoundingClientRect() { return { x: 0, y: 0, left: 0, top: 0, width: 640, height: 360, right: 640, bottom: 360 }; }
     getContext() { return this.context as unknown as CanvasRenderingContext2D; }
     closest(selector: string): LifecycleElement | null {
@@ -121,10 +139,22 @@ export function sceneLifecycleBrowser(t: Pick<TestContext, 'after'>) {
     const requestAnimationFrame = (callback: FrameRequestCallback) => { frames.set(++frameId, callback); return frameId; };
     const cancelAnimationFrame = (id: number) => { frames.delete(id); };
     const media = Object.assign(new Surface(), { matches: false });
+    // Only standalone quoted attribute equality is needed by control capture.
+    // Fail on other selector shapes so the mock cannot silently disable guards.
+    const querySelector = (selector: string): LifecycleElement | null => {
+        const match = /^\[\s*([a-zA-Z_][\w-]*)\s*=\s*(?:"([^"\\]*)"|'([^'\\]*)')\s*\]$/.exec(selector.trim());
+        assert.ok(match, `Unsupported lifecycle selector: ${selector}`);
+        const find = (element: LifecycleElement): LifecycleElement | null => {
+            if (element.getAttribute(match[1]) === (match[2] ?? match[3])) return element;
+            for (const child of element.children) { const found = find(child); if (found) return found; }
+            return null;
+        };
+        return find(documentElement);
+    };
     const document = Object.assign(new Surface(), { hidden: false, title: '', body, documentElement,
         fullscreenElement: null as LifecycleElement | null, activeElement: null,
         getElementById: (id: string) => id === 'game-canvas' ? canvas : null,
-        createElement: makeElement, createElementNS: (_namespace: string, tag: string) => makeElement(tag), createTextNode });
+        createElement: makeElement, createElementNS: (_namespace: string, tag: string) => makeElement(tag), createTextNode, querySelector });
     const window = Object.assign(new Surface(), { innerWidth: 640, innerHeight: 440, devicePixelRatio: 1,
         requestAnimationFrame, cancelAnimationFrame, matchMedia: () => media, worldGame: undefined as WorldGame | undefined,
         renderer: undefined as unknown });
