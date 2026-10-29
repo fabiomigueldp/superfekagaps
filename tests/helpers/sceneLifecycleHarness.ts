@@ -24,14 +24,44 @@ class Surface extends EventTarget {
         this.dispatchEvent(event); return event;
     }
 }
-export class LifecycleElement extends Surface {
+abstract class LifecycleNode extends Surface {
+    abstract readonly nodeType: number;
+    abstract readonly nodeName: string;
+    abstract get textContent(): string;
+    abstract set textContent(value: string | null);
+    readonly childNodes: LifecycleNode[] = [];
+    parent: LifecycleElement | null = null;
+    get parentNode() { return this.parent; }
+    get parentElement() { return this.parent; }
+    remove() {
+        if (!this.parent) return;
+        const nodes = this.parent.childNodes, index = nodes.indexOf(this);
+        if (index >= 0) nodes.splice(index, 1);
+        if (this instanceof LifecycleElement) {
+            const elements = this.parent.children, index = elements.indexOf(this);
+            if (index >= 0) elements.splice(index, 1);
+        }
+        this.parent = null;
+    }
+}
+class LifecycleText extends LifecycleNode {
+    readonly nodeType = 3; readonly nodeName = '#text';
+    constructor(public data: string) { super(); }
+    get nodeValue(): string { return this.data; }
+    set nodeValue(value: string | null) { this.data = value ?? ''; }
+    get textContent(): string { return this.data; }
+    set textContent(value: string | null) { this.data = value ?? ''; }
+}
+export class LifecycleElement extends LifecycleNode {
+    readonly nodeType = 1;
+    get nodeName() { return this.tagName; }
     id = ''; className = ''; title = ''; type = ''; width = 640; height = 360;
-    hidden = false; disabled = false; tabIndex = 0; textContent = ''; isContentEditable = false;
+    hidden = false; disabled = false; tabIndex = 0; isContentEditable = false;
     readonly style: Record<string, string> = {};
     readonly dataset: DOMStringMap = {};
     readonly attributes = new Map<string, string>();
     readonly captures = new Set<number>();
-    children: LifecycleElement[] = []; parent: LifecycleElement | null = null;
+    readonly children: LifecycleElement[] = [];
     drawCalls = 0;
     readonly context = new Proxy({ imageSmoothingEnabled: false } as Record<string, unknown>, {
         get: (object, key: string) => {
@@ -41,9 +71,19 @@ export class LifecycleElement extends Surface {
         }
     });
     constructor(readonly tagName = 'DIV') { super(); }
-    append(...children: LifecycleElement[]) { for (const child of children) { child.parent = this; this.children.push(child); } }
-    replaceChildren(...children: LifecycleElement[]) { for (const child of this.children) child.parent = null; this.children = []; this.append(...children); }
-    remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); this.parent = null; }
+    get textContent(): string { return this.childNodes.map(child => child.textContent).join(''); }
+    set textContent(value: string | null) { this.replaceChildren(...(value ? [value] : [])); }
+    append(...children: Array<LifecycleNode | string>) {
+        for (const value of children) {
+            const child = typeof value === 'string' ? new LifecycleText(value) : value;
+            child.remove(); child.parent = this; this.childNodes.push(child);
+            if (child instanceof LifecycleElement) this.children.push(child);
+        }
+    }
+    replaceChildren(...children: Array<LifecycleNode | string>) {
+        for (const child of [...this.childNodes]) child.remove();
+        this.append(...children);
+    }
     get classList() { return { contains: (name: string) => this.className.split(/\s+/).includes(name), toggle: () => {} }; }
     setAttribute(name: string, value: string) { this.attributes.set(name, value); }
     getAttribute(name: string) { return this.attributes.get(name) ?? null; }
@@ -73,6 +113,7 @@ export class DeviceNode {
 export function sceneLifecycleBrowser(t: Pick<TestContext, 'after'>) {
     const surfaces: Surface[] = [];
     const makeElement = (tag: string) => { const element = new LifecycleElement(tag.toUpperCase()); surfaces.push(element); return element; };
+    const createTextNode = (data: string) => { const text = new LifecycleText(data); surfaces.push(text); return text; };
     const canvas = makeElement('canvas'); canvas.id = 'game-canvas';
     const status = makeElement('p'), body = makeElement('body'), documentElement = makeElement('html');
     documentElement.append(body); body.append(canvas, status);
@@ -83,7 +124,7 @@ export function sceneLifecycleBrowser(t: Pick<TestContext, 'after'>) {
     const document = Object.assign(new Surface(), { hidden: false, title: '', body, documentElement,
         fullscreenElement: null as LifecycleElement | null, activeElement: null,
         getElementById: (id: string) => id === 'game-canvas' ? canvas : null,
-        createElement: makeElement, createElementNS: (_namespace: string, tag: string) => makeElement(tag) });
+        createElement: makeElement, createElementNS: (_namespace: string, tag: string) => makeElement(tag), createTextNode });
     const window = Object.assign(new Surface(), { innerWidth: 640, innerHeight: 440, devicePixelRatio: 1,
         requestAnimationFrame, cancelAnimationFrame, matchMedia: () => media, worldGame: undefined as WorldGame | undefined,
         renderer: undefined as unknown });
