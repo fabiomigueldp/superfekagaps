@@ -28,6 +28,7 @@ export class LifecycleElement extends Surface {
     id = ''; className = ''; title = ''; type = ''; width = 640; height = 360;
     hidden = false; disabled = false; tabIndex = 0; textContent = ''; isContentEditable = false;
     readonly style: Record<string, string> = {};
+    readonly dataset: DOMStringMap = {};
     readonly attributes = new Map<string, string>();
     readonly captures = new Set<number>();
     children: LifecycleElement[] = []; parent: LifecycleElement | null = null;
@@ -73,12 +74,14 @@ export function sceneLifecycleBrowser(t: Pick<TestContext, 'after'>) {
     const surfaces: Surface[] = [];
     const makeElement = (tag: string) => { const element = new LifecycleElement(tag.toUpperCase()); surfaces.push(element); return element; };
     const canvas = makeElement('canvas'); canvas.id = 'game-canvas';
-    const status = makeElement('p'), body = makeElement('body'); body.append(canvas, status);
+    const status = makeElement('p'), body = makeElement('body'), documentElement = makeElement('html');
+    documentElement.append(body); body.append(canvas, status);
     const frames = new Map<number, FrameRequestCallback>(); let frameId = 0;
     const requestAnimationFrame = (callback: FrameRequestCallback) => { frames.set(++frameId, callback); return frameId; };
     const cancelAnimationFrame = (id: number) => { frames.delete(id); };
     const media = Object.assign(new Surface(), { matches: false });
-    const document = Object.assign(new Surface(), { hidden: false, title: '', body, activeElement: null,
+    const document = Object.assign(new Surface(), { hidden: false, title: '', body, documentElement,
+        fullscreenElement: null as LifecycleElement | null, activeElement: null,
         getElementById: (id: string) => id === 'game-canvas' ? canvas : null,
         createElement: makeElement, createElementNS: (_namespace: string, tag: string) => makeElement(tag) });
     const window = Object.assign(new Surface(), { innerWidth: 640, innerHeight: 440, devicePixelRatio: 1,
