@@ -155,6 +155,7 @@ export class WorldGame {
     constructor(canvas: HTMLCanvasElement, private readonly ephemeral = false) {
         this.mapCanvas = canvas;
         try {
+            this.addCleanup(() => this.controllerDom.dispose());
             this.renderer = new Renderer(canvas);
             this.addCleanup(() => this.renderer.dispose());
             // Mount the modal's capture boundary before gameplay Input.
@@ -238,7 +239,6 @@ export class WorldGame {
         if (this.isDisposed) return;
         if (this.gamepad) { if (host) this.gamepadHost = host; return; }
         const gamepad = this.gamepad = new StandardGamepad(this.input);
-        this.addCleanup(() => this.controllerDom.dispose());
         this.gamepadHost = host;
         // Standalone encounters use ordinary menus even with an ephemeral save.
         if (!host && !this.menuAccessibility) {

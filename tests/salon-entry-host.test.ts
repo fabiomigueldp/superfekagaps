@@ -30,6 +30,9 @@ function browser(t: TestContext, reducedMotion = false) {
     require.extensions['.css'] = () => {};
     t.after(() => { if (css) require.extensions['.css'] = css; else delete require.extensions['.css']; });
     const { FactoryCampaign } = require('../src/adventure/factory/FactoryCampaign.ts') as typeof import('../src/adventure/factory/FactoryCampaign');
+    // Module-level keyboard/touch listeners outlive scenes, including when this
+    // fixture is the first import in an individually selected disposal test.
+    const globalListeners = { window: [...h.window.listeners], document: [...h.document.listeners], count: h.listenerCount() };
     const game = new FactoryCampaign(h.canvas as unknown as HTMLCanvasElement);
     dispose = () => game.dispose();
     game.load(FACTORY_SALON.stage);
@@ -49,7 +52,7 @@ function browser(t: TestContext, reducedMotion = false) {
     // Native canvas events reach Input's window capture listener. This EventTarget
     // fixture has no DOM propagation, and queued interactions need one update.
     const startWithKey = () => { key('e'); tick(1); };
-    return { ...h, game, doc, writes, entrance, session, shell, tick, key, releaseKey, startWithKey };
+    return { ...h, game, doc, writes, entrance, session, shell, tick, key, releaseKey, startWithKey, globalListeners };
 }
 function snapshot(game: ReturnType<typeof browser>['game']) {
     return JSON.stringify({ player: game.player.data, elapsed: game.elapsed, time: game.time,
@@ -170,5 +173,7 @@ for (const steps of [10, 28]) test(`disposing at frame ${steps} releases listene
         h.game.dispose(); const draws = h.drawCount();
         h.tick(100); h.key('e'); h.entrance.click(); h.frame();
         assert.equal(h.shell(), undefined); assert.equal(h.frames.size, 0);
-        assert.equal(h.listenerCount(), 0); assert.equal(h.drawCount(), draws);
+        assert.deepEqual(h.window.listeners, h.globalListeners.window);
+        assert.deepEqual(h.document.listeners, h.globalListeners.document);
+        assert.equal(h.listenerCount(), h.globalListeners.count); assert.equal(h.drawCount(), draws);
 });
