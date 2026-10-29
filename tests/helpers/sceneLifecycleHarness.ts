@@ -44,7 +44,7 @@ abstract class LifecycleNode extends Surface {
         this.parent = null;
     }
 }
-class LifecycleText extends LifecycleNode {
+export class LifecycleText extends LifecycleNode {
     readonly nodeType = 3; readonly nodeName = '#text';
     constructor(public data: string) { super(); }
     get nodeValue(): string { return this.data; }
@@ -102,7 +102,25 @@ export class LifecycleElement extends LifecycleNode {
         for (const child of [...this.childNodes]) child.remove();
         this.append(...children);
     }
-    get classList() { return { contains: (name: string) => this.className.split(/\s+/).includes(name), toggle: () => {} }; }
+    get classList() {
+        const tokens = () => new Set(this.className.split(/[\t\n\f\r ]+/).filter(Boolean));
+        const validate = (name: string) => {
+            if (!name) throw new DOMException('Empty class token', 'SyntaxError');
+            if (/[\t\n\f\r ]/.test(name)) throw new DOMException('Whitespace in class token', 'InvalidCharacterError');
+        };
+        const contains = (name: string) => tokens().has(name);
+        const add = (...names: string[]) => {
+            names.forEach(validate); const next = tokens(); names.forEach(name => next.add(name)); this.className = [...next].join(' ');
+        };
+        const remove = (...names: string[]) => {
+            names.forEach(validate); const next = tokens(); names.forEach(name => next.delete(name)); this.className = [...next].join(' ');
+        };
+        return { add, remove, contains, toggle: (name: string, force?: boolean) => {
+            validate(name); const before = contains(name), after = force ?? !before;
+            if (after !== before) { if (after) add(name); else remove(name); }
+            return after;
+        } };
+    }
     setAttribute(name: string, value: string) { this.attributes.set(name.toLowerCase(), String(value)); }
     getAttribute(name: string) { return this.attributes.get(name.toLowerCase()) ?? null; }
     removeAttribute(name: string) { this.attributes.delete(name.toLowerCase()); }

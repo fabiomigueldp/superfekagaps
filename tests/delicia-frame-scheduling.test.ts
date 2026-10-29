@@ -5,28 +5,18 @@ import { readFileSync } from 'node:fs';
 import { runInThisContext } from 'node:vm';
 import ts from 'typescript';
 import type { DeliciaInput, DeliciaSimulation } from '../src/adventure/delicia/DeliciaSimulation';
+import { LifecycleElement, LifecycleText } from './helpers/sceneLifecycleHarness';
 
 /** Deterministic browser clock; app handlers, simulation and canvas painting remain real. */
 function fixture(t: TestContext) {
     let activeElement: Element | null = null;
-    class Element extends EventTarget {
-        style: Record<string, string> = {};
-        className = ''; dataset: Record<string, string> = {}; hidden = false; disabled = false;
-        textContent = ''; parent: Element | null = null; children: Element[] = [];
-        attributes = new Map<string, string>(); captureFails = false;
-        constructor(readonly tagName: string) { super(); }
-        get classList() { return { add: (name: string) => { this.className += ' ' + name; },
-            contains: (name: string) => this.className.split(' ').includes(name) }; }
-        append(...children: Element[]) { for (const child of children) { child.parent = this; this.children.push(child); } }
-        replaceChildren(...children: Element[]) { this.children.forEach(child => child.parent = null); this.children = []; this.append(...children); }
-        remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); this.parent = null; }
-        setAttribute(name: string, value: string) { this.attributes.set(name, value); }
-        removeAttribute(name: string) { this.attributes.delete(name); }
-        getAttribute(name: string) { return this.attributes.get(name) ?? null; }
-        getBoundingClientRect() { return { left: 0, top: 0, width: 960, height: 540 }; }
+    class Element extends LifecycleElement {
+        captureFails = false;
+        constructor(tagName: string) { super(tagName.toUpperCase()); }
+        override getBoundingClientRect() { return { x: 0, y: 0, left: 0, top: 0, width: 960, height: 540, right: 960, bottom: 540 }; }
         blur() { if (activeElement === this) { activeElement = null; this.dispatchEvent(new Event('blur')); } }
         readonly draws: string[] = [];
-        private readonly context = new Proxy({} as CanvasRenderingContext2D, {
+        private readonly drawingContext = new Proxy({} as CanvasRenderingContext2D, {
             get: (_target, key) => {
                 if (key === 'createLinearGradient' || key === 'createRadialGradient') return () => ({ addColorStop() {} });
                 if (key === 'measureText') return (text: string) => ({ width: text.length * 6 });
@@ -35,14 +25,14 @@ function fixture(t: TestContext) {
             set: (_target, key, value) => { this.draws.push(`${String(key)}=${typeof value === 'object' ? '[object]' : String(value)}`); return true; },
         });
         clientWidth = 960;
-        getContext() { return this.context; }
-        all(): Element[] { return this.children.flatMap(child => [child, ...child.all()]); }
-        querySelector() { return this.all().find(node => node.tagName === 'button') ?? null; }
-        querySelectorAll() { return this.all().filter(node => node.tagName === 'button'); }
+        override getContext() { return this.drawingContext; }
+        all(): Element[] { return this.children.flatMap(child => child instanceof Element ? [child, ...child.all()] : []); }
+        querySelector() { return this.all().find(node => node.tagName === 'BUTTON') ?? null; }
+        querySelectorAll() { return this.all().filter(node => node.tagName === 'BUTTON'); }
         getClientRects() { return [1]; }
         closest(selector: string): Element | null {
-            for (let node: Element | null = this; node; node = node.parent)
-                if (selector.split(',').some(tag => tag.trim() === node!.tagName || tag.trim().startsWith('.') && node!.className.split(' ').includes(tag.trim().slice(1)))) return node;
+            for (let node: LifecycleElement | null = this; node; node = node.parent)
+                if (node instanceof Element && selector.split(',').some(tag => tag.trim().toUpperCase() === node!.tagName || tag.trim().startsWith('.') && node!.className.split(' ').includes(tag.trim().slice(1)))) return node;
             return null;
         }
         focus() {
@@ -54,8 +44,17 @@ function fixture(t: TestContext) {
         setPointerCapture() { if (this.captureFails) throw new DOMException('Capture unavailable'); }
     }
     const body = new Element('body'), window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1 });
-    const document = Object.assign(new EventTarget(), { body, hidden: false, title: '', activeElement: null as Element | null,
-        getElementById: () => null, createElement: (tag: string) => new Element(tag) });
+    const documentElement = new Element('html'); documentElement.append(body);
+    const querySelectorAll = (selector: string) => {
+        const nodes = [documentElement, ...documentElement.all()];
+        if (selector === '[data-control-capture="true"]') return nodes.filter(node => node.dataset.controlCapture === 'true');
+        assert.equal(selector, 'dialog[open]', 'Only control capture and open-dialog queries are modeled');
+        return nodes.filter(node => node.tagName === 'DIALOG' && node.getAttribute('open') !== null);
+    };
+    const document = Object.assign(new EventTarget(), { body, documentElement, fullscreenElement: null, hidden: false, title: '', activeElement: null as Element | null,
+        getElementById: () => null, createElement: (tag: string) => new Element(tag),
+        createTextNode: (data: string) => new LifecycleText(data),
+        querySelectorAll, querySelector: (selector: string) => querySelectorAll(selector)[0] ?? null });
     // Define the live focus getter after assigning the document's typed shape.
     Object.defineProperty(document, 'activeElement', { get: () => activeElement });
     const frames = new Map<number, FrameRequestCallback>();
@@ -63,10 +62,12 @@ function fixture(t: TestContext) {
     const motion = Object.assign(new EventTarget(), { matches: false });
     const finishArt: Array<() => void> = [];
     let connected = true;
-    const pad = { mapping: 'standard', axes: [0, 0], buttons: Array.from({ length: 16 }, () => ({ pressed: false })) };
+    const pad = { index: 0, id: 'Frame scheduling fixture', connected: true, mapping: 'standard', axes: [0, 0, 0, 0],
+        buttons: Array.from({ length: 17 }, () => ({ pressed: false, get value() { return this.pressed ? 1 : 0; }, get touched() { return this.pressed; } })) };
     const original = new Map<string, PropertyDescriptor | undefined>();
     for (const [name, value] of Object.entries({ window, document, location: { hash: '' },
         navigator: { maxTouchPoints: 1, getGamepads: () => { polls++; return connected ? [pad] : []; } },
+        HTMLElement: Element,
         matchMedia: () => motion,
         localStorage: { getItem: () => null, setItem() {} },
         requestAnimationFrame: (callback: FrameRequestCallback) => { frames.set(++frameId, callback); return frameId; },
@@ -82,6 +83,10 @@ function fixture(t: TestContext) {
     const module = { exports: {} as typeof import('../src/adventure/delicia/DeliciaApp') };
     runInThisContext(`(function(require,module,exports){${compiled}\n})`, { filename: url.pathname })(require, module, module.exports);
     const { DeliciaApp } = module.exports;
+    const { selectGamepad } = require('../../engine/GamepadDevice') as typeof import('../src/engine/GamepadDevice');
+    // These scheduling tests start with a selected, neutral controller. They do
+    // not exercise the first-button device selection or remapping UI.
+    selectGamepad(pad as unknown as Gamepad);
     const { DeliciaArt } = require('./DeliciaArt') as typeof import('../src/adventure/delicia/DeliciaArt');
     t.mock.method(DeliciaArt.prototype, 'load', () => new Promise<void>(resolve => { finishArt.push(resolve); }));
     const prototype = DeliciaApp.prototype as unknown as { renderGame(): void };
@@ -100,6 +105,7 @@ function fixture(t: TestContext) {
         assert.equal(app.loadStage('delicia-1', true), true); return app; };
     t.after(() => {
         apps.forEach(app => app.dispose());
+        selectGamepad(null);
         if (css) require.extensions['.css'] = css; else delete require.extensions['.css'];
         for (const [name, descriptor] of original) {
             if (descriptor) Object.defineProperty(globalThis, name, descriptor); else Reflect.deleteProperty(globalThis, name);
@@ -126,6 +132,23 @@ function fixture(t: TestContext) {
     return { app, scene: app.presentation.renderer.worldCanvas, create, window, document, body, key, pointer, button, frame, pad, frames, hidden, motion, finishArt,
         painting, polls: () => polls, now: () => now, disconnect: () => { connected = false; } };
 }
+
+test('frame fixture queries connected capture owners and open dialogs in document order', t => {
+    const h = fixture(t), capture = h.document.createElement('details'), dialog = h.document.createElement('dialog');
+    const query = '[data-control-capture="true"]';
+    capture.dataset.controlCapture = 'true'; dialog.setAttribute('open', '');
+    assert.equal(h.document.querySelector(query), null); assert.deepEqual(h.document.querySelectorAll('dialog[open]'), []);
+    h.body.append(capture, dialog);
+    assert.equal(h.document.querySelector(query), capture); assert.deepEqual(h.document.querySelectorAll('dialog[open]'), [dialog]);
+    const second = h.document.createElement('dialog'); second.setAttribute('open', 'false'); h.body.append(second);
+    assert.deepEqual(h.document.querySelectorAll('dialog[open]'), [dialog, second], 'open is a boolean attribute, not a text value');
+    dialog.removeAttribute('open'); assert.equal(h.document.querySelector('dialog[open]'), second);
+    capture.remove(); second.remove(); assert.equal(h.document.querySelector(query), null);
+    assert.deepEqual(h.document.querySelectorAll('dialog[open]'), []);
+    assert.throws(() => h.document.querySelector('.unmodeled'), /Only control capture and open-dialog/);
+    const label = h.document.createElement('label'), text = h.document.createTextNode(''); label.append(text);
+    assert.equal(text.nodeType, 3); assert.equal(label.children.length, 0); assert.equal(label.childNodes.length, 1);
+});
 
 test('a settled pause retains identical canvas output without repeated paints or lost controller polling', t => {
     const h = fixture(t); h.app.pause();
