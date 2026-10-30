@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import test, { type TestContext } from 'node:test';
-import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import { runInThisContext } from 'node:vm';
 import ts from 'typescript';
@@ -8,76 +7,31 @@ import type { DeliciaInput, DeliciaSimulation } from '../src/adventure/delicia/D
 import { DeliciaStore } from '../src/adventure/delicia/DeliciaProgress';
 import { ProgressStore } from '../src/adventure/progress';
 import type { DeliciaAppOptions } from '../src/adventure/delicia/DeliciaApp';
-import { createMediaQueryHarness } from './helpers/mediaQueryHarness';
-import { createClassList } from './helpers/classListHarness';
-import { createDocumentRoots } from './helpers/documentRootsHarness';
+import { Event, type HTMLElement as Element, type EventTarget, type TEventListener } from 'happy-dom';
+import { createDeliciaDom } from './helpers/deliciaDomHarness';
+import { loadDeliciaApp } from './helpers/deliciaAppLoader';
 
 /** DOM/event boundaries only. Constructor, registered handlers, loop and simulation are real. */
 function fixture(t: TestContext, initiallyFocused = true) {
-    let focused = initiallyFocused;
-    let activeElement: Element | null = null;
-    class Element extends EventTarget {
-        style: Record<string, string> = {};
-        dataset: Record<string, string> = {}; hidden = false; disabled = false;
-        textContent = ''; parent: Element | null = null; children: Element[] = [];
-        attributes = new Map<string, string>(); captureFails = false;
-        constructor(readonly tagName: string) { super(); }
-        readonly classList = createClassList(this);
-        get className() { return this.getAttribute('class') ?? ''; }
-        set className(value: string) { this.setAttribute('class', value); }
-        append(...children: Element[]) { for (const child of children) { child.parent = this; this.children.push(child); } }
-        replaceChildren(...children: Element[]) { this.children.forEach(child => child.parent = null); this.children = []; this.append(...children); }
-        remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); this.parent = null; }
-        setAttribute(name: string, value: string) { this.attributes.set(name, value); }
-        removeAttribute(name: string) { this.attributes.delete(name); }
-        getAttribute(name: string) { return this.attributes.get(name) ?? null; }
-        getBoundingClientRect() { return { left: 0, top: 0, width: 960, height: 540 }; }
-        blur() { if (activeElement === this) { activeElement = null; this.dispatchEvent(new Event('blur')); } }
-        getContext() { return new Proxy({}, { get: () => () => {}, set: () => true }); }
-        all(): Element[] { return this.children.flatMap(child => [child, ...child.all()]); }
-        querySelector() { return this.all().find(node => node.tagName === 'button') ?? null; }
-        querySelectorAll() { return this.all().filter(node => node.tagName === 'button'); }
-        getClientRects() { return [1]; }
-        closest(selector: string): Element | null {
-            for (let node: Element | null = this; node; node = node.parent)
-                if (selector.split(',').some(tag => tag.trim() === node!.tagName || tag.trim().startsWith('.') && node!.className.split(' ').includes(tag.trim().slice(1)))) return node;
-            return null;
-        }
-        focus() {
-            if (activeElement === this) return;
-            const old = activeElement; activeElement = this;
-            old?.dispatchEvent(new Event('blur')); this.dispatchEvent(new Event('focus'));
-        }
-        click() { this.dispatchEvent(new Event('click')); }
-        setPointerCapture() { if (this.captureFails) throw new DOMException('Capture unavailable'); }
-    }
-    const mediaQueries = createMediaQueryHarness();
-    const roots = createDocumentRoots(tag => new Element(tag)), { body } = roots;
-    const window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1, matchMedia: mediaQueries.matchMedia });
-    const document = Object.assign(new EventTarget(), roots, { hidden: false, title: '',
-        hasFocus: () => focused, getElementById: () => null, createElement: (tag: string) => new Element(tag) });
-
-    Object.defineProperty(document, 'activeElement', { get: () => activeElement });
-    let nextFrame: FrameRequestCallback = () => {}, now = 1000;
+    const dom = createDeliciaDom(initiallyFocused), { window, document, body } = dom;
+    const cleanups: (() => void)[] = [];
+    t.after(async () => { try { cleanups.forEach(cleanup => cleanup()); } finally { await dom.dispose(); } });
+    const frames = new Map<number, FrameRequestCallback>(); let frameId = 0, now = 1000;
     let connected = true;
-    const pad = { index: 0, id: 'test-pad', connected: true, mapping: 'standard', axes: [0, 0], buttons: Array.from({ length: 16 }, () => ({ pressed: false })) };
-    const original = new Map<string, PropertyDescriptor | undefined>();
-    for (const [name, value] of Object.entries({ window, document, location: { hash: '' }, matchMedia: mediaQueries.matchMedia,
+    const pad = { index: 0, id: 'test-pad', get connected() { return connected; }, mapping: 'standard', timestamp: 0, axes: [0, 0],
+        buttons: Array.from({ length: 16 }, (): { pressed: boolean; touched: boolean; value: number } =>
+            ({ pressed: false, get touched() { return this.pressed; }, get value() { return Number(this.pressed); } })),
+        vibrationActuator: { playEffect: async () => 'complete', reset: async () => 'complete' } } satisfies Gamepad;
+    dom.install({
         navigator: { maxTouchPoints: 1, getGamepads: () => connected ? [pad] : [] },
         localStorage: { getItem: () => null, setItem() {} },
-        requestAnimationFrame: (callback: FrameRequestCallback) => { nextFrame = callback; return 1; },
-        cancelAnimationFrame() {}, fetch: async () => ({ ok: false }) })) {
-        original.set(name, Object.getOwnPropertyDescriptor(globalThis, name));
-        Object.defineProperty(globalThis, name, { configurable: true, value });
-    }
-    const url = new URL('../src/adventure/delicia/DeliciaApp.ts', import.meta.url), require = createRequire(url);
-    const css = require.extensions['.css']; require.extensions['.css'] = () => {};
-    // Vite normally injects this environment value. No handler/source behavior is replaced.
-    const source = readFileSync(url, 'utf8').replace('import.meta', '({env:{DEV:false}})');
-    const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;
-    const module = { exports: {} as typeof import('../src/adventure/delicia/DeliciaApp') };
-    runInThisContext(`(function(require,module,exports){${compiled}\n})`, { filename: url.pathname })(require, module, module.exports);
-    const { DeliciaApp } = module.exports;
+        requestAnimationFrame: (callback: FrameRequestCallback) => { frames.set(++frameId, callback); return frameId; },
+        cancelAnimationFrame: (id: number) => { frames.delete(id); }, fetch: async () => ({ ok: false }) });
+    const loaded = loadDeliciaApp(), { DeliciaApp, require } = loaded;
+    // Ownership scenarios begin with an already selected, neutral controller.
+    // Device selection has its own baseline; a first held button must not stand in for a fresh press.
+    const { selectGamepad } = require('../../engine/GamepadDevice') as typeof import('../src/engine/GamepadDevice');
+    selectGamepad(pad);
     const { DeliciaArt } = require('./DeliciaArt') as typeof import('../src/adventure/delicia/DeliciaArt');
     t.mock.method(DeliciaArt.prototype, 'load', async () => {});
     // Rendering is outside the input boundary; all event/lifecycle paths execute unchanged.
@@ -91,28 +45,22 @@ function fixture(t: TestContext, initiallyFocused = true) {
     const apps: App[] = [], nativeCleanups: (() => void)[] = [];
     const create = (options?: DeliciaAppOptions) => { const app = new DeliciaApp(body as unknown as HTMLElement, options) as unknown as App; apps.push(app);
         if (!options?.initialStage) assert.equal(app.loadStage('delicia-1', true), true); return app; };
-    t.after(() => {
-        nativeCleanups.forEach(cleanup => cleanup());
-        apps.forEach(app => app.dispose());
-        mediaQueries.dispose();
-        if (css) require.extensions['.css'] = css; else delete require.extensions['.css'];
-        for (const [name, descriptor] of original) {
-            if (descriptor) Object.defineProperty(globalThis, name, descriptor); else Reflect.deleteProperty(globalThis, name);
-        }
-    });
+    cleanups.push(() => { nativeCleanups.forEach(cleanup => cleanup()); apps.forEach(app => app.dispose()); }, loaded.dispose);
     const app = create();
     function dispatch(type: string, target: Element | EventTarget, values: Record<string, unknown> = {}) {
         const event = new Event(type, { cancelable: true, bubbles: true });
-        for (const [name, value] of Object.entries({ target, ...values })) Object.defineProperty(event, name, { value });
+        for (const [name, value] of Object.entries(values)) Object.defineProperty(event, name, { value });
         target.dispatchEvent(event);
-        if (target instanceof Element) window.dispatchEvent(event);
         return event;
     }
-    const key = (type: string, key: string, target: Element = activeElement!, repeat = false, code = '') =>
+    const key = (type: string, key: string, target: Element = document.activeElement instanceof window.HTMLElement ? document.activeElement : body, repeat = false, code = '') =>
         dispatch(type, target, { key, code, repeat });
     const pointer = (type: string, target: Element | EventTarget, pointerId = 1) => dispatch(type, target, { pointerId, button: 0 });
-    const button = (key: string) => { const b = app.touch.all().find(node => node.dataset.key === key); assert.ok(b); return b; };
-    const frame = () => { now += 1000 / 60; nextFrame(now); };
+    const button = (key: string) => { const b = Array.from(app.touch.querySelectorAll('button')).find(node => node.dataset.key === key); assert.ok(b); return b; };
+    const frame = () => {
+        now += 1000 / 60; const pending = [...frames.values()]; frames.clear();
+        for (const callback of pending) callback(now);
+    };
     frame();
     /** Execute the actual outer owner method and native host, with only module delivery delayed. */
     function nativeEntry(completed: boolean, delay: 'outer' | 'inner' = 'inner') {
@@ -129,17 +77,19 @@ function fixture(t: TestContext, initiallyFocused = true) {
         const gate = new Promise<void>((resolve, fail) => { release = resolve; reject = fail; });
         let importing!: () => void;
         const importStarted = new Promise<void>(resolve => { importing = resolve; });
-        const tracked = new Map<EventTarget, Set<EventListenerOrEventListenerObject>>();
+        const tracked = new Map<EventTarget, Set<TEventListener>>();
         for (const target of [window, document]) {
-            const listeners = new Set<EventListenerOrEventListenerObject>(); tracked.set(target, listeners);
+            const listeners = new Set<TEventListener>(); tracked.set(target, listeners);
             const add = target.addEventListener.bind(target), remove = target.removeEventListener.bind(target);
-            t.mock.method(target, 'addEventListener', (type: string, listener: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean) => {
+            t.mock.method(target, 'addEventListener', (...args: Parameters<typeof add>) => {
+                const [type, listener] = args;
                 if (listener && (type === 'blur' || type === 'visibilitychange')) listeners.add(listener);
-                add(type, listener, options);
+                add(...args);
             });
-            t.mock.method(target, 'removeEventListener', (type: string, listener: EventListenerOrEventListenerObject | null, options?: EventListenerOptions | boolean) => {
+            t.mock.method(target, 'removeEventListener', (...args: Parameters<typeof remove>) => {
+                const [type, listener] = args;
                 if (listener && (type === 'blur' || type === 'visibilitychange')) listeners.delete(listener);
-                remove(type, listener, options);
+                remove(...args);
             });
         }
         function compile(source: string, path: URL, load: (name: string) => unknown) {
@@ -158,9 +108,13 @@ function fixture(t: TestContext, initiallyFocused = true) {
         const source = ts.createSourceFile(ownerUrl.pathname, readFileSync(ownerUrl, 'utf8'), ts.ScriptTarget.Latest, true);
         const ownerClass = source.statements.find(ts.isClassDeclaration)!;
         const method = ownerClass.members.find(member => ts.isMethodDeclaration(member) && member.name.getText(source) === 'mountChapter')!;
-        const ownerType = compile(`export class NativeOwner { ${method.getText(source)} }`, ownerUrl,
-            () => { if (delay === 'outer') { importing(); return gate.then(() => host); } return host; }).NativeOwner;
-        const mapRoot = new Element('section'), mapCanvas = new Element('canvas'); body.append(mapRoot, mapCanvas);
+        const ownerType = compile(`import { installDomGamepad } from '../engine/DomGamepadMenu';
+            export class NativeOwner { ${method.getText(source)} }`, ownerUrl,
+            name => {
+                if (name === '../engine/DomGamepadMenu') return require('../../engine/DomGamepadMenu');
+                if (delay === 'outer') { importing(); return gate.then(() => host); } return host;
+            }).NativeOwner;
+        const mapRoot = document.createElement('section'), mapCanvas = document.createElement('canvas'); body.append(mapRoot, mapCanvas);
         let returned = 0, disposed = false;
         const owner = Object.assign(new ownerType(), {
             chapterActive: false, running: true, input: { reset() {} }, audio: { enabled: true, pause() {}, volume() {} },
@@ -176,7 +130,8 @@ function fixture(t: TestContext, initiallyFocused = true) {
             close: () => owner.chapterCleanup?.(), dispose: () => { disposed = true; owner.chapterCleanup?.(); } };
     }
     return { app, create, nativeEntry, window, document, body, key, pointer, button, frame, pad,
-        focus: (value: boolean, notify = true) => { focused = value; if (notify) window.dispatchEvent(new Event(value ? 'focus' : 'blur')); },
+        gamepadEvent: (type: string) => dispatch(type, window, { gamepad: pad }),
+        focus: dom.focus, failPointerCapture: dom.failPointerCapture,
         disconnect: () => { connected = false; }, connect: () => { connected = true; } };
 }
 function neutral(input: DeliciaInput) { assert.ok(Object.values(input).every(value => value === false), JSON.stringify(input)); }
@@ -277,7 +232,7 @@ test('releasing gamepad jump preserves a keyboard owner without a phantom releas
 });
 
 test('pointer capture failure still releases outside the button via the window', t => {
-    const h = fixture(t), right = h.button('arrowright'); right.captureFails = true;
+    const h = fixture(t), right = h.button('arrowright'); h.failPointerCapture(right);
     h.pointer('pointerdown', right); assert.equal(h.app.input().right, true);
     h.pointer('pointerup', h.window); assert.equal(h.app.input().right, false);
     h.pointer('pointerdown', right); h.pointer('pointercancel', h.window); assert.equal(h.app.input().right, false);
@@ -364,13 +319,13 @@ for (const index of [0, 1, 9]) test(`ordinary focused pause button ${index} reta
 
 test('disposed app stays inert through focus and connection events', t => {
     const h = fixture(t); h.focus(false); h.app.dispose(); const screen = h.app.screen;
-    h.pad.buttons[9].pressed = true; h.focus(true); h.window.dispatchEvent(new Event('gamepadconnected')); h.frame();
+    h.pad.buttons[9].pressed = true; h.focus(true); h.gamepadEvent('gamepadconnected'); h.frame();
     assert.equal(h.app.screen, screen); neutral(h.app.input());
 });
 
 test('connection events disarm held controls even when disconnect and reconnect occur between frames', t => {
     const h = fixture(t); h.app.pause();
-    h.pad.buttons[9].pressed = true; h.window.dispatchEvent(new Event('gamepaddisconnected')); h.window.dispatchEvent(new Event('gamepadconnected')); h.frame();
+    h.pad.buttons[9].pressed = true; h.gamepadEvent('gamepaddisconnected'); h.gamepadEvent('gamepadconnected'); h.frame();
     assert.equal(h.app.screen, 'pause');
     h.pad.buttons[9].pressed = false; h.frame(); h.pad.buttons[9].pressed = true; h.frame();
     assert.equal(h.app.screen, 'playing');
@@ -438,7 +393,7 @@ for (const delay of ['outer', 'inner'] as const) test(`failed ${delay} import re
     t.mock.method(console, 'error', () => {});
     entry.reject(new Error('Test module delivery failure')); await entry.pending;
     assert.equal(entry.mounted(), undefined); assert.equal(entry.activityListeners(), 0);
-    assert.ok(h.body.all().some(node => node.textContent === 'Tentar novamente'));
+    assert.ok(Array.from(h.body.querySelectorAll('*')).some(node => node.textContent === 'Tentar novamente'));
     entry.close(); assert.equal(entry.activityListeners(), 0);
 });
 test('an interrupted entry does not pause the next focused visit', async t => {
