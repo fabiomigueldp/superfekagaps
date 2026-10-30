@@ -91,7 +91,7 @@ function makeStage(spec: ChapterSpec, index: number): DeliciaStage {
     }
     authorDeliciaTraversal(s,spec.lore);
     s.intro = number === 1 ? [{ speaker: 'Dona Casca', text: 'Bem-vindo à Delícia. Guina levou a safra inteira, e as nossas fontes secaram.' }, { speaker: 'Feka', text: 'Um grande vilão? Finalmente uma missão com suco!' }, { speaker: 'Dona Casca', text: 'Abra as duas válvulas de cada percurso. E ouça as memórias: esta ilha tem mais que um lado.' }]
-        : [{ speaker: number<6?'Dona Casca':'Jajá', text: number===3?'Abra primeiro a fonte do bairro, depois a do cais. O aqueduto precisa voltar a lembrar o trajeto.':number===7?'A nascente voltou a correr! Segure Shift para correr e salte nas travessias. As balsas ajudam a alcançar a outra margem.':number===8?'As esteiras empurram você e os inimigos. Rebata os projéteis com Q: latão contra latão.':number===11?'O medidor alimenta a armadura de Guina. Abra as válvulas quando ele carregar o ataque.':spec.subtitle }];
+        : [{ speaker: number<6?'Dona Casca':'Jajá', text: number===3?'Abra primeiro a fonte do bairro, depois a do cais. O aqueduto precisa voltar a lembrar o trajeto.':number===7?'A nascente voltou a correr! Segure Correr e salte nas travessias. As balsas ajudam a alcançar a outra margem.':number===8?'As esteiras empurram você. Use Rebater contra os projéteis: latão contra latão.':number===11?'O medidor alimenta a armadura de Guina. Abra as válvulas quando ele carregar o ataque.':spec.subtitle }];
     if (number===3) s.secret='delicia-raizes'; if(number===9) s.secret='delicia-relogio';
     return s;
 }
