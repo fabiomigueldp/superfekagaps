@@ -1,7 +1,7 @@
 import { hasDevelopmentAccess } from '../../../DevelopmentProgress';
 import { GuairaChapterControlsHelp } from './GuairaChapterControlsHelp';
 import { chapterCompletionStory } from './GuairaChapterStory';
-import { chapterExitPresentation, chapterGuidance, chapterTitle, chapterAttemptSummary } from './GuairaChapterPresentation';
+import { chapterExitPresentation, chapterGuidance, chapterTitle, chapterAttemptSummary, chapterCanvasLabel } from './GuairaChapterPresentation';
 import { ProgressStore } from '../../../progress';
 import { freshGuairaChapterProgress, guairaAlternateOpening, type GuairaChapterProgress } from './GuairaChapterProgress';
 import { mergeGuairaExploration, sampleGuairaExploration } from '../GuairaCourseExploration';
@@ -333,6 +333,12 @@ export class GuairaChapterApp {
         return help;
     }
 
+    private describeCanvas(canvas: HTMLCanvasElement, description: string, scope: DisposalScope) {
+        const sync = () => canvas.setAttribute('aria-label', chapterCanvasLabel(description));
+        sync();
+        scope.listen(window, 'feka-controls-change', sync);
+    }
+
     private scenePanel(attempt: GuairaChapterAttempt, scope: DisposalScope) {
         const info = CHAPTER_SCENES[attempt.sceneId], nav = document.createElement('nav');
         nav.className = 'chapter-game-toolbar'; nav.setAttribute('aria-label', 'Controles do capítulo de Guaíra');
@@ -354,7 +360,7 @@ export class GuairaChapterApp {
         // Install before native primary/replay handlers, including already-paused Resume.
         scope.listen(primary, 'click', event => { canPrimary(event); });
         const chrome = chapterSceneChrome(scope, canvas, nav, status, primary, help, retry, map, sound.button, false);
-        canvas.setAttribute('aria-label', `${info.title}. ${info.objective} Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr, Escape para pausar e M para o som.`);
+        this.describeCanvas(canvas, `${info.title}. ${info.objective}`, scope);
         this.root.append(nav, canvas);
         scope.listen(canvas, 'pointerdown', () => canvas.focus({ preventScroll: true }));
         scope.listen(retry, 'click', event => {
@@ -551,7 +557,7 @@ export class GuairaChapterApp {
         // Install before native primary/replay handlers, including already-paused Resume.
         scope.listen(primary, 'click', event => { canPrimary(event); });
         const chrome = chapterSceneChrome(scope, canvas, nav, status, primary, help, retry, map, sound.button, true);
-        canvas.setAttribute('aria-label', `${info.title}, percurso opcional. ${info.objective}. Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr, Escape para pausar e M para o som.`);
+        this.describeCanvas(canvas, `${info.title}, percurso opcional. ${info.objective}.`, scope);
         this.root.append(nav, canvas);
         scope.listen(canvas, 'pointerdown', () => canvas.focus({ preventScroll: true }));
         scope.listen(retry, 'click', event => {
