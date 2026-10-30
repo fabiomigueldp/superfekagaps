@@ -1,7 +1,7 @@
 import { connectedPads } from './ControlPreferences';
 
 // A touchscreen is a capability, not evidence that the player uses touch.
-let pointerTouch = matchMedia('(pointer: coarse)').matches;
+let pointerTouch = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 window.addEventListener('pointerdown', event => {
     pointerTouch = event.pointerType === 'touch';
 }, true);

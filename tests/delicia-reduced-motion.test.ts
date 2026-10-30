@@ -1,9 +1,8 @@
 import assert from 'node:assert/strict';
 import test, { type TestContext } from 'node:test';
-import { createRequire } from 'node:module';
-import { readFileSync } from 'node:fs';
-import { runInThisContext } from 'node:vm';
-import ts from 'typescript';
+import { createDeliciaDom } from './helpers/deliciaDomHarness';
+import { createMediaQueryHarness } from './helpers/mediaQueryHarness';
+import { loadDeliciaApp } from './helpers/deliciaAppLoader';
 import { DELICIA_STAGES, type Box } from '../src/adventure/delicia/DeliciaContent';
 import { DELICIA_SAVE_KEY, freshDeliciaSave, type DeliciaStore } from '../src/adventure/delicia/DeliciaProgress';
 import { DeliciaSimulation, noDeliciaInput, steamPhase } from '../src/adventure/delicia/DeliciaSimulation';
@@ -11,63 +10,27 @@ import { DeliciaSimulation, noDeliciaInput, steamPhase } from '../src/adventure/
 type DrawCall = [string, ...unknown[]];
 /** Browser boundaries only: the constructor, settings, loop and both renderers run unchanged. */
 function fixture(t: TestContext, system: boolean | null = false, manual = false, legacy = false) {
-    let activeElement: Element | null = null;
-    class Element extends EventTarget {
-        style: Record<string, string> = {};
-        className = ''; dataset: Record<string, string> = {}; hidden = false; disabled = false; checked = false;
-        id = ''; type = ''; clientWidth = 960; private text = ''; parent: Element | null = null; children: Element[] = [];
-        attributes = new Map<string, string>(); calls: DrawCall[] = [];
-        context = new Proxy({} as Record<string, unknown>, { get: (target, key: string) => {
-            if (key in target) return target[key];
-            return (...args: unknown[]) => { this.calls.push([key, ...args]);
-                if (key.startsWith('create')) return { addColorStop() {} }; };
-        } });
-        constructor(readonly tagName: string) { super(); }
-        get textContent(): string { return this.text + this.children.map(child => child.textContent).join(''); }
-        set textContent(value: string) { this.text = value; this.replaceChildren(); }
-        get classList() { return { add: (name: string) => { this.className += ' ' + name; },
-            contains: (name: string) => this.className.split(' ').includes(name) }; }
-        append(...children: Element[]) { for (const child of children) { child.parent = this; this.children.push(child); } }
-        replaceChildren(...children: Element[]) { this.children.forEach(child => child.parent = null); this.children = []; this.append(...children); }
-        remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); this.parent = null; }
-        setAttribute(name: string, value: string) { this.attributes.set(name, value); }
-        removeAttribute(name: string) { this.attributes.delete(name); }
-        getAttribute(name: string) { return this.attributes.get(name) ?? null; }
-        getBoundingClientRect() { return { left: 0, top: 0, width: 960, height: 540 }; }
-        blur() { if (activeElement === this) { activeElement = null; this.dispatchEvent(new Event('blur')); } }
-        getContext() { return this.context; }
-        all(): Element[] { return this.children.flatMap(child => [child, ...child.all()]); }
-        querySelector() { return this.all().find(node => node.tagName === 'button') ?? null; }
-        focus() { activeElement = this; }
-        click() { this.dispatchEvent(new Event('click')); }
-    }
-    const listeners = new Set<EventListener>();
-    const media = { matches: system ?? false,
-        addEventListener: legacy ? undefined : (name: string, listener: EventListener) => { assert.equal(name, 'change'); listeners.add(listener); },
-        removeEventListener: legacy ? undefined : (name: string, listener: EventListener) => { assert.equal(name, 'change'); listeners.delete(listener); },
-        addListener: (listener: EventListener) => { listeners.add(listener); },
-        removeListener: (listener: EventListener) => { listeners.delete(listener); } };
-    const changeSystem = (matches: boolean) => { media.matches = matches; listeners.forEach(listener => listener(new Event('change'))); if (listeners.size) app.renderGame(); };
-    const body = new Element('body'), window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1 });
-    const document = Object.assign(new EventTarget(), { body, hidden: false, title: '', getElementById: () => null, createElement: (tag: string) => new Element(tag) });
-    Object.defineProperty(document, 'activeElement', { get: () => activeElement });
+    const dom = createDeliciaDom(), motion = '(prefers-reduced-motion: reduce)';
+    const mediaQueries = createMediaQueryHarness({ [motion]: system ?? false }, legacy);
+    const cleanups: (() => void)[] = [];
+    t.after(async () => {
+        try { cleanups.forEach(cleanup => cleanup()); }
+        finally { mediaQueries.dispose(); await dom.dispose(); }
+    });
+    const match = system === null ? undefined : mediaQueries.matchMedia;
+    Object.defineProperty(dom.window, 'matchMedia', { configurable: true, value: match });
     let raw = JSON.stringify({ ...freshDeliciaSave(), reducedMotion: manual }), writes = 0, frameRequests = 0;
-    const original = new Map<string, PropertyDescriptor | undefined>();
-    for (const [name, value] of Object.entries({ window, document, location: { hash: '' }, navigator: { maxTouchPoints: 0 },
-        matchMedia: system === null ? undefined : (query: string) => { assert.equal(query, '(prefers-reduced-motion: reduce)'); return media; },
-        localStorage: { getItem: () => raw, setItem(key: string, value: string) { assert.equal(key, DELICIA_SAVE_KEY); raw = value; writes++; } },
-        requestAnimationFrame: () => ++frameRequests, cancelAnimationFrame() {}, fetch: async () => ({ ok: false }) })) {
-        original.set(name, Object.getOwnPropertyDescriptor(globalThis, name));
-        Object.defineProperty(globalThis, name, { configurable: true, value });
-    }
-    const url = new URL('../src/adventure/delicia/DeliciaApp.ts', import.meta.url), require = createRequire(url);
-    const css = require.extensions['.css']; require.extensions['.css'] = () => {};
-    // This is Vite's environment value; no app methods or handlers are replaced.
-    const source = readFileSync(url, 'utf8').replace('import.meta', '({env:{DEV:false}})');
-    const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;
-    const module = { exports: {} as typeof import('../src/adventure/delicia/DeliciaApp') };
-    runInThisContext(`(function(require,module,exports){${compiled}\n})`, { filename: url.pathname })(require, module, module.exports);
-    const { DeliciaApp } = module.exports;
+    const frames = new Map<number, FrameRequestCallback>();
+    dom.install({ navigator: { maxTouchPoints: 0, getGamepads: () => [] }, matchMedia: match,
+        localStorage: dom.window.localStorage, AudioContext: undefined,
+        requestAnimationFrame: (callback: FrameRequestCallback) => { frames.set(++frameRequests, callback); return frameRequests; },
+        cancelAnimationFrame: (id: number) => { frames.delete(id); }, fetch: async () => ({ ok: false }) });
+    const loaded = loadDeliciaApp(); cleanups.push(loaded.dispose);
+    const { DeliciaApp, require } = loaded;
+    const { DeliciaStore } = require('./DeliciaProgress') as typeof import('../src/adventure/delicia/DeliciaProgress');
+    const storage = { getItem: () => raw, setItem(key: string, value: string) {
+        assert.equal(key, DELICIA_SAVE_KEY); raw = value; writes++;
+    } };
     const { DeliciaArt } = require('./DeliciaArt') as typeof import('../src/adventure/delicia/DeliciaArt');
     t.mock.method(DeliciaArt.prototype, 'load', async () => {});
     const artDraw = t.mock.method(DeliciaArt.prototype, 'draw');
@@ -75,34 +38,62 @@ function fixture(t: TestContext, system: boolean | null = false, manual = false,
         steam(context: CanvasRenderingContext2D, box: Box, phase: string, time: number): void
     }, 'steam');
     interface App {
-        reducedMotion: boolean; presentation: { renderer: { worldCanvas: Element }; menus: { root: Element } }; canvas: Element; panel: Element; screen: string; sim: DeliciaSimulation; store: DeliciaStore;
-        mapCanvas: Element; shake: number; hitStop: number; accumulator: number;
+        reducedMotion: boolean; disposed: boolean;
+        presentation: { renderer: { worldCanvas: HTMLCanvasElement }; menus: { root: HTMLElement } };
+        canvas: HTMLCanvasElement; panel: HTMLElement; screen: string; sim: DeliciaSimulation; store: DeliciaStore;
+        mapCanvas?: HTMLCanvasElement; shake: number; hitStop: number; accumulator: number;
         showSettings(): void; renderGame(): void; paintMap(time: number): void; loop(time: number): void;
         loadStage(id: string, retry: boolean): boolean; dispose(): void;
     }
-    const apps: App[] = [];
-    const create = () => { const app = new DeliciaApp(body as unknown as HTMLElement) as unknown as App; apps.push(app); return app; };
-    t.after(() => {
-        apps.forEach(app => app.dispose());
-        if (css) require.extensions['.css'] = css; else delete require.extensions['.css'];
-        for (const [name, descriptor] of original) {
-            if (descriptor) Object.defineProperty(globalThis, name, descriptor); else Reflect.deleteProperty(globalThis, name);
+    const recorded = new WeakMap<HTMLCanvasElement, DrawCall[]>();
+    const calls = (canvas: HTMLCanvasElement) => {
+        if (!recorded.has(canvas)) {
+            const trace: DrawCall[] = [], context = canvas.getContext('2d')!;
+            // The shared DOM controls painting; record the operations asserted below.
+            for (const method of ['translate', 'lineTo'] as const) {
+                const draw = context[method].bind(context);
+                Object.defineProperty(context, method, { configurable: true, value: (...args: [number, number]) => {
+                    trace.push([method, ...args]); draw(...args);
+                } });
+            }
+            recorded.set(canvas, trace);
         }
-    });
+        return recorded.get(canvas)!;
+    };
+    const apps: App[] = [];
+    const create = () => {
+        const app = new DeliciaApp(undefined, { store: new DeliciaStore(storage, false) }) as unknown as App;
+        apps.push(app);
+        // Paint a real playable scene, not the title menu which deliberately hides stage art.
+        assert.equal(app.loadStage('delicia-1', true), true);
+        return app;
+    };
+    cleanups.unshift(() => apps.forEach(app => app.dispose()));
     const app = create();
-    const render = () => { app.sim ??= new DeliciaSimulation(); app.sim.time = 1; app.shake = .1;
-        app.presentation.renderer.worldCanvas.calls.length = 0; app.renderGame();
-        return { reduced: artDraw.mock.calls.at(-1)!.arguments[2], shake: app.presentation.renderer.worldCanvas.calls.some(([name]) => name === 'translate') }; };
-    const map = (time: number) => { app.mapCanvas ??= new Element('canvas'); app.mapCanvas.calls.length = 0;
-        app.paintMap(time); return app.mapCanvas.calls.filter(([name]) => name === 'lineTo'); };
-    const options = (target=app) => { target.showSettings();
-        const input = target.presentation.menus.root.all().find(node => node.attributes.get('aria-label')?.startsWith('Sempre reduzir movimento')); assert.ok(input);
-        return { input, hint: () => input.attributes.get('aria-label') ?? '', toggle: (checked: boolean) => {
+    const listeners = () => new Set(mediaQueries.control(motion).listeners.map(({ callback }) => {
+        assert.equal(typeof callback, 'function'); return callback as EventListener;
+    }));
+    const changeSystem = (matches: boolean) => {
+        mediaQueries.set(motion, matches);
+        // Deliver a paint without advancing simulation time, as in the original fixture.
+        for (const target of apps) if (!target.disposed) target.renderGame();
+    };
+    const render = () => { app.sim.time = 1; app.shake = .1;
+        const trace = calls(app.presentation.renderer.worldCanvas); trace.length = 0; app.renderGame();
+        return { reduced: artDraw.mock.calls.at(-1)!.arguments[2], shake: trace.some(([name]) => name === 'translate') }; };
+    const map = (time: number) => {
+        app.mapCanvas ??= dom.document.createElement('canvas') as unknown as HTMLCanvasElement;
+        const trace = calls(app.mapCanvas); trace.length = 0;
+        app.paintMap(time); return trace.filter(([name]) => name === 'lineTo');
+    };
+    const options = (target = app) => { target.showSettings();
+        const input = target.presentation.menus.root.querySelector<HTMLButtonElement>('[aria-label^="Sempre reduzir movimento"]'); assert.ok(input);
+        return { input, hint: () => input.getAttribute('aria-label') ?? '', toggle: (checked: boolean) => {
             if (target.store.save.reducedMotion !== checked) input.click(); target.renderGame();
         } };
     };
-    return { app, create, render, map, options, changeSystem, listeners, window, artDraw, steamDraw,
-        get raw() { return raw; }, get writes() { return writes; }, get activeElement() { return activeElement; }, get frameRequests() { return frameRequests; } };
+    return { app, create, render, map, options, changeSystem, get listeners() { return listeners(); }, window: dom.window, artDraw, steamDraw, calls,
+        get raw() { return raw; }, get writes() { return writes; }, get activeElement() { return dom.document.activeElement; }, get frameRequests() { return frameRequests; } };
 }
 
 for (const system of [false, true, null]) for (const manual of [false, true])
@@ -146,7 +137,7 @@ test('manual settings still toggle immediately without matchMedia', t => {
 for (const legacy of [false, true]) test(`${legacy ? 'legacy' : 'modern'} media listeners dispose without stale menu updates`, t => {
     const h = fixture(t, false, false, legacy), { hint } = h.options(); assert.equal(h.listeners.size, 1);
     h.changeSystem(true); const text = hint(), queued = [...h.listeners][0]; assert.match(text, /ativa pelo sistema/);
-    h.window.dispatchEvent(new Event('pagehide')); h.app.dispose(); assert.equal(h.listeners.size, 0);
+    h.window.dispatchEvent(new h.window.Event('pagehide')); h.app.dispose(); assert.equal(h.listeners.size, 0);
     const requests = h.frameRequests; h.app.loop(1000); assert.equal(h.frameRequests, requests);
     h.changeSystem(false); queued(new Event('change')); assert.equal(hint(), text);
     const next = h.create(); assert.equal(h.listeners.size, 1); const nextHint = h.options(next).hint;
@@ -180,7 +171,7 @@ test('reduced art keeps steam hazard cues on simulation time', t => {
     for (const fraction of [.2, .65, .9]) {
         h.app.sim.time = (steam.period ?? 4) * fraction - (steam.phase ?? 0);
         const before = structuredClone(h.app.sim);
-        h.app.canvas.calls.length = 0; h.app.renderGame();
+        h.calls(h.app.canvas).length = 0; h.app.renderGame();
         assert.equal(h.artDraw.mock.calls.at(-1)!.arguments[2], true);
         const cue = h.steamDraw.mock.calls.filter(call => call.arguments[1] === steam).at(-1)!;
         assert.equal(cue.arguments[2], steamPhase(h.app.sim.time, steam.period, steam.phase));
