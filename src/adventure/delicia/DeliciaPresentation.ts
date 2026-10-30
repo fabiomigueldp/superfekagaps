@@ -93,7 +93,8 @@ export class DeliciaPresentation {
             }
             const choices = menu.choices.map(choice => ({ ...choice, label: read(choice.label), ariaLabel: read(choice.ariaLabel) || read(choice.label) }));
             choices.forEach((choice, i) => workshopButton(c, choice.label, choice.x, choice.y, choice.width, choice.height, selected === i));
-            this.menus.sync(menu.id, `${menu.title}${text ? ': ' + text : ''}`, choices, selected, options.status);
+            const description = [text, detail].filter(Boolean).join('\n');
+            this.menus.sync(menu.id, `${menu.title}${description ? ': ' + description : ''}`, choices, selected, options.status);
         } else this.menus.clear({ restoreFocus: false });
 
         // Same position and typography as campaign feedback, never on top of a conversation or menu.
