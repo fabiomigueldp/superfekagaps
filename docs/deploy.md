@@ -1,4 +1,12 @@
-# Fast Oracle deployment
+# Fast Oracle deployment — World
+
+This workflow publishes the World experiences in Torbware's catalog, using
+`/home/ubuntu/torbware-world/`. It does not update the separate Remaster/Classic
+site directory, leaderboard API or SQLite database under
+`/home/ubuntu/super-feka-gaps-remaster`, and does not restart that service.
+See [Remaster/Classic hosting and leaderboard maintenance](scoreboard.md) for
+that separate deployment target. Do not substitute its rsync/restart sequence
+for this catalog publication workflow.
 
 ```sh
 npm run deploy
