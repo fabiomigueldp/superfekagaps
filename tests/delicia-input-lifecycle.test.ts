@@ -317,6 +317,23 @@ for (const index of [0, 1, 9]) test(`ordinary focused pause button ${index} reta
     assert.equal(h.app.screen, 'playing');
 });
 
+for (const index of [0, 1, 9]) test(`button ${index} already held when pause opens needs release before resuming`, t => {
+    const h = fixture(t); h.pad.buttons[index].pressed = true; h.app.pause();
+    const elapsed = h.app.sim.elapsed;
+    h.frame(); h.frame(); assert.equal(h.app.screen, 'pause'); neutral(h.app.input());
+    assert.equal(h.app.sim.elapsed, elapsed);
+    h.pad.buttons[index].pressed = false; h.frame(); assert.equal(h.app.screen, 'pause');
+    h.pad.buttons[index].pressed = true; h.frame(); assert.equal(h.app.screen, 'playing');
+});
+
+test('the controller gesture that opens pause cannot immediately close it', t => {
+    const h = fixture(t); h.pad.buttons[9].pressed = true; h.frame();
+    assert.equal(h.app.screen, 'pause'); h.frame(); h.frame(); assert.equal(h.app.screen, 'pause');
+    neutral(h.app.input());
+    h.pad.buttons[9].pressed = false; h.frame(); assert.equal(h.app.screen, 'pause');
+    h.pad.buttons[9].pressed = true; h.frame(); assert.equal(h.app.screen, 'playing');
+});
+
 test('disposed app stays inert through focus and connection events', t => {
     const h = fixture(t); h.focus(false); h.app.dispose(); const screen = h.app.screen;
     h.pad.buttons[9].pressed = true; h.focus(true); h.gamepadEvent('gamepadconnected'); h.frame();

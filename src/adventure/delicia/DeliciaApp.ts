@@ -276,7 +276,12 @@ export class DeliciaApp {
     }
     private resetInput():void{
         this.gamepad.reset();this.pointerOwners.clear();
-        this.held.clear();this.pressed.clear();this.released.clear();this.sources.clear();this.buttonKeys.clear();this.accumulator=0;}
+        this.held.clear();this.pressed.clear();this.released.clear();this.sources.clear();this.buttonKeys.clear();this.accumulator=0;
+        // Native menu focus/keyup also resets input. Observe carried buttons now,
+        // so a fresh press after this reset is accepted on the next frame.
+        if(this.screen==='pause'&&this.menu?.kind==='pause')
+            this.gamepad.menu(`delicia:${this.menu.id}:${this.listOpen}`);
+    }
     private setScreen(screen:Screen):void{
         this.saveImportCleanup?.();
         this.invalidatePausedPaint();
@@ -491,6 +496,8 @@ export class DeliciaApp {
         const actions=[()=>this.resume(),()=>this.showSettings(()=>this.pauseMenu()),()=>this.showMap()];
         this.nativeMenu({id:'paused',kind:'pause',title:'Pausa',text:`D-${this.sim?.stage.number} · ${this.sim?.stage.name}`,choices:
             WORLD_PAUSE_ACTIONS.map((box,i)=>({...box,label:['CONTINUAR','OPÇÕES','VOLTAR AO MAPA'][i],run:actions[i]}))});
+        // The pause menu identity exists only after nativeMenu has installed it.
+        this.resetInput();
     }
     private resume():void{if(this.screen!=='pause')return;this.setScreen('playing');this.panel.hidden=true;this.audio.pause(false);this.canvas.focus({preventScroll:true});}
     private showDeath():void {
