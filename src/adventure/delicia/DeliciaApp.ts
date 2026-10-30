@@ -508,7 +508,7 @@ export class DeliciaApp {
     }
     private retry():void{if(this.sim)this.loadStage(this.sim.stage.id,true);}
     private clearStage():void {
-        const sim=this.sim!;completeDeliciaStage(this.store.save,sim.stage.id,sim.elapsed,sim.recordEligible);const medals=awardDeliciaMedals(this.store.save,sim.stage.id,{eligible:sim.recordEligible,damage:sim.damageTaken,seals:sim.stage.pickups.filter(p=>p.kind==='seal'&&sim.collected.has(p.id)).length,seconds:sim.elapsed,parries:sim.parries});this.store.persist();this.audio.effect('victory');
+        const sim=this.sim!;completeDeliciaStage(this.store.save,sim.stage.id,sim.elapsed,sim.recordEligible,sim.assists);const medals=awardDeliciaMedals(this.store.save,sim.stage.id,{eligible:sim.recordEligible,damage:sim.damageTaken,seals:sim.stage.pickups.filter(p=>p.kind==='seal'&&sim.collected.has(p.id)).length,seconds:sim.elapsed,parries:sim.parries},sim.assists);this.store.persist();this.audio.effect('victory');
         const finish=()=>{
             this.setScreen('clear');
             const seals=sim.stage.pickups.filter(p=>p.kind==='seal'&&sim.collected.has(p.id)).length;

@@ -9,8 +9,9 @@ export interface DeliciaSave {
 }
 export const freshDeliciaSave = (): DeliciaSave => ({version:1,completed:[],collected:[],lore:['carta'],selected:'delicia-1',times:{},checkpoint:null,music:.45,effects:.7,reducedMotion:false,assists:false,medals:{}});
 export const DELICIA_MEDALS={clean:'Travessia sem dano',seals:'Os três selos',tempo:'Ritmo cítrico',parry:'Mestre da rebatida'} as const;
-export function awardDeliciaMedals(save:DeliciaSave,id:string,run:{eligible:boolean;damage:number;seals:number;seconds:number;parries:number}):string[]{
-    if(!valid(id)||!run.eligible||save.assists)return[];
+// Runtime callers supply the attempt's fixed assistance; the saved preference is for the next attempt.
+export function awardDeliciaMedals(save:DeliciaSave,id:string,run:{eligible:boolean;damage:number;seals:number;seconds:number;parries:number},attemptAssists=save.assists):string[]{
+    if(!valid(id)||!run.eligible||attemptAssists)return[];
     const stage=ALL_DELICIA_STAGES.find(s=>s.id===id)!,earned:string[]=[];
     if(run.damage===0)earned.push('clean');if(!stage.boss&&run.seals===3)earned.push('seals');
     if(stage.parTime&&run.seconds<=stage.parTime)earned.push('tempo');if(stage.boss&&run.parries>=3)earned.push('parry');
@@ -36,10 +37,10 @@ export function deliciaUnlocked(id:string, save:DeliciaSave):boolean {
     if(i>=0) return i===0||save.completed.includes(DELICIA_STAGES[i-1].id)||save.completed.includes(id);
     return id==='delicia-raizes'?save.completed.includes('delicia-3'):id==='delicia-relogio'?save.completed.includes('delicia-9'):false;
 }
-export function completeDeliciaStage(save:DeliciaSave,id:string,seconds:number,recordEligible=true):void {
+export function completeDeliciaStage(save:DeliciaSave,id:string,seconds:number,recordEligible=true,attemptAssists=save.assists):void {
     if(!valid(id)||!deliciaUnlocked(id,save)) throw new Error('Fase da Delícia indisponível.');
     if(!save.completed.includes(id)) save.completed.push(id);
-    if(Number.isFinite(seconds)&&seconds>0&&!save.assists&&recordEligible) save.times[id]=Math.min(save.times[id]??Infinity,seconds);
+    if(Number.isFinite(seconds)&&seconds>0&&!attemptAssists&&recordEligible) save.times[id]=Math.min(save.times[id]??Infinity,seconds);
     const index=DELICIA_STAGES.findIndex(s=>s.id===id);
     // Optional shrines return to their own stop; only main stages advance.
     save.selected=index<0?id:DELICIA_STAGES[Math.min(DELICIA_STAGES.length-1,index+1)]?.id??id;
