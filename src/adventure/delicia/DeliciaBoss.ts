@@ -62,8 +62,13 @@ export class DeliciaBoss {
     update(dt:number,player:Box):void {
         this.events=[];this.time+=dt;this.beatTime+=dt;this.hitFlash=Math.max(0,this.hitFlash-dt);this.hitCooldown=Math.max(0,this.hitCooldown-dt);this.relief=Math.max(0,this.relief-dt);
         this.gaps=this.gaps.filter(g=>{g.life-=dt;return g.life>0;});
-        for(const m of this.missiles){m.life-=dt;m.x+=m.vx*dt;m.y+=m.vy*dt;m.vy+=m.gravity*dt;if(m.friendly&&intersects(m,this.rect)){
-            if(!this.hit(1,m)){this.pressure=Math.max(0,this.pressure-30);if(this.pressure<25){this.shield=false;this.relief=4;if(this.beat==='recover'){this.beat='stagger';this.timer=1.1;}}}m.life=0;}}
+        // A phase change or defeat clears this queue during hit().
+        for(let index=0;index<this.missiles.length;index++){
+            const m=this.missiles[index];m.life-=dt;m.x+=m.vx*dt;m.y+=m.vy*dt;m.vy+=m.gravity*dt;
+            if(m.life>0&&m.friendly&&intersects(m,this.rect)){
+                if(!this.hit(1,m)){this.pressure=Math.max(0,this.pressure-30);if(this.pressure<25){this.shield=false;this.relief=4;if(this.beat==='recover'){this.beat='stagger';this.timer=1.1;}}}m.life=0;
+            }
+        }
         this.missiles=this.missiles.filter(m=>m.life>0&&m.y<700&&m.x>-100&&m.x<1440);
         if(this.beat==='intro'||this.beat==='defeated')return;
         this.timer-=dt;this.danger=[];
