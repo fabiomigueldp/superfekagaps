@@ -10,6 +10,7 @@ import { ProgressStore } from '../src/adventure/progress';
 import type { DeliciaAppOptions } from '../src/adventure/delicia/DeliciaApp';
 import { createMediaQueryHarness } from './helpers/mediaQueryHarness';
 import { createClassList } from './helpers/classListHarness';
+import { createDocumentRoots } from './helpers/documentRootsHarness';
 
 /** DOM/event boundaries only. Constructor, registered handlers, loop and simulation are real. */
 function fixture(t: TestContext, initiallyFocused = true) {
@@ -51,8 +52,9 @@ function fixture(t: TestContext, initiallyFocused = true) {
         setPointerCapture() { if (this.captureFails) throw new DOMException('Capture unavailable'); }
     }
     const mediaQueries = createMediaQueryHarness();
-    const body = new Element('body'), window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1, matchMedia: mediaQueries.matchMedia });
-    const document = Object.assign(new EventTarget(), { body, hidden: false, title: '',
+    const roots = createDocumentRoots(tag => new Element(tag)), { body } = roots;
+    const window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1, matchMedia: mediaQueries.matchMedia });
+    const document = Object.assign(new EventTarget(), roots, { hidden: false, title: '',
         hasFocus: () => focused, getElementById: () => null, createElement: (tag: string) => new Element(tag) });
 
     Object.defineProperty(document, 'activeElement', { get: () => activeElement });

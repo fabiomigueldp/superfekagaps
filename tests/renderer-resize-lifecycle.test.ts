@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test, { type TestContext } from 'node:test';
 import type { Renderer } from '../src/engine/Renderer';
 import { sceneLifecycleBrowser } from './helpers/sceneLifecycleHarness';
+import { createDocumentRoots } from './helpers/documentRootsHarness';
 
 async function fixture(t: TestContext) {
     const renderers: Renderer[] = [];
@@ -19,6 +20,26 @@ async function fixture(t: TestContext) {
 function dimensions(h: Awaited<ReturnType<typeof fixture>>) {
     return [h.canvas.style.width, h.canvas.style.height, h.canvas.width, h.canvas.height];
 }
+
+test('document roots use distinct html/body nodes with independent datasets and fullscreen state', () => {
+    // The same small element boundary used by the Delicia input/import fixtures.
+    class Element {
+        dataset: Record<string, string> = {}; children: Element[] = []; parent: Element | null = null;
+        constructor(readonly tagName: string) {}
+        append(...children: Element[]) { for (const child of children) { child.parent = this; this.children.push(child); } }
+    }
+    const first = createDocumentRoots(tag => new Element(tag)), second = createDocumentRoots(tag => new Element(tag));
+    assert.equal(first.documentElement.tagName, 'html'); assert.equal(first.body.tagName, 'body');
+    assert.notEqual(first.documentElement, first.body);
+    assert.equal(first.body.parent, first.documentElement); assert.deepEqual(first.documentElement.children, [first.body]);
+    assert.equal(first.documentElement.parent, null); assert.equal(first.fullscreenElement, null);
+    assert.deepEqual(first.documentElement.dataset, {});
+    first.documentElement.dataset.embeddedFullscreen = 'true'; first.fullscreenElement = first.body;
+    assert.equal(first.body.dataset.embeddedFullscreen, undefined);
+    assert.equal(second.documentElement.dataset.embeddedFullscreen, undefined); assert.equal(second.fullscreenElement, null);
+    delete first.documentElement.dataset.embeddedFullscreen;
+    assert.equal(first.documentElement.dataset.embeddedFullscreen, undefined);
+});
 
 test('normal renderer mounts and resizes at integer scale, high DPI and below native size', async t => {
     const h = await fixture(t); h.mount();
@@ -63,4 +84,24 @@ test('renderer disposal removes its resize listener and ignores a previously cap
     else listener.callback.handleEvent(new Event('resize'));
     assert.deepEqual(dimensions(h), before);
     assert.equal(h.frames.size, 0);
+});
+
+test('renderer reads only the live html fullscreen flag and native state on resize', async t => {
+    const h = await fixture(t); Object.assign(h.window, { innerWidth: 1000, innerHeight: 700 }); h.mount();
+    const normal = ['960px', '540px', 960, 540], fullscreen = ['1000px', '562.5px', 960, 540];
+    assert.equal(h.body.parentElement, h.document.documentElement);
+    h.body.dataset.embeddedFullscreen = 'true';
+    h.window.dispatch('resize'); assert.deepEqual(dimensions(h), normal, 'the body flag is not the document flag');
+    for (const value of ['', 'false', 'TRUE', '1']) {
+        h.document.documentElement.dataset.embeddedFullscreen = value;
+        h.window.dispatch('resize'); assert.deepEqual(dimensions(h), normal);
+    }
+    h.document.documentElement.dataset.embeddedFullscreen = 'true';
+    h.window.dispatch('resize'); assert.deepEqual(dimensions(h), fullscreen);
+    delete h.document.documentElement.dataset.embeddedFullscreen;
+    h.window.dispatch('resize'); assert.deepEqual(dimensions(h), normal);
+    h.document.fullscreenElement = h.canvas;
+    h.window.dispatch('resize'); assert.deepEqual(dimensions(h), fullscreen);
+    h.document.fullscreenElement = null;
+    h.window.dispatch('resize'); assert.deepEqual(dimensions(h), normal);
 });

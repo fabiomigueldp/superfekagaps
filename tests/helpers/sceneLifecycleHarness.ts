@@ -3,6 +3,7 @@ import type { TestContext } from 'node:test';
 import type { WorldGame } from '../../src/adventure/WorldGame';
 import { createMediaQueryHarness } from './mediaQueryHarness';
 import { createClassList } from './classListHarness';
+import { createDocumentRoots } from './documentRootsHarness';
 
 /** Native EventTarget dispatch/removal; only browser/device boundaries are instrumented. */
 class Surface extends EventTarget {
@@ -137,8 +138,8 @@ export function sceneLifecycleBrowser(t: Pick<TestContext, 'after'>) {
     const makeElement = (tag: string) => { const element = new LifecycleElement(tag.toUpperCase()); surfaces.push(element); return element; };
     const createTextNode = (data: string) => { const text = new LifecycleText(data); surfaces.push(text); return text; };
     const canvas = makeElement('canvas'); canvas.id = 'game-canvas';
-    const status = makeElement('p'), body = makeElement('body'), documentElement = makeElement('html');
-    documentElement.append(body); body.append(canvas, status);
+    const status = makeElement('p'), roots = createDocumentRoots(makeElement), { body, documentElement } = roots;
+    body.append(canvas, status);
     const frames = new Map<number, FrameRequestCallback>(); let frameId = 0;
     const requestAnimationFrame = (callback: FrameRequestCallback) => { frames.set(++frameId, callback); return frameId; };
     const cancelAnimationFrame = (id: number) => { frames.delete(id); };
@@ -155,8 +156,7 @@ export function sceneLifecycleBrowser(t: Pick<TestContext, 'after'>) {
         };
         return find(documentElement);
     };
-    const document = Object.assign(new Surface(), { hidden: false, title: '', body, documentElement,
-        fullscreenElement: null as LifecycleElement | null, activeElement: null,
+    const document = Object.assign(new Surface(), roots, { hidden: false, title: '', activeElement: null,
         getElementById: (id: string) => id === 'game-canvas' ? canvas : null,
         createElement: makeElement, createElementNS: (_namespace: string, tag: string) => makeElement(tag), createTextNode, querySelector });
     const window = Object.assign(new Surface(), { innerWidth: 640, innerHeight: 440, devicePixelRatio: 1,

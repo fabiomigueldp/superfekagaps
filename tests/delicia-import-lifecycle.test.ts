@@ -9,6 +9,7 @@ import { freshSave } from '../src/adventure/progress';
 import { DeliciaStore, DELICIA_SAVE_KEY, freshDeliciaSave, parseDeliciaSave } from '../src/adventure/delicia/DeliciaProgress';
 import { createMediaQueryHarness } from './helpers/mediaQueryHarness';
 import { createClassList } from './helpers/classListHarness';
+import { createDocumentRoots } from './helpers/documentRootsHarness';
 
 /** Native Node EventTarget plus a minimal DOM boundary; real constructor, menus, import and store. */
 function fixture(t: TestContext) {
@@ -51,8 +52,9 @@ function fixture(t: TestContext) {
         setPointerCapture() { if (this.captureFails) throw new DOMException('Capture unavailable'); }
     }
     const mediaQueries = createMediaQueryHarness();
-    const body = new Element('body'), window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1, matchMedia: mediaQueries.matchMedia });
-    const document = Object.assign(new EventTarget(), { body, hidden: false, title: '',
+    const roots = createDocumentRoots(tag => new Element(tag)), { body } = roots;
+    const window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1, matchMedia: mediaQueries.matchMedia });
+    const document = Object.assign(new EventTarget(), roots, { hidden: false, title: '',
         getElementById: () => null, createElement: (tag: string) => new Element(tag), createElementNS: (_namespace: string, tag: string) => new Element(tag) });
     Object.defineProperty(document, 'activeElement', { get: () => activeElement });
     let raw = JSON.stringify(freshDeliciaSave()), storageFails = false; const writes: string[] = [];
