@@ -1,42 +1,29 @@
 import assert from 'node:assert/strict';
 import test, { type TestContext } from 'node:test';
-import { createRequire } from 'node:module';
 import { textWidth, wrapText } from '../src/graphics/BitmapFont';
 import { DELICIA_STAGES } from '../src/adventure/delicia/DeliciaContent';
 import { DELICIA_SAVE_KEY, DeliciaStore, freshDeliciaSave, parseDeliciaSave } from '../src/adventure/delicia/DeliciaProgress';
 import { DeliciaSimulation, noDeliciaInput, type DeliciaInput } from '../src/adventure/delicia/DeliciaSimulation';
+import { createDeliciaDom } from './helpers/deliciaDomHarness';
+import { loadDeliciaApp } from './helpers/deliciaAppLoader';
 
-/** Only the DOM/audio boundary is fake; app event handling and persistence are real. */
-class Element extends EventTarget {
-    className = ''; dataset = {}; hidden = false; disabled = false; private text = '';
-    children: Element[] = []; parent: Element | null = null; attributes = new Map<string, string>();
-    constructor(readonly tagName: string) { super(); }
-    get textContent(): string { return this.text + this.children.map(child => child.textContent).join(''); }
-    set textContent(value: string) { this.text = value; this.replaceChildren(); }
-    get classList() { return { add: (name: string) => { this.className += ' ' + name; } }; }
-    append(...children: Element[]) { for (const child of children) { child.parent = this; this.children.push(child); } }
-    replaceChildren(...children: Element[]) { this.children.forEach(child => child.parent = null); this.children = []; this.append(...children); }
-    remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); this.parent = null; }
-    setAttribute(name: string, value: string) { this.attributes.set(name, value); }
-    removeAttribute(name: string) { this.attributes.delete(name); }
-    getContext() { return null; }
-    querySelector() { return this.all().find(node => node.tagName === 'button') ?? null; }
-    focus() {}
-    click() { this.dispatchEvent(new Event('click')); }
-    all(): Element[] { return this.children.flatMap(child => [child, ...child.all()]); }
-}
+/** Private app probes for the real constructor/event paths; only browser/device/storage boundaries are controlled. */
 interface App {
     store: DeliciaStore; sim: DeliciaSimulation; toast: string; toastTime: number; screen: string;
-    panel: Element; status: Element; settingsMessage?: Element; menu: { id: string; choices: { label: string; run(): void }[] };
+    panel: HTMLElement; status: HTMLElement; settingsMessage?: HTMLElement; menu: { id: string; choices: { label: string; run(): void }[] };
     step(dt: number, input: DeliciaInput): void; loadStage(id: string, retry?: boolean): boolean;
     clearStage(): void; pause(): void; showEnding(): void; showSettings(): void;
-    dialogueDone(): void;
+    dialogueDone(): void; dispose(): void; invalidatePausedPaint(): void; readonly reducedMotion: boolean;
 }
 function fixture(t: TestContext, mode: 'QuotaExceededError' | 'SecurityError' | 'read' | 'ok' = 'ok') {
-    const require = createRequire(import.meta.url), css = require.extensions['.css'];
-    require.extensions['.css'] = () => {};
-    t.after(() => { if (css) require.extensions['.css'] = css; else delete require.extensions['.css']; });
-    const { DeliciaApp } = require('../src/adventure/delicia/DeliciaApp.ts') as typeof import('../src/adventure/delicia/DeliciaApp');
+    const dom = createDeliciaDom(), frames = new Map<number, FrameRequestCallback>(); let frameId = 0, closed = false;
+    const cleanups: (() => void)[] = [];
+    const close = async () => {
+        if (closed) return; closed = true;
+        try { cleanups.forEach(cleanup => cleanup()); }
+        finally { await dom.dispose(); }
+    };
+    t.after(close);
     const original = JSON.stringify(freshDeliciaSave()); let raw = original, failure = mode, writes = 0;
     const storage = {
         getItem: () => { if (failure === 'read') throw new DOMException('Blocked', 'SecurityError'); return raw; },
@@ -46,35 +33,55 @@ function fixture(t: TestContext, mode: 'QuotaExceededError' | 'SecurityError' | 
             raw = value; writes++;
         }
     };
-    const before = Object.getOwnPropertyDescriptor(globalThis, 'document');
-    Object.defineProperty(globalThis, 'document', { configurable: true, value: {
-        createElement: (tag: string) => new Element(tag), activeElement: null
-    } });
-    t.after(() => before ? Object.defineProperty(globalThis, 'document', before) : Reflect.deleteProperty(globalThis, 'document'));
-    const app = Object.assign(Object.create(DeliciaApp.prototype), {
-        store: new DeliciaStore(storage), sim: new DeliciaSimulation(), screen: 'playing', options: {}, menuEpoch: 0,
-        presentation: { hide() {}, draw() {}, menus: { requestFocusFromCanvas() {} } },
-        root: new Element('main'), panel: new Element('section'), status: new Element('p'),
-        hud: new Element('div'), canvas: new Element('canvas'), playfield: new Element('div'), touch: new Element('div'),
-        held: new Set(), pressed: new Set(), released: new Set(), sources: new Map(), buttonKeys: new Map(),
-        audio: { effect() {}, pause() {}, unlock: async () => {}, music() {}, voice() {}, muted: false },
-        // HUD painting is independent of save feedback; actual notify/announce/menu rendering execute.
-        updateHud() {}
-    }) as App;
+    // TouchMode and other window-owned modules evaluate only after the shared DOM/media API exists.
+    // Preferences use a separate storage boundary from the failing campaign store under test.
+    dom.install({ navigator: { maxTouchPoints: 0, getGamepads: () => [] }, localStorage: dom.window.localStorage,
+        requestAnimationFrame: (callback: FrameRequestCallback) => { frames.set(++frameId, callback); return frameId; },
+        cancelAnimationFrame: (id: number) => { frames.delete(id); }, AudioContext: undefined,
+        fetch: async () => ({ ok: false }) });
+    const loaded = loadDeliciaApp(); cleanups.push(loaded.dispose);
+    const { DeliciaArt } = loaded.require('./DeliciaArt') as typeof import('../src/adventure/delicia/DeliciaArt');
+    t.mock.method(DeliciaArt.prototype, 'load', async () => {});
+    const app = new loaded.DeliciaApp(undefined, { store: new DeliciaStore(storage, false) }) as unknown as App;
+    cleanups.unshift(() => app.dispose());
+    assert.equal(app.loadStage('delicia-1', true), true);
     const button = (name: string) => {
-        // Persistence runs unchanged; only the canvas/accessibility painting boundary is fake.
+        // Use the same native recovery callbacks as the visible menu.
         const review = app.menu.choices.find(choice => choice.label === 'REVER PROGRESSO');
         if (review) review.run();
         const label = name === 'Exportar cópia' ? 'EXPORTAR' : name.toUpperCase();
         const choice = app.menu.choices.find(choice => choice.label === label);
         assert.ok(choice, `Missing ${name} action`); return { click: () => choice.run() };
     };
-    return { app, button, storage, original, get raw() { return raw; }, get writes() { return writes; },
+    return { app, button, storage, original, dom, frames, close, get raw() { return raw; }, get writes() { return writes; },
         recover() { failure = 'ok'; }, warning: () => app.store.warning &&
             (app.menu.id.startsWith('recovery') || app.menu.choices.some(choice => choice.label === 'REVER PROGRESSO'))
             ? { textContent: app.store.warning } : undefined };
 
 }
+
+test('save feedback fixtures install live media queries before imports and release each visit', async t => {
+    const globals = ['window', 'document', 'matchMedia', 'Event'] as const;
+    const before = globals.map(name => Object.getOwnPropertyDescriptor(globalThis, name));
+    const motion = '(prefers-reduced-motion: reduce)', pointer = '(pointer: coarse)';
+    for (let visit = 0; visit < 2; visit++) {
+        const h = fixture(t), list = matchMedia(motion);
+        assert.equal(list.media, motion); assert.equal(list.matches, false);
+        assert.equal(h.app.reducedMotion, false); assert.ok(h.dom.mediaQueries.listenerCount() > 0);
+        const invalidate = t.mock.method(h.app, 'invalidatePausedPaint');
+        h.dom.mediaQueries.set(motion, true);
+        assert.equal(list.matches, true); assert.equal(h.app.reducedMotion, true);
+        assert.equal(invalidate.mock.callCount(), 1);
+        h.dom.mediaQueries.set(motion, true); assert.equal(invalidate.mock.callCount(), 1);
+        assert.equal(matchMedia(pointer).matches, false);
+        h.app.dispose();
+        assert.equal(h.dom.mediaQueries.listenerCount(), 0); assert.equal(h.frames.size, 0);
+        const calls = invalidate.mock.callCount(); h.dom.mediaQueries.set(motion, false);
+        assert.equal(invalidate.mock.callCount(), calls, 'Disposed app receives no stale media callbacks.');
+        await h.close();
+        assert.deepEqual(globals.map(name => Object.getOwnPropertyDescriptor(globalThis, name)), before);
+    }
+});
 function reachCheckpoint(app: App, index = 0) {
     const cp = app.sim.stage.checkpoints[index];
     Object.assign(app.sim.player, { x: cp.x, y: cp.y, vx: 0, vy: 0 });
