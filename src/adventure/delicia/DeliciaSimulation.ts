@@ -211,9 +211,10 @@ export class DeliciaSimulation {
     private hitEnemy(e:DeliciaEnemy,power:number):void {e.hp-=power;e.flash=.16;this.burst(e.x,e.y,'#ffa84a',15);this.emit('enemy',e.x,e.y);e.state=e.hp<=0?'dead':'stun';if(e.state==='dead')this.enemiesDefeated++;e.timer=1.2;}
     private updateProjectiles(dt:number):void {
         for(const m of this.projectiles){m.life-=dt;m.x+=m.vx*dt;m.y+=m.vy*dt;m.vy+=m.gravity*dt;
+            if(m.life<=0)continue;
             if(m.friendly){
                 for(const e of this.enemies)if(e.state!=='dead'&&intersects(m,e)){if(e.kind!=='sentinel'||e.state==='stun')this.hitEnemy(e,1);else{e.state='stun';e.timer=1;}m.life=0;break;}
-                if(this.boss&&intersects(m,this.boss.rect)){this.boss.hit(1,m);m.life=0;}
+                if(m.life>0&&this.boss&&intersects(m,this.boss.rect)){this.boss.hit(1,m);m.life=0;}
             }else this.missileContact(m);
             if(this.dead)return;
         }
