@@ -5,7 +5,7 @@ import { hypotheticalStage } from '../src/adventure/hipotetico/HypotheticalStage
 import { siegeGarrison, SIEGE_SECTORS } from '../src/adventure/hipotetico/HypotheticalSiege';
 import { WorldLevel, WorldObjects } from '../src/adventure/WorldPhysics';
 import { HypotheticalModel } from '../src/adventure/hipotetico/HypotheticalModel';
-import { SCENIC_STARTS, nextScenicTick } from '../src/adventure/hipotetico/HypotheticalDevastation';
+import { SCENIC_STARTS, DEVASTATION, nextScenicTick } from '../src/adventure/hipotetico/HypotheticalDevastation';
 import { forecourtPeople } from '../src/adventure/hipotetico/HypotheticalForecourt';
 import { vanguardFoot } from '../src/adventure/hipotetico/HypotheticalVanguardArt';
 import type { Rect } from '../src/types';
@@ -78,7 +78,7 @@ test('the elite remains in its arena and fixed-step movement is independent of u
 test('later destruction waits for both the cleared gate and a visible local stage, however long the player waits',()=>{
     const p={x:360,y:200,width:14,height:24},m=new HypotheticalModel('siege');
     for(let i=0;i<3600;i++)m.update(dt,p,2);
-    assert.equal(m.backdrop.tick,799);assert.equal(m.destroyed,2);
+    assert.equal(m.backdrop.tick,SCENIC_STARTS[1]-1);assert.equal(m.destroyed,2);
     assert.ok(m.backdrop.people.filter(p=>p.district>0).every(p=>p.hitAt===null));
     for(let d=1;d<4;d++){
         const start=SCENIC_STARTS[d],watch=SIEGE_SECTORS[d].origin+96;
@@ -97,12 +97,12 @@ test('a faster crossing starts the visible street without silently destroying an
     for(let i=0;i<70;i++)m.update(dt,p,1);
     assert.equal(m.backdrop.breaches[2],-1);
     m.route.cleared=2;m.update(dt,{...p,x:1184},1);
-    assert.equal(m.backdrop.tick,1200);assert.equal(m.backdrop.breaches[2],-1);
+    assert.equal(m.backdrop.tick,SCENIC_STARTS[2]);assert.equal(m.backdrop.breaches[2],-1);
     assert.deepEqual(m.backdrop.events,[]);
     const resumed=new HypotheticalModel('siege',9,2,0,true,m.backdrop);
     assert.equal(resumed.backdrop.breaches[2],-1,'retry preserves what happened, not fabricated ruins');
     for(let i=0;i<190;i++)resumed.update(dt,{...p,x:1300},1);
-    assert.equal(resumed.backdrop.breaches[2],-1);assert.equal(resumed.backdrop.breaches[3],1380);
+    assert.equal(resumed.backdrop.breaches[2],-1);assert.equal(resumed.backdrop.breaches[3],SCENIC_STARTS[2]+DEVASTATION.impact);
 });
 test('an early stomp bounces off the visible brow guard without removing health',()=>{
     const {e,step}=setup();while(e.phase!=='warning')step();
