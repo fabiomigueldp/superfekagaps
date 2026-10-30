@@ -171,16 +171,22 @@ test('canceling a sole button jump discards its pending press, while an ordinary
 });
 
 test('unidentified physical codes keep distinct valid keyboard actions and releases', t => {
-    const h = fixture(t);
+    const h = fixture(t), sim = h.app.sim, save = JSON.stringify(h.app.store.save), x = sim.player.x;
     h.key('keydown', 'ArrowRight', h.app.canvas, false, 'Unidentified');
     h.key('keydown', 'w', h.app.canvas, false, 'Unidentified');
+    assert.equal(h.app.input().right, false, 'Movement is sampled by the next frame.');
+    assert.equal(h.app.input().jump, true); assert.equal(h.app.input().jumpPressed, true);
+    assert.equal(sim.player.x, x); h.frame();
     assert.equal(h.app.input().right, true); assert.equal(h.app.input().jump, true);
+    assert.ok(sim.player.x > x); assert.equal(h.app.input().jumpPressed, false);
     h.key('keyup', 'ArrowRight', h.app.canvas, false, 'Unidentified');
+    assert.equal(h.app.input().right, true, 'The previous sample lasts until the next frame.'); h.frame();
     assert.equal(h.app.input().right, false); assert.equal(h.app.input().jump, true);
     assert.equal(h.app.input().jumpReleased, false);
     h.key('keyup', 'w', h.app.canvas, false, 'Unidentified');
     assert.equal(h.app.input().jump, false); assert.equal(h.app.input().jumpReleased, true);
     h.frame(); neutral(h.app.input());
+    assert.equal(h.app.sim, sim); assert.equal(JSON.stringify(h.app.store.save), save);
 });
 
 test('window keyup releases the translated button owner even without a focus event', t => {
@@ -191,15 +197,20 @@ test('window keyup releases the translated button owner even without a focus eve
 });
 
 test('focus cancellation and one pointer release preserve the remaining keyboard and pointer owners', t => {
-    const h = fixture(t), right = h.button('arrowright');
-    h.key('keydown', 'ArrowRight', h.app.canvas); h.pointer('pointerdown', right, 1); h.pointer('pointerdown', right, 2);
+    const h = fixture(t), right = h.button('arrowright'), sim = h.app.sim, save = JSON.stringify(h.app.store.save);
+    h.key('keydown', 'ArrowRight', h.app.canvas); h.frame(); assert.equal(h.app.input().right, true);
+    h.pointer('pointerdown', right, 1); h.pointer('pointerdown', right, 2);
     right.focus(); h.key('keydown', 'Enter'); h.app.canvas.focus();
     h.key('keyup', 'Enter'); assert.equal(h.app.input().right, true);
     h.pointer('pointerup', right, 1); assert.equal(h.app.input().right, true);
-    h.key('keyup', 'ArrowRight'); assert.equal(h.app.input().right, true);
+    h.key('keyup', 'ArrowRight'); h.frame(); assert.equal(h.app.input().right, true);
     h.pointer('pointercancel', right, 2); assert.equal(h.app.input().right, false);
     h.key('keydown', 'd'); h.pointer('pointerdown', right); h.pointer('lostpointercapture', right);
-    assert.equal(h.app.input().right, true); h.key('keyup', 'd'); assert.equal(h.app.input().right, false);
+    assert.equal(h.app.input().right, false, 'The fresh keyboard owner has not been sampled yet.'); h.frame();
+    assert.equal(h.app.input().right, true);
+    h.pointer('lostpointercapture', right); assert.equal(h.app.input().right, true, 'A late pointer release cannot cancel the sampled keyboard owner.');
+    h.key('keyup', 'd'); h.frame(); assert.equal(h.app.input().right, false);
+    assert.equal(h.app.sim, sim); assert.equal(JSON.stringify(h.app.store.save), save);
 });
 
 for (const [key, code, action] of [['a', 'KeyA', 'left'], ['d', 'KeyD', 'right'], ['Shift', 'ShiftLeft', 'run']] as const)
