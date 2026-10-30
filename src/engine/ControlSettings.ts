@@ -114,6 +114,7 @@ export class ControlSettings {
         const pad = this.pad();
         this.capturePad = pad ? { index: pad.index, id: pad.id, axes: [...pad.axes], buttons: pad.buttons.map(b => b.pressed || b.value > .35) } : null;
         this.binding.textContent = 'Cancelar';
+        this.binding.setAttribute('aria-label', `Cancelar alteração de ${CONTROL_LABELS[this.action.value as ControlAction]}`);
         this.status.textContent = pad ? 'Solte os controles; depois mova um eixo ou aperte um botão. Menu + View cancela.' : 'Aperte uma tecla. Esc cancela.';
         let released = !pad;
         const poll = () => {
