@@ -31,6 +31,7 @@ function fixture(t: TestContext, initiallyFocused = true) {
     // Ownership scenarios begin with an already selected, neutral controller.
     // Device selection has its own baseline; a first held button must not stand in for a fresh press.
     const { selectGamepad } = require('../../engine/GamepadDevice') as typeof import('../src/engine/GamepadDevice');
+    const { heldKeyboardMovement } = require('../../engine/KeyboardMovement') as typeof import('../src/engine/KeyboardMovement');
     selectGamepad(pad);
     const { DeliciaArt } = require('./DeliciaArt') as typeof import('../src/adventure/delicia/DeliciaArt');
     t.mock.method(DeliciaArt.prototype, 'load', async () => {});
@@ -67,29 +68,52 @@ function fixture(t: TestContext, initiallyFocused = true) {
         app.dispose();
         const store = new DeliciaStore(null), progress = new ProgressStore(null);
         if (completed) store.save.completed.push('delicia-1');
+        type ActivityOwner = 'entry' | 'loading-gamepad' | 'chapter';
+        let activityOwner: ActivityOwner = 'entry', visit = 0;
+        const withOwner = <T>(owner: ActivityOwner, run: () => T): T => {
+            const previous = activityOwner; activityOwner = owner;
+            try { return run(); } finally { activityOwner = previous; }
+        };
         let mounted: App | undefined;
         class ObservedApp extends DeliciaApp {
             constructor(...args: ConstructorParameters<typeof DeliciaApp>) {
-                super(...args); mounted = this as unknown as App; apps.push(mounted);
+                const previous = activityOwner; activityOwner = 'chapter';
+                try { super(...args); } finally { activityOwner = previous; }
+                mounted = this as unknown as App; apps.push(mounted);
             }
         }
         let release!: () => void, reject!: (error: Error) => void;
         const gate = new Promise<void>((resolve, fail) => { release = resolve; reject = fail; });
         let importing!: () => void;
         const importStarted = new Promise<void>(resolve => { importing = resolve; });
-        const tracked = new Map<EventTarget, Set<TEventListener>>();
-        for (const target of [window, document]) {
-            const listeners = new Set<TEventListener>(); tracked.set(target, listeners);
+        // Preserve the DOM's identity tuple, not just a count of callbacks.
+        // Module-owned listeners predate this tracker; every new entry/scene must release its own.
+        const callbackIds = new WeakMap<TEventListener, number>(); let nextId = 0;
+        type Activity = { key: string; owner: ActivityOwner; visit: number };
+        const tracked = new Map<string, Activity>(), registered: Activity[] = [];
+        for (const [name, target] of [['window', window], ['document', document]] as const) {
             const add = target.addEventListener.bind(target), remove = target.removeEventListener.bind(target);
+            const identity = (type: string, listener: TEventListener, options?: boolean | { capture?: boolean }) => {
+                if (!callbackIds.has(listener)) callbackIds.set(listener, ++nextId);
+                const capture = typeof options === 'boolean' ? options : options?.capture ?? false;
+                return `${name}:${type}:${capture}:${callbackIds.get(listener)}`;
+            };
             t.mock.method(target, 'addEventListener', (...args: Parameters<typeof add>) => {
-                const [type, listener] = args;
-                if (listener && (type === 'blur' || type === 'visibilitychange')) listeners.add(listener);
                 add(...args);
+                const [type, listener, options] = args;
+                if (listener && (type === 'blur' || type === 'visibilitychange')) {
+                    const key = identity(type, listener, options);
+                    if (!tracked.has(key)) {
+                        const entry = { key, owner: activityOwner, visit };
+                        tracked.set(key, entry); registered.push(entry);
+                    }
+                }
             });
-            t.mock.method(target, 'removeEventListener', (...args: Parameters<typeof remove>) => {
-                const [type, listener] = args;
-                if (listener && (type === 'blur' || type === 'visibilitychange')) listeners.delete(listener);
-                remove(...args);
+            // Happy DOM declares two arguments; callers still pass the DOM capture argument.
+            t.mock.method(target, 'removeEventListener', (...args: [string, TEventListener, (boolean | { capture?: boolean })?]) => {
+                Reflect.apply(remove, target, args);
+                const [type, listener, options] = args;
+                if (listener && (type === 'blur' || type === 'visibilitychange')) tracked.delete(identity(type, listener, options));
             });
         }
         function compile(source: string, path: URL, load: (name: string) => unknown) {
@@ -111,7 +135,11 @@ function fixture(t: TestContext, initiallyFocused = true) {
         const ownerType = compile(`import { installDomGamepad } from '../engine/DomGamepadMenu';
             export class NativeOwner { ${method.getText(source)} }`, ownerUrl,
             name => {
-                if (name === '../engine/DomGamepadMenu') return require('../../engine/DomGamepadMenu');
+                if (name === '../engine/DomGamepadMenu') {
+                    const { installDomGamepad } = require('../../engine/DomGamepadMenu') as typeof import('../src/engine/DomGamepadMenu');
+                    return { installDomGamepad: (...args: Parameters<typeof installDomGamepad>) =>
+                        withOwner('loading-gamepad', () => installDomGamepad(...args)) };
+                }
                 if (delay === 'outer') { importing(); return gate.then(() => host); } return host;
             }).NativeOwner;
         const mapRoot = document.createElement('section'), mapCanvas = document.createElement('canvas'); body.append(mapRoot, mapCanvas);
@@ -122,14 +150,21 @@ function fixture(t: TestContext, initiallyFocused = true) {
             mapView: { root: mapRoot, deliciaStore: store, openChapter() { returned++; }, hud: { focusEnter() {} } },
         });
         Object.defineProperty(owner, 'isDisposed', { get: () => disposed });
-        const pending: Promise<void> = owner.mountChapter('delicia', 'delicia-1');
+        const mount = (): Promise<void> => { visit++; mounted = undefined; return owner.mountChapter('delicia', 'delicia-1'); };
+        const pending = mount();
         nativeCleanups.push(() => owner.chapterCleanup?.());
         return { pending, importStarted, release, reject, mounted: () => mounted, returned: () => returned, owner,
-            activityListeners: () => [...tracked.values()].reduce((sum, listeners) => sum + listeners.size, 0),
-            mountAgain: () => owner.mountChapter('delicia', 'delicia-1') as Promise<void>,
+            activityListeners: () => [...tracked.values()],
+            assertActivityOwner: (expectedOwner: ActivityOwner) => {
+                const expected = registered.filter(entry => entry.owner === expectedOwner && entry.visit === visit);
+                assert.ok(expected.length > 0, `The ${expectedOwner} must register its own activity callbacks`);
+                assert.deepEqual([...tracked.keys()].sort(), expected.map(entry => entry.key).sort(),
+                    'Only the current owner may retain its exact registered callbacks');
+            },
+            mountAgain: mount,
             close: () => owner.chapterCleanup?.(), dispose: () => { disposed = true; owner.chapterCleanup?.(); } };
     }
-    return { app, create, nativeEntry, window, document, body, key, pointer, button, frame, pad,
+    return { app, create, nativeEntry, window, document, body, key, pointer, button, frame, pad, heldKeyboardMovement,
         gamepadEvent: (type: string) => dispatch(type, window, { gamepad: pad }),
         focus: dom.focus, failPointerCapture: dom.failPointerCapture,
         disconnect: () => { connected = false; }, connect: () => { connected = true; } };
@@ -324,13 +359,36 @@ for (const held of ['dpad', 'stick-x', 'stick-y', 'opposed']) test(`interruption
     h.pad.buttons[9].pressed = true; h.frame(); assert.equal(h.app.screen, 'playing');
 });
 
-for (const index of [0, 1, 9]) test(`reconnected controller button ${index} requires neutral and preserves keyboard ownership`, t => {
-    const h = fixture(t); h.disconnect(); h.frame(); h.app.pause(); h.pad.buttons[index].pressed = true; h.connect(); h.frame();
+for (const delivery of ['poll', 'event']) for (const index of [0, 1, 9])
+test(`reconnected controller button ${index} via ${delivery} requires release and preserves keyboard through pause`, t => {
+    const h = fixture(t), sim = h.app.sim, save = JSON.stringify(h.app.store.save);
+    const disconnect = () => { h.disconnect(); if (delivery === 'event') h.gamepadEvent('gamepaddisconnected'); };
+    disconnect(); h.frame();
     assert.equal(h.app.screen, 'pause'); neutral(h.app.input());
-    h.pad.buttons[index].pressed = false; h.frame(); h.pad.buttons[index].pressed = true; h.frame();
+    const elapsed = sim.elapsed;
+    h.pad.buttons[index].pressed = true; h.connect();
+    if (delivery === 'event') h.gamepadEvent('gamepadconnected');
+    h.frame(); h.frame();
+    assert.equal(h.app.screen, 'pause'); neutral(h.app.input()); assert.equal(sim.elapsed, elapsed);
+    h.pad.buttons[index].pressed = false; h.frame(); assert.equal(h.app.screen, 'pause');
+    h.pad.buttons[index].pressed = true; h.frame();
     assert.equal(h.app.screen, 'playing');
-    h.key('keydown', 'd'); h.disconnect(); h.frame(); assert.equal(h.app.input().right, true);
-    h.key('keyup', 'd');
+    h.key('keydown', 'd', h.app.canvas, false, 'KeyD');
+    const beforeDisconnect = { x: sim.player.x, elapsed: sim.elapsed };
+    disconnect(); h.frame();
+    assert.equal(h.app.screen, 'pause'); neutral(h.app.input());
+    assert.deepEqual([...h.heldKeyboardMovement()], [['KeyD', 'right']]);
+    h.frame(); h.frame();
+    assert.deepEqual({ x: sim.player.x, elapsed: sim.elapsed }, beforeDisconnect);
+    neutral(h.app.input());
+    // The Node fixture omits painting; activate the same CONTINUAR action that the browser clicks.
+    const resume = h.app.menu.choices.find(choice => choice.label === 'CONTINUAR'); assert.ok(resume); resume.run();
+    h.frame(); assert.equal(h.app.screen, 'playing'); assert.equal(h.app.input().right, true);
+    assert.deepEqual([...h.heldKeyboardMovement()], [['KeyD', 'right']]);
+    assert.ok(sim.player.x > beforeDisconnect.x); assert.equal(h.pad.connected, false);
+    h.key('keyup', 'd', h.app.canvas, false, 'KeyD'); h.frame();
+    assert.equal(h.app.input().right, false); assert.deepEqual([...h.heldKeyboardMovement()], []);
+    assert.equal(h.app.sim, sim); assert.equal(JSON.stringify(h.app.store.save), save);
 });
 
 test('a newly constructed unfocused app ignores controller actions until focus and neutral', t => {
@@ -400,7 +458,7 @@ test(`native completed entry pauses after ${interrupt} during ${delay} import`, 
     else { h.focus(false); if (interrupt === 'blur-return') h.focus(true); }
     entry.release(); await entry.pending;
     const app = entry.mounted()!; assert.ok(app); assert.equal(app.screen, 'pause');
-    assert.equal(entry.activityListeners(), 3, 'Only the app and its accessible menus keep their activity listeners');
+    entry.assertActivityOwner('chapter');
     const elapsed = app.sim.elapsed;
     for (let i = 0; i < 8; i++) h.frame();
     assert.equal(app.sim.elapsed, elapsed);
@@ -411,6 +469,7 @@ test(`native completed entry pauses after ${interrupt} during ${delay} import`, 
     h.pad.buttons[9].pressed = false; h.frame(); h.pad.buttons[9].pressed = true; h.frame();
     assert.equal(app.screen, 'playing', 'Only a released controller followed by fresh intent resumes');
     for (let i = 0; i < 8; i++) h.frame(); assert.ok(app.sim.elapsed > elapsed);
+    entry.close(); assert.deepEqual(entry.activityListeners(), []);
 });
 for (const completed of [false, true]) test(`focused native entry preserves ${completed ? 'replay' : 'introduction'}`, async t => {
     const h = fixture(t), entry = h.nativeEntry(completed); entry.release(); await entry.pending;
@@ -430,23 +489,39 @@ test(`${cancel} during ${delay} chapter import prevents late construction`, asyn
     await entry.importStarted; entry[cancel]();
     h.focus(false); h.focus(true); entry.release(); await entry.pending;
     assert.equal(entry.mounted(), undefined); assert.equal(entry.owner.chapterActive, false); assert.equal(entry.returned(), 1);
-    assert.equal(entry.activityListeners(), 0);
+    assert.deepEqual(entry.activityListeners(), []);
 });
 
 for (const delay of ['outer', 'inner'] as const) test(`failed ${delay} import releases the entry activity lease`, async t => {
     const h = fixture(t), entry = h.nativeEntry(true, delay);
-    t.mock.method(console, 'error', () => {});
+    const loading = entry.activityListeners().filter(listener => listener.owner === 'loading-gamepad');
+    assert.ok(loading.length > 0);
     entry.reject(new Error('Test module delivery failure')); await entry.pending;
-    assert.equal(entry.mounted(), undefined); assert.equal(entry.activityListeners(), 0);
+    assert.equal(entry.mounted(), undefined); entry.assertActivityOwner('loading-gamepad');
+    assert.deepEqual(entry.activityListeners(), loading, 'Entry callbacks end; the still-open error menu keeps its own gamepad');
     assert.ok(Array.from(h.body.querySelectorAll('*')).some(node => node.textContent === 'Tentar novamente'));
-    entry.close(); assert.equal(entry.activityListeners(), 0);
+    entry.close(); assert.deepEqual(entry.activityListeners(), []);
+    assert.equal(entry.returned(), 1); entry.close(); assert.equal(entry.returned(), 1);
 });
 test('an interrupted entry does not pause the next focused visit', async t => {
     const h = fixture(t), entry = h.nativeEntry(true); h.focus(false); h.focus(true);
     entry.release(); await entry.pending; assert.equal(entry.mounted()?.screen, 'pause');
-    entry.close(); assert.equal(entry.activityListeners(), 0);
-    await entry.mountAgain(); assert.equal(entry.mounted()?.screen, 'playing');
-    assert.equal(entry.activityListeners(), 3); entry.close(); assert.equal(entry.activityListeners(), 0);
+    entry.assertActivityOwner('chapter');
+    const seen = new Set(entry.activityListeners().map(listener => listener.key));
+    entry.close(); assert.deepEqual(entry.activityListeners(), []);
+    for (let visit = 0; visit < 3; visit++) {
+        await entry.mountAgain(); const app = entry.mounted()!; assert.equal(app.screen, 'playing');
+        entry.assertActivityOwner('chapter');
+        for (const listener of entry.activityListeners()) {
+            assert.equal(seen.has(listener.key), false, 'A new scene must not retain a previous scene callback'); seen.add(listener.key);
+        }
+        const pause = t.mock.method(app, 'pause'); h.key('keydown', 'Escape', app.canvas);
+        assert.equal(app.screen, 'pause'); assert.equal(pause.mock.callCount(), 1, 'One command reaches only the current scene');
+        const back = app.menu.choices.find(choice => choice.label === 'VOLTAR AO MAPA'); assert.ok(back); back.run();
+        assert.deepEqual(entry.activityListeners(), []); assert.equal(entry.returned(), visit + 2);
+        entry.close(); assert.equal(entry.returned(), visit + 2);
+        h.key('keydown', 'Escape', app.canvas); assert.equal(pause.mock.callCount(), 1, 'Disposed handlers remain inert');
+    }
 });
 for (const state of ['unfocused', 'hidden'] as const) test(`native replay constructor detects already ${state} document`, t => {
     const h = fixture(t); h.app.dispose();
