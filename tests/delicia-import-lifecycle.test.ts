@@ -7,6 +7,7 @@ import ts from 'typescript';
 import type { DeliciaSimulation } from '../src/adventure/delicia/DeliciaSimulation';
 import { freshSave } from '../src/adventure/progress';
 import { DeliciaStore, DELICIA_SAVE_KEY, freshDeliciaSave, parseDeliciaSave } from '../src/adventure/delicia/DeliciaProgress';
+import { createMediaQueryHarness } from './helpers/mediaQueryHarness';
 
 /** Native Node EventTarget plus a minimal DOM boundary; real constructor, menus, import and store. */
 function fixture(t: TestContext) {
@@ -47,13 +48,14 @@ function fixture(t: TestContext) {
         click() { if (this.type === 'file') { assert.ok(this.parent, 'Chooser must remain attached'); if (pickerFails) throw Error('Picker unavailable'); } this.dispatchEvent(new Event('click')); }
         setPointerCapture() { if (this.captureFails) throw new DOMException('Capture unavailable'); }
     }
-    const body = new Element('body'), window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1 });
+    const mediaQueries = createMediaQueryHarness();
+    const body = new Element('body'), window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1, matchMedia: mediaQueries.matchMedia });
     const document = Object.assign(new EventTarget(), { body, hidden: false, title: '',
         getElementById: () => null, createElement: (tag: string) => new Element(tag), createElementNS: (_namespace: string, tag: string) => new Element(tag) });
     Object.defineProperty(document, 'activeElement', { get: () => activeElement });
     let raw = JSON.stringify(freshDeliciaSave()), storageFails = false; const writes: string[] = [];
     const original = new Map<string, PropertyDescriptor | undefined>();
-    for (const [name, value] of Object.entries({ window, document, location: { hash: '' },
+    for (const [name, value] of Object.entries({ window, document, location: { hash: '' }, matchMedia: mediaQueries.matchMedia,
         navigator: { maxTouchPoints: 1, getGamepads: () => [] },
         localStorage: { getItem: () => raw, setItem(key: string, value: string) { assert.equal(key, DELICIA_SAVE_KEY); if (storageFails) throw Error('quota'); raw = value; writes.push(value); } },
         requestAnimationFrame: (): number => 1,
@@ -87,6 +89,7 @@ function fixture(t: TestContext) {
         assert.equal(app.loadStage('delicia-1', true), true); return app; };
     t.after(() => {
         apps.forEach(app => app.dispose());
+        mediaQueries.dispose();
         if (css) require.extensions['.css'] = css; else delete require.extensions['.css'];
         for (const [name, descriptor] of original) {
             if (descriptor) Object.defineProperty(globalThis, name, descriptor); else Reflect.deleteProperty(globalThis, name);

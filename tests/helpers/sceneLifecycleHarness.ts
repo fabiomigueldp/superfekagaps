@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import type { TestContext } from 'node:test';
 import type { WorldGame } from '../../src/adventure/WorldGame';
+import { createMediaQueryHarness } from './mediaQueryHarness';
 
 /** Native EventTarget dispatch/removal; only browser/device boundaries are instrumented. */
 class Surface extends EventTarget {
@@ -156,7 +157,7 @@ export function sceneLifecycleBrowser(t: Pick<TestContext, 'after'>) {
     const frames = new Map<number, FrameRequestCallback>(); let frameId = 0;
     const requestAnimationFrame = (callback: FrameRequestCallback) => { frames.set(++frameId, callback); return frameId; };
     const cancelAnimationFrame = (id: number) => { frames.delete(id); };
-    const media = Object.assign(new Surface(), { matches: false });
+    const mediaQueries = createMediaQueryHarness(), media = mediaQueries.control('(prefers-reduced-motion: reduce)');
     // Only standalone quoted attribute equality is needed by control capture.
     // Fail on other selector shapes so the mock cannot silently disable guards.
     const querySelector = (selector: string): LifecycleElement | null => {
@@ -174,9 +175,9 @@ export function sceneLifecycleBrowser(t: Pick<TestContext, 'after'>) {
         getElementById: (id: string) => id === 'game-canvas' ? canvas : null,
         createElement: makeElement, createElementNS: (_namespace: string, tag: string) => makeElement(tag), createTextNode, querySelector });
     const window = Object.assign(new Surface(), { innerWidth: 640, innerHeight: 440, devicePixelRatio: 1,
-        requestAnimationFrame, cancelAnimationFrame, matchMedia: () => media, worldGame: undefined as WorldGame | undefined,
+        requestAnimationFrame, cancelAnimationFrame, matchMedia: mediaQueries.matchMedia, worldGame: undefined as WorldGame | undefined,
         renderer: undefined as unknown });
-    surfaces.push(window, document, media);
+    surfaces.push(window, document);
     const contexts: DeviceContext[] = [];
     let failGainAt = 0;
     class DeviceContext {
@@ -217,7 +218,7 @@ export function sceneLifecycleBrowser(t: Pick<TestContext, 'after'>) {
     const requests: Array<{ signal?: AbortSignal; resolve: (value: unknown) => void }> = [];
     const descriptors = new Map<string, PropertyDescriptor | undefined>();
     for (const [name, value] of Object.entries({ window, document, HTMLElement: LifecycleElement, HTMLButtonElement: LifecycleElement,
-        navigator: { maxTouchPoints: 2 }, PointerEvent: Event, location: { hash: '' }, matchMedia: () => media,
+        navigator: { maxTouchPoints: 2 }, PointerEvent: Event, location: { hash: '' }, matchMedia: mediaQueries.matchMedia,
         requestAnimationFrame, cancelAnimationFrame, AudioContext: DeviceContext, Audio: Clip, ResizeObserver: Observer, Image: ImageBoundary,
         fetch: (_url: string, options?: { signal?: AbortSignal }) => new Promise(resolve => requests.push({ signal: options?.signal, resolve })) })) {
         descriptors.set(name, Object.getOwnPropertyDescriptor(globalThis, name));
@@ -227,6 +228,7 @@ export function sceneLifecycleBrowser(t: Pick<TestContext, 'after'>) {
     Object.defineProperty(globalThis, 'localStorage', { configurable: true, get() { assert.fail('An ephemeral scene must never touch campaign storage'); } });
     t.after(() => {
         window.worldGame?.dispose();
+        mediaQueries.dispose();
         for (const [name, descriptor] of descriptors) {
             if (descriptor) Object.defineProperty(globalThis, name, descriptor); else Reflect.deleteProperty(globalThis, name);
         }
@@ -238,8 +240,8 @@ export function sceneLifecycleBrowser(t: Pick<TestContext, 'after'>) {
     const key = (type: 'keydown' | 'keyup', key: string) => window.dispatch(type, {
         key, code: key === ' ' ? 'Space' : key.length === 1 ? `Key${key.toUpperCase()}` : key, repeat: false
     });
-    return { window, document, canvas, status, body, media, contexts, frames, clips, observers, images, requests, frame, key,
-        listenerCount: () => surfaces.reduce((count, target) => count + target.listeners.length, 0),
+    return { window, document, canvas, status, body, media, mediaQueries, contexts, frames, clips, observers, images, requests, frame, key,
+        listenerCount: () => surfaces.reduce((count, target) => count + target.listeners.length, 0) + mediaQueries.listenerCount(),
         drawCount: () => surfaces.reduce((count, target) => count + (target instanceof LifecycleElement ? target.drawCalls : 0), 0),
         failGain: (at: number) => { failGainAt = at; },
         create: <T>(Scene: new (canvas: HTMLCanvasElement, status: HTMLElement) => T) => new Scene(canvas as unknown as HTMLCanvasElement, status as unknown as HTMLElement)

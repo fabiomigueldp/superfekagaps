@@ -8,6 +8,7 @@ import type { DeliciaInput, DeliciaSimulation } from '../src/adventure/delicia/D
 import { DeliciaStore } from '../src/adventure/delicia/DeliciaProgress';
 import { ProgressStore } from '../src/adventure/progress';
 import type { DeliciaAppOptions } from '../src/adventure/delicia/DeliciaApp';
+import { createMediaQueryHarness } from './helpers/mediaQueryHarness';
 
 /** DOM/event boundaries only. Constructor, registered handlers, loop and simulation are real. */
 function fixture(t: TestContext, initiallyFocused = true) {
@@ -47,7 +48,8 @@ function fixture(t: TestContext, initiallyFocused = true) {
         click() { this.dispatchEvent(new Event('click')); }
         setPointerCapture() { if (this.captureFails) throw new DOMException('Capture unavailable'); }
     }
-    const body = new Element('body'), window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1 });
+    const mediaQueries = createMediaQueryHarness();
+    const body = new Element('body'), window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1, matchMedia: mediaQueries.matchMedia });
     const document = Object.assign(new EventTarget(), { body, hidden: false, title: '',
         hasFocus: () => focused, getElementById: () => null, createElement: (tag: string) => new Element(tag) });
 
@@ -56,7 +58,7 @@ function fixture(t: TestContext, initiallyFocused = true) {
     let connected = true;
     const pad = { index: 0, id: 'test-pad', connected: true, mapping: 'standard', axes: [0, 0], buttons: Array.from({ length: 16 }, () => ({ pressed: false })) };
     const original = new Map<string, PropertyDescriptor | undefined>();
-    for (const [name, value] of Object.entries({ window, document, location: { hash: '' },
+    for (const [name, value] of Object.entries({ window, document, location: { hash: '' }, matchMedia: mediaQueries.matchMedia,
         navigator: { maxTouchPoints: 1, getGamepads: () => connected ? [pad] : [] },
         localStorage: { getItem: () => null, setItem() {} },
         requestAnimationFrame: (callback: FrameRequestCallback) => { nextFrame = callback; return 1; },
@@ -88,6 +90,7 @@ function fixture(t: TestContext, initiallyFocused = true) {
     t.after(() => {
         nativeCleanups.forEach(cleanup => cleanup());
         apps.forEach(app => app.dispose());
+        mediaQueries.dispose();
         if (css) require.extensions['.css'] = css; else delete require.extensions['.css'];
         for (const [name, descriptor] of original) {
             if (descriptor) Object.defineProperty(globalThis, name, descriptor); else Reflect.deleteProperty(globalThis, name);
