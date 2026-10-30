@@ -1130,7 +1130,7 @@ export class WorldGame {
             (window as unknown as { renderer: Renderer }).renderer = this.renderer;
             document.title = 'Super Feka Gaps World';
             view.openChapter(chapter, chapter === 'guaira' ? this.store.save.guaira.selectedScene : view.deliciaStore.save.selected,
-                playedStage);
+                playedStage, this.store.save);
             view.hud.focusEnter(); this.last = null; this.requestFrame();
         };
         this.chapterCleanup = close;

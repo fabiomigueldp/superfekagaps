@@ -299,8 +299,11 @@ export class WorldMapView {
     private showGuaira(): void {
         this.openChapter('guaira');
     }
-    openChapter(chapter: WorldChapter, selected?: string, returnedStage?: string): void {
-        if (!this.save || !this.journey || this.journey.destination) return;
+    openChapter(chapter: WorldChapter, selected?: string, returnedStage?: string, latestSave = this.save): void {
+        if (!latestSave || !this.journey || this.journey.destination) return;
+        // Chapter persistence can replace the save while this map is suspended.
+        // Resolve entry gates and the recommended destination from that current state.
+        this.save = latestSave;
         this.chapter = chapter; this.overview = false; this.pendingChapterStage = null; this.pendingIsland = null;
         this.guairaDeparture = null;
         this.chapterStages = chapterMapStages(chapter, this.save, this.deliciaStore.save);
