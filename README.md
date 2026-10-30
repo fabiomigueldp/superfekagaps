@@ -41,7 +41,8 @@ O [critério do pacote de publicação](docs/build-output.md) preserva os origin
 e omite apenas referências de revisão que não são usadas pelas entradas publicadas.
 
 O deploy usa envio incremental e reaproveita os assets já presentes na Oracle.
-Veja [o comando e a localização dos arquivos](docs/deploy.md).
+Veja [o comando e a localização dos arquivos da publicação World](docs/deploy.md).
+Esse fluxo publica o catálogo World; a [hospedagem separada do Remaster/Classic e sua API de placar](docs/scoreboard.md) usa outro diretório e outro procedimento de manutenção. Não intercambie os dois procedimentos.
 
 ### Editor de mundos
 
