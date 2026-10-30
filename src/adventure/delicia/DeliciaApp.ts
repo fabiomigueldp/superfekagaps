@@ -16,7 +16,7 @@ import { button, deliciaCanvasLabel, element, formatTime, heading, lettering, wo
 import './delicia.css';
 import { GamepadDevice } from '../../engine/GamepadDevice';
 import { DomGamepadMenu, closeGamepadDialog, menuId } from '../../engine/DomGamepadMenu';
-import { controlCode, keyAction } from '../../engine/ControlPreferences';
+import { bindingLabel, controlCode, keyAction, profileFor, type PadAction } from '../../engine/ControlPreferences';
 import { WorldControlsHelp } from '../WorldControlsHelp';
 const LOGICAL_KEYS:Record<string,string>={left:'arrowleft',right:'arrowright',jump:' ',run:'shift',down:'s',seed:'j',parry:'q',interact:'e'};
 const INPUT_KEYS:Record<string,string>={arrowleft:'arrowleft',a:'arrowleft','pad-left':'arrowleft',arrowright:'arrowright',d:'arrowright','pad-right':'arrowright',' ':' ',w:' ',z:' ',arrowup:' ','pad-jump':' ',shift:'shift',x:'shift','pad-dash':'shift',s:'s',arrowdown:'s','pad-pound':'s',j:'j','pad-seed':'j',q:'q','pad-parry':'q',e:'e','pad-interact':'e'};
@@ -63,10 +63,14 @@ export class DeliciaApp {
         this.listen(this.assistControl,'change',()=>{this.store.save.assists=this.assistControl.checked;this.persistSettings();});
         this.controlsHelp=new WorldControlsHelp(this.canvas,{
             canOpen:()=>!this.disposed&&this.screen!=='playing',resetInput:()=>this.resetInput(),suspendTouch:()=>()=>{},
-        },{id:'delicia-controls',extraActions:true,extraContent:assistLabel,regionLabel:'Controles da Delícia',closeLabel:'VOLTAR',navigation:[
-            'A confirma; B volta; Menu pausa. View abre os controles.',
-            'Semente, rebatida e interação ficam disponíveis conforme os equipamentos e a fase.',
-        ],touch:'Use os botões na tela. É possível correr e pular ao mesmo tempo; soltar o pulo encurta o salto.'});
+        },{id:'delicia-controls',extraActions:true,extraContent:assistLabel,regionLabel:'Controles da Delícia',closeLabel:'VOLTAR',navigation:pad=>{
+            const buttons=(action:PadAction)=>pad?profileFor(pad).bindings[action].map(binding=>bindingLabel(binding,pad)).join(' / ')||'Sem botão':'';
+            return [
+                pad?`Confirmar: ${buttons('confirm')}; voltar: ${buttons('back')}; pausar: ${buttons('pause')}; controles: ${buttons('guide')}.`
+                    :'Menus: Tab ou ↑/↓ para escolher; Enter ou Espaço para confirmar; Esc para voltar.',
+                'Semente, rebatida e interação ficam disponíveis conforme os equipamentos e a fase.',
+            ];
+        },touch:'Use os botões na tela. É possível correr e pular ao mesmo tempo; soltar o pulo encurta o salto.'});
         this.cleanups.push(()=>{this.controlsHelp.dispose();this.gamepad.dispose();this.controllerMenu.dispose();});
         this.listen(window,'feka-controls-change',()=>{this.resetInput();this.canvas.setAttribute('aria-label',deliciaCanvasLabel());});
         this.applyVolume();this.canvas.hidden=true;this.buildTouch();
