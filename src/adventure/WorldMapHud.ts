@@ -468,7 +468,7 @@ export class WorldMapHud {
         this.exploration.hidden = true;
         if (this.chapter) {
             this.chapter = null; this.chapterKey = ''; this.chapterTraveling = false; this.signature = '';
-            this.chapterButtons.forEach(button => { button.hidden = true; });
+            this.positionChapterNodes([]);
             this.root.classList.remove('is-chapter');
         }
         this.state = state;
