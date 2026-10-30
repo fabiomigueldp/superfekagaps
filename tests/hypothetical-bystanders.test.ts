@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { HypotheticalBackdrop } from '../src/adventure/hipotetico/HypotheticalBackdrop';
-import {SCENIC_STARTS,scenicDistrict} from '../src/adventure/hipotetico/HypotheticalDevastation';
+import {SCENIC_STARTS,SCENIC_END,scenicDistrict} from '../src/adventure/hipotetico/HypotheticalDevastation';
 import { HypotheticalModel } from '../src/adventure/hipotetico/HypotheticalModel';
 import { bystanderPose,bystanderBounds,bystanderFall,bystanderIntersection } from '../src/adventure/hipotetico/HypotheticalBystanderMotion';
 import { bystanderTexture,drawBystanderTexture } from '../src/adventure/hipotetico/HypotheticalBystanderPixels';
@@ -9,7 +9,8 @@ import { drawBystanders } from '../src/adventure/hipotetico/HypotheticalBystande
 
 test('the fictional rider prefers a red-star shirt in each local group, including one behind a closer neutral actor',()=>{
     const b=new HypotheticalBackdrop(true),firstHits:number[]=[],aims:number[]=[];
-    for(let tick=1;tick<=1800;tick++){
+    // Include every district after the helicopter beat shifts the scenic clock.
+    for(let tick=1;tick<=SCENIC_END;tick++){
         const old=b.people.map(p=>p.hitAt);b.update(tick);
         if(SCENIC_STARTS.some(start=>tick===start+90)){
             const target=b.aimedPerson!;assert.equal(target.clothes,'star-shirt');assert.equal(target.district,scenicDistrict(tick));
@@ -68,7 +69,7 @@ test('the gait follows travelled distance, crouching blends after arrival, and f
 
 test('shots and reactions remain bounded, and replaying a cleared district reconstructs the same people',()=>{
     const a=new HypotheticalBackdrop(true);let maxShots=0,maxImpacts=0;
-    for(let tick=1;tick<=2000;tick++){
+    for(let tick=1;tick<=SCENIC_END;tick++){
         a.update(tick);maxShots=Math.max(maxShots,a.shots.length);maxImpacts=Math.max(maxImpacts,a.impacts.length);
         if(SCENIC_STARTS.slice(1).some(start=>start===tick)){
             const restored=new HypotheticalModel('siege',9,SCENIC_STARTS.findIndex(start=>start===tick)).backdrop;
@@ -115,7 +116,15 @@ test('gunfire reactions start after the sound and overlapping shots do not reset
 
 function pixelRecorder(){
     const pixels=new Map<string,string>();
-    const context={fillStyle:'',fillRect(x:number,y:number,w:number,h:number){for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)pixels.set(`${xx},${yy}`,this.fillStyle);}};
+    type PaintState={fillStyle:string;globalAlpha:number;globalCompositeOperation:GlobalCompositeOperation};
+    const stack:PaintState[]=[];
+    // Record occupied pixels; shadows still need the Canvas paint-state stack.
+    const context:PaintState & Pick<CanvasRenderingContext2D,'save'|'restore'|'fillRect'>={
+        fillStyle:'#000000',globalAlpha:1,globalCompositeOperation:'source-over',
+        save(){stack.push({fillStyle:this.fillStyle,globalAlpha:this.globalAlpha,globalCompositeOperation:this.globalCompositeOperation});},
+        restore(){const state=stack.pop();if(state)Object.assign(this,state);},
+        fillRect(x,y,w,h){for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)pixels.set(`${xx},${yy}`,this.fillStyle);}
+    };
     return {pixels,c:context as unknown as CanvasRenderingContext2D};
 }
 
@@ -137,6 +146,9 @@ test('the rendered fall keeps heads, hands, bags and hats above the street throu
         p.x=30;p.hitAt=100;p.stoppedAt=crouched?80:null;
         for(let age=0;age<=55;age++){
             b.tick=100+age;const {c,pixels}=pixelRecorder();drawBystanders(c,b,60,true);
+            assert.equal(c.globalAlpha,1,'the shadow restores opacity before drawing the actor');
+            assert.equal(c.globalCompositeOperation,'source-over','the shadow restores normal painting');
+            assert.ok(pixels.size>0,'the fall must draw pixels');
             const ys=[...pixels.keys()].map(key=>Number(key.split(',')[1]));
             assert.ok(Math.max(...ys)<=60,`${p.clothes} sinks below its floor at ${age}`);
         }
