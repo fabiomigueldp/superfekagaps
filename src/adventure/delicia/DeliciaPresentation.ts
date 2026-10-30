@@ -54,8 +54,11 @@ export class DeliciaPresentation {
         const scene = sim && (!menu || ['pause', 'dialogue', 'result'].includes(menu.kind));
         const seals = sim?.stage.pickups.filter(p => p.kind === 'seal' && sim.collected.has(p.id)).length ?? 0;
         const stage = sim ? (sim.stage.optional ? 'D-EX' : `D-${sim.stage.number}`) : '';
+        const progress = sim?.boss
+            ? sim.gateOpen ? 'Portão aberto' : `${sim.boss.character === 'jaja' ? 'Jajá' : 'Guina'}: ${sim.boss.hp}/${sim.boss.maxHp}`
+            : sim ? `${sim.coins} laranjas · ${seals}/3 selos · ${sim.valves.size}/${sim.stage.valves.length} fontes` : '';
         this.hud.sync(options.playing, stage, sim?.coins ?? 0, seals, false, sim
-            ? `${stage} · ${sim.player.health} vidas · ${sim.coins} laranjas · ${seals}/3 selos · ${sim.valves.size}/${sim.stage.valves.length} fontes` : '');
+            ? `${stage} · ${sim.player.health} vidas · ${progress}` : '');
         if (scene) {
             c.save();
             if (options.shake > 0 && !options.reduced)
