@@ -122,7 +122,8 @@ export class DeliciaApp {
         const editable=(event.target as HTMLElement)?.closest('input,textarea,select');if(editable){if(key==='tab')this.menuKeyboard(event);return;}
         const active=(this.screen==='playing'&&!(event.target as HTMLElement)?.closest('button,a,summary'))||event.target===this.canvas;
         if(action&&LOGICAL_KEYS[action]&&active){
-            event.preventDefault();rememberMovementKey(event);
+            // Apply the display's input reset before admitting the key that changed it.
+            event.preventDefault();this.syncTouchControls();rememberMovementKey(event);
             if(!['left','right','run'].includes(action))this.holdInput(`key:${this.physicalKey(event)}`,LOGICAL_KEYS[action]);
         }
         if((key==='enter'||key===' ')&&event.target===this.canvas&&this.screen==='dialogue'){event.preventDefault();this.advanceDialogue();}
@@ -166,12 +167,15 @@ export class DeliciaApp {
         for(const source of this.sources.keys())if(source.startsWith('gamepad:'))this.releaseInput(source,true);
     }
     private disarmGamepad():void{this.gamepad.reset();}
-    private pollGamepad():void {
-        if(this.disposed)return;
+    private syncTouchControls():void {
         const touchVisible=touchControlsEnabled();
         if(this.root.classList.contains('dl-has-touch')!==touchVisible){
             this.root.classList.toggle('dl-has-touch',touchVisible);this.resetInput();
         }
+    }
+    private pollGamepad():void {
+        if(this.disposed)return;
+        this.syncTouchControls();
         if(this.controlsHelp.isOpen){
             const command=this.gamepad.menu(this.controlsHelp.canControl()?'delicia:controls':null);
             if(command)this.controlsHelp.control(command);return;
