@@ -40,7 +40,9 @@ export function completeDeliciaStage(save:DeliciaSave,id:string,seconds:number,r
     if(!valid(id)||!deliciaUnlocked(id,save)) throw new Error('Fase da Delícia indisponível.');
     if(!save.completed.includes(id)) save.completed.push(id);
     if(Number.isFinite(seconds)&&seconds>0&&!save.assists&&recordEligible) save.times[id]=Math.min(save.times[id]??Infinity,seconds);
-    const index=DELICIA_STAGES.findIndex(s=>s.id===id); save.selected=DELICIA_STAGES[Math.min(DELICIA_STAGES.length-1,index+1)]?.id??id;
+    const index=DELICIA_STAGES.findIndex(s=>s.id===id);
+    // Optional shrines return to their own stop; only main stages advance.
+    save.selected=index<0?id:DELICIA_STAGES[Math.min(DELICIA_STAGES.length-1,index+1)]?.id??id;
     save.checkpoint=null;
     if(id==='delicia-6'&&!save.lore.includes('jaja')) save.lore.push('jaja');
     if(id==='delicia-12') for(const lore of ['recomeço','delicia'])if(!save.lore.includes(lore))save.lore.push(lore);
