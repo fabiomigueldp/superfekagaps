@@ -117,7 +117,7 @@ export class DeliciaArt {
         if(nearby){
             const x=Math.max(29,Math.min(290,Math.round(nearby.x/U)-cx)),y=Math.round(nearby.y/U)-cy;
             const active=sim.boss?!sim.valveReady(nearby.id):sim.valves.has(nearby.id);
-            panel(c,x-28,y-64,58,12,ART.ink,ART.rockLight);pixelText(c,active?'ABERTA':'E: ABRIR',x+1,y-61,ART.paper,1,'center');
+            panel(c,x-28,y-64,58,12,ART.ink,ART.rockLight);pixelText(c,active?'ABERTA':'ABRIR',x+1,y-61,ART.paper,1,'center');
         }
         c.restore();c.imageSmoothingEnabled = false;
     }
