@@ -1,11 +1,10 @@
 /** Native accessible-name checks for the shared remapping UI; loopback only.
- * npm install --no-save --package-lock=false playwright@1.58.2
  * CHROMIUM_PATH=/usr/bin/chromium node --test tests/control-capture-accessibility.browser.mjs
+ * PLAYWRIGHT_MODULE may select an existing Playwright installation.
  */
 import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { chromium } from 'playwright';
 import { createServer } from 'vite';
 
 let browser, server, base;
@@ -19,6 +18,7 @@ window.h = { settings, controlPreferences, keyAction, profileFor };
 </script></html>`;
 
 before(async () => {
+    const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
     server = await createServer({ root: fileURLToPath(new URL('../', import.meta.url)), configFile: false,
         appType: 'custom', server: { host: '127.0.0.1', port: 0 },
         plugins: [{ name: 'control-capture-fixture', configureServer(vite) {
@@ -31,7 +31,7 @@ before(async () => {
 });
 after(async () => { await browser?.close(); await server?.close(); });
 
-async function setup(t, gamepad = false) {
+async function setup(t, gamepad = false, mapping = 'standard') {
     const context = await browser.newContext(), page = await context.newPage(), errors = [];
     page.setDefaultTimeout(3000);
     page.on('pageerror', error => errors.push(error.message));
@@ -39,11 +39,11 @@ async function setup(t, gamepad = false) {
         assert.equal(new URL(route.request().url()).origin, base, 'only loopback requests');
         return route.continue();
     });
-    if (gamepad) await page.addInitScript(() => {
-        window.pad = { index: 0, id: 'Capture fixture', mapping: 'standard', connected: true,
+    if (gamepad) await page.addInitScript(mapping => {
+        window.pad = { index: 0, id: 'Capture fixture', mapping, connected: true,
             axes: [0, 0, 0, 0], buttons: Array.from({ length: 17 }, () => ({ pressed: false, value: 0 })) };
         navigator.getGamepads = () => [window.pad];
-    });
+    }, mapping);
     t.after(async () => {
         try {
             assert.deepEqual(errors, []);
@@ -111,4 +111,56 @@ test('gamepad capture exposes cancellation and returns to the selected button af
     await page.waitForFunction(() => !h.settings.root.dataset.controlCapture);
     assert.equal(await accessibleName(page), 'Alterar Pular: Y');
     assert.deepEqual(await page.evaluate(() => h.profileFor(pad).bindings.jump), [{ button: 3 }]);
+});
+
+test('non-standard capture announces working cancellation controls without changing preferences', async t => {
+    const { page, binding } = await setup(t, true, ''), initial = await accessibleName(page);
+    const before = await page.evaluate(() => ({ preferences: JSON.stringify(h.controlPreferences),
+        stored: localStorage.getItem('super_feka_gaps_controls_v1') }));
+    for (const cancel of ['button', 'Escape']) {
+        await binding.click();
+        const text = await page.getByRole('status').textContent();
+        assert.doesNotMatch(text, /Menu.*View/);
+        assert.match(text, /Cancelar/); assert.match(text, /Esc/);
+        // Check that the instruction is exposed in the native accessibility tree.
+        const cdp = await page.context().newCDPSession(page);
+        try {
+            const { nodes } = await cdp.send('Accessibility.getFullAXTree');
+            assert.ok(nodes.some(node => node.role?.value === 'status'));
+            assert.ok(nodes.some(node => node.role?.value === 'StaticText' && node.name?.value === text));
+        } finally { await cdp.detach(); }
+        if (cancel === 'button') await page.getByRole('button', { name: 'Cancelar alteração de Pular', exact: true }).click();
+        else await page.keyboard.press('Escape');
+        assert.equal(await page.locator('[data-control-capture="true"]').count(), 0);
+        assert.equal(await accessibleName(page), initial);
+        assert.equal(await binding.evaluate(node => node === document.activeElement), true);
+        assert.deepEqual(await page.evaluate(() => ({ preferences: JSON.stringify(h.controlPreferences),
+            stored: localStorage.getItem('super_feka_gaps_controls_v1') })), before);
+    }
+});
+
+test('standard Menu plus View still cancels capture without saving a binding', async t => {
+    const { page, binding } = await setup(t, true), initial = await accessibleName(page);
+    const before = await page.evaluate(() => ({ preferences: JSON.stringify(h.controlPreferences),
+        stored: localStorage.getItem('super_feka_gaps_controls_v1') }));
+    await binding.click(); assert.match(await page.getByRole('status').textContent(), /Menu \+ View cancela/);
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    await page.evaluate(() => { for (const index of [8, 9]) pad.buttons[index] = { pressed: true, value: 1 }; });
+    await page.waitForFunction(() => !h.settings.root.dataset.controlCapture);
+    assert.equal(await accessibleName(page), initial);
+    assert.deepEqual(await page.evaluate(() => ({ preferences: JSON.stringify(h.controlPreferences),
+        stored: localStorage.getItem('super_feka_gaps_controls_v1') })), before);
+});
+
+test('non-standard buttons remain assignable rather than assuming a standard cancel chord', async t => {
+    const { page, binding } = await setup(t, true, '');
+    const before = await page.evaluate(() => ({ profile: h.profileFor(pad), keys: h.controlPreferences.keys }));
+    await binding.click(); const hint = await page.getByRole('status').textContent();
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    await page.evaluate(() => { for (const index of [8, 9]) pad.buttons[index] = { pressed: true, value: 1 }; });
+    await page.waitForFunction(() => !h.settings.root.dataset.controlCapture);
+    const after = await page.evaluate(() => ({ profile: h.profileFor(pad), keys: h.controlPreferences.keys }));
+    assert.deepEqual(after, { profile: { ...before.profile, bindings: { ...before.profile.bindings, jump: [{ button: 8 }] } }, keys: before.keys });
+    assert.equal(await accessibleName(page), 'Alterar Pular: Botão 9');
+    t.diagnostic(JSON.stringify({ mapping: '', hint, captured: after.profile.bindings.jump }));
 });
