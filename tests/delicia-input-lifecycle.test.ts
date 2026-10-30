@@ -202,6 +202,34 @@ test('focus cancellation and one pointer release preserve the remaining keyboard
     assert.equal(h.app.input().right, true); h.key('keyup', 'd'); assert.equal(h.app.input().right, false);
 });
 
+for (const [key, code, action] of [['a', 'KeyA', 'left'], ['d', 'KeyD', 'right'], ['Shift', 'ShiftLeft', 'run']] as const)
+test(`held keyboard ${action} survives element blur until its physical keyup`, t => {
+    const h = fixture(t);
+    h.key('keydown', key, h.app.canvas, false, code); h.frame(); assert.equal(h.app.input()[action], true);
+    h.button('arrowright').focus(); h.app.canvas.focus(); h.frame();
+    assert.equal(h.app.screen, 'playing'); assert.equal(h.app.input()[action], true);
+    h.key('keyup', key, h.app.canvas, false, code); h.frame(); assert.equal(h.app.input()[action], false);
+});
+
+for (const boundary of ['window blur', 'hidden document']) test(`${boundary} still clears keyboard movement across resume`, t => {
+    const h = fixture(t); h.key('keydown', 'd', h.app.canvas, false, 'KeyD'); h.frame();
+    assert.equal(h.app.input().right, true);
+    if (boundary === 'window blur') h.focus(false);
+    else { h.document.hidden = true; h.document.dispatchEvent(new Event('visibilitychange')); }
+    assert.equal(h.app.screen, 'pause'); neutral(h.app.input());
+    if (boundary === 'window blur') h.focus(true);
+    else { h.document.hidden = false; h.document.dispatchEvent(new Event('visibilitychange')); }
+    h.app.resume(); h.frame(); assert.equal(h.app.input().right, false);
+});
+
+test('a keyup consumed by a native control still releases held movement', t => {
+    const h = fixture(t), right = h.button('arrowright');
+    h.key('keydown', 'd', h.app.canvas, false, 'KeyD'); h.frame(); assert.equal(h.app.input().right, true);
+    right.focus(); right.addEventListener('keyup', event => event.stopImmediatePropagation(), { once: true });
+    h.key('keyup', 'd', right, false, 'KeyD'); h.app.canvas.focus(); h.frame();
+    assert.equal(h.app.input().right, false);
+});
+
 test('button Enter and Space are independent owners, and auto-repeat cannot restart a canceled press', t => {
     const h = fixture(t), right = h.button('arrowright'); right.focus();
     h.key('keydown', 'Enter'); h.key('keydown', ' '); h.key('keyup', 'Enter'); assert.equal(h.app.input().right, true);

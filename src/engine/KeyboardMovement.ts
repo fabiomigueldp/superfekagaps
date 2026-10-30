@@ -6,7 +6,8 @@ const keys = new Set<string>();
 // These listeners precede modal capture handlers. A key released in a dialog
 // must also stop being held when gameplay resumes.
 window.addEventListener('keyup', event => keys.delete(controlCode(event)), true);
-window.addEventListener('blur', () => keys.clear(), true);
+// Capture also sees element blur during an in-page focus change.
+window.addEventListener('blur', event => { if (event.target === window) keys.clear(); }, true);
 window.addEventListener('pagehide', () => keys.clear(), true);
 window.addEventListener('feka-controls-change', () => keys.clear());
 document.addEventListener('visibilitychange', () => { if (document.hidden) keys.clear(); });
