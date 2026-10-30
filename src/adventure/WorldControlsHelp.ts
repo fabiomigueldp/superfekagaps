@@ -1,10 +1,22 @@
 import { DisposalScope } from '../engine/DisposalScope';
 import type { GamepadMenuCommand } from '../engine/StandardGamepad';
 import { ControlSettings } from '../engine/ControlSettings';
-import { CONTROL_LABELS, bindingLabel, controlPreferences, keyLabel, profileFor, type ControlAction } from '../engine/ControlPreferences';
+import { CONTROL_LABELS, bindingLabel, controlPreferences, keyLabel, profileFor, type ControlAction, type PadAction } from '../engine/ControlPreferences';
 import { selectedGamepad } from '../engine/GamepadDevice';
 import { DomGamepadMenu } from '../engine/DomGamepadMenu';
 import './world-controls-help.css';
+
+function defaultNavigation(pad?: Gamepad): string[] {
+    const buttons = (action: PadAction, fallback: string) => pad
+        ? profileFor(pad).bindings[action].map(binding => bindingLabel(binding, pad)).join(' / ') || 'Sem botão'
+        : fallback;
+    return [
+        'Menus: Tab ou ↑/↓ para escolher; Enter ou Espaço para confirmar; Esc para voltar.',
+        `Controle: use as direções para escolher. Confirmar: ${buttons('confirm', 'A/×')}; voltar: ${buttons('back', 'B/○')}; pausar/continuar: ${buttons('pause', 'Menu')}.`,
+        `Mapa: ←/→ fases; ↑/↓ regiões. Ilhas: ${buttons('run', 'X/□')}; mundo: ${buttons('parry', 'Y/△')}; usar a ação selecionada ou pular a viagem: ${buttons('confirm', 'A/×')}.`,
+        'A sentada é usada no ar. Direção e corrida continuam enquanto estiverem pressionadas.',
+    ];
+}
 
 interface ControlsHelpHost {
     canOpen(): boolean;
@@ -38,6 +50,7 @@ export class WorldControlsHelp {
     private readonly navigation = new DomGamepadMenu();
     private readonly settings: ControlSettings;
     private readonly bindings = new Map<ControlAction, HTMLElement>();
+    private readonly defaultNavigationParagraphs: HTMLParagraphElement[] = [];
 
     constructor(private readonly canvas: HTMLCanvasElement, private readonly host: ControlsHelpHost, contentOptions: ControlsHelpContent = {}) {
         this.settings = new ControlSettings(contentOptions.extraActions);
@@ -56,13 +69,9 @@ export class WorldControlsHelp {
                 const term = document.createElement('dt'), description = document.createElement('dd');
                 term.textContent = CONTROL_LABELS[action]; this.bindings.set(action, description); list.append(term, description);
             }
-            const navigation = (contentOptions.navigation ?? [
-                'Menus: Tab ou ↑/↓ para escolher; Enter ou Espaço para confirmar; Esc para voltar.',
-                'Controle: direcional/analógico escolhe; A/× confirma; B/○ volta; Menu pausa/continua.',
-                'Mapa: ←/→ fases; ↑/↓ regiões; X/□ ilhas; Y/△ mundo. A/× usa a ação selecionada ou pula a viagem.',
-                'A sentada é usada no ar. Direção e corrida continuam enquanto estiverem pressionadas.',
-            ])
+            const navigation = (contentOptions.navigation ?? defaultNavigation(selectedGamepad()))
                 .map(text => { const paragraph = document.createElement('p'); paragraph.textContent = text; return paragraph; });
+            if (!contentOptions.navigation) this.defaultNavigationParagraphs.push(...navigation);
             const touchTitle = document.createElement('h3'); touchTitle.textContent = 'NA TELA DE TOQUE';
             const touch = document.createElement('p');
             touch.textContent = contentOptions.touch ?? '← / → para andar; ↑ para pular; segure X + direção para correr; ↓ no ar para a sentada. Toque no topo da tela para pausar.';
@@ -117,6 +126,10 @@ export class WorldControlsHelp {
             const keys = controlPreferences.keys[action].map(keyLabel).join(' / ') || 'Sem tecla';
             const buttons = action === 'mute' ? '' : (pad ? profileFor(pad).bindings[action] : []).map(b => bindingLabel(b, pad)).join(' / ');
             node.textContent = buttons ? `${keys} · ${buttons}` : keys;
+        }
+        if (this.defaultNavigationParagraphs.length) {
+            const text = defaultNavigation(pad);
+            this.defaultNavigationParagraphs.forEach((paragraph, index) => { paragraph.textContent = text[index]; });
         }
     }
 
