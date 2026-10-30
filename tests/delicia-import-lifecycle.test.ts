@@ -8,6 +8,7 @@ import type { DeliciaSimulation } from '../src/adventure/delicia/DeliciaSimulati
 import { freshSave } from '../src/adventure/progress';
 import { DeliciaStore, DELICIA_SAVE_KEY, freshDeliciaSave, parseDeliciaSave } from '../src/adventure/delicia/DeliciaProgress';
 import { createMediaQueryHarness } from './helpers/mediaQueryHarness';
+import { createClassList } from './helpers/classListHarness';
 
 /** Native Node EventTarget plus a minimal DOM boundary; real constructor, menus, import and store. */
 function fixture(t: TestContext) {
@@ -15,14 +16,15 @@ function fixture(t: TestContext) {
     let activeElement: Element | null = null;
     class Element extends EventTarget {
         style: Record<string, string> = {};
-        className = ''; dataset: Record<string, string> = {}; hidden = false; disabled = false;
+        dataset: Record<string, string> = {}; hidden = false; disabled = false;
         type = ''; size = 0; files: { size: number; text(): Promise<string> }[] = [];
         onchange: (() => Promise<void>) | null = null; oncancel: (() => void) | null = null;
         textContent = ''; parent: Element | null = null; children: Element[] = [];
         attributes = new Map<string, string>(); captureFails = false;
         constructor(readonly tagName: string) { super(); }
-        get classList() { return { add: (name: string) => { this.className += ' ' + name; },
-            contains: (name: string) => this.className.split(' ').includes(name) }; }
+        readonly classList = createClassList(this);
+        get className() { return this.getAttribute('class') ?? ''; }
+        set className(value: string) { this.setAttribute('class', value); }
         append(...children: Element[]) { for (const child of children) { child.parent = this; this.children.push(child); } }
         replaceChildren(...children: Element[]) { this.children.forEach(child => child.parent = null); this.children = []; this.append(...children); }
         remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); this.parent = null; }

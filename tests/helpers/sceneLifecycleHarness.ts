@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import type { TestContext } from 'node:test';
 import type { WorldGame } from '../../src/adventure/WorldGame';
 import { createMediaQueryHarness } from './mediaQueryHarness';
+import { createClassList } from './classListHarness';
 
 /** Native EventTarget dispatch/removal; only browser/device boundaries are instrumented. */
 class Surface extends EventTarget {
@@ -57,7 +58,7 @@ const dataAttribute = (key: string) => `data-${key.replace(/[A-Z]/g, letter => `
 export class LifecycleElement extends LifecycleNode {
     readonly nodeType = 1;
     get nodeName() { return this.tagName; }
-    id = ''; className = ''; title = ''; type = ''; width = 640; height = 360;
+    id = ''; title = ''; type = ''; width = 640; height = 360;
     hidden = false; disabled = false; tabIndex = 0; isContentEditable = false;
     readonly style: Record<string, string> = {};
     readonly attributes = new Map<string, string>();
@@ -103,25 +104,9 @@ export class LifecycleElement extends LifecycleNode {
         for (const child of [...this.childNodes]) child.remove();
         this.append(...children);
     }
-    get classList() {
-        const tokens = () => new Set(this.className.split(/[\t\n\f\r ]+/).filter(Boolean));
-        const validate = (name: string) => {
-            if (!name) throw new DOMException('Empty class token', 'SyntaxError');
-            if (/[\t\n\f\r ]/.test(name)) throw new DOMException('Whitespace in class token', 'InvalidCharacterError');
-        };
-        const contains = (name: string) => tokens().has(name);
-        const add = (...names: string[]) => {
-            names.forEach(validate); const next = tokens(); names.forEach(name => next.add(name)); this.className = [...next].join(' ');
-        };
-        const remove = (...names: string[]) => {
-            names.forEach(validate); const next = tokens(); names.forEach(name => next.delete(name)); this.className = [...next].join(' ');
-        };
-        return { add, remove, contains, toggle: (name: string, force?: boolean) => {
-            validate(name); const before = contains(name), after = force ?? !before;
-            if (after !== before) { if (after) add(name); else remove(name); }
-            return after;
-        } };
-    }
+    readonly classList = createClassList(this);
+    get className() { return this.getAttribute('class') ?? ''; }
+    set className(value: string) { this.setAttribute('class', value); }
     setAttribute(name: string, value: string) { this.attributes.set(name.toLowerCase(), String(value)); }
     getAttribute(name: string) { return this.attributes.get(name.toLowerCase()) ?? null; }
     removeAttribute(name: string) { this.attributes.delete(name.toLowerCase()); }
