@@ -1,4 +1,5 @@
 import { DisposalScope } from '../../../../engine/DisposalScope';
+import { bindingLabel, profileFor, type PadAction } from '../../../../engine/ControlPreferences';
 import type { GamepadMenuCommand } from '../../../../engine/StandardGamepad';
 import { WorldControlsHelp } from '../../../WorldControlsHelp';
 import type { WorldGame } from '../../../WorldGame';
@@ -8,6 +9,9 @@ interface SceneControlsRuntime {
     readonly game: WorldGame;
     togglePause(): void;
 }
+
+const buttons = (pad: Gamepad, action: PadAction) =>
+    profileFor(pad).bindings[action].map(binding => bindingLabel(binding, pad)).join(' / ') || 'Sem botão';
 
 /** Mount before the scene's Input. Reading help never consumes or restarts an attempt. */
 export class GuairaChapterControlsHelp {
@@ -36,10 +40,12 @@ export class GuairaChapterControlsHelp {
         }, {
             id: 'chapter-controls-help', regionLabel: 'Controles e ajuda do capítulo de Guaíra',
             closeLabel: 'VOLTAR',
-            footerHint: '↑/↓ rola o texto · Esc ou B/○ volta',
-            navigation: [
-                'Controle padrão: direcional ou analógico para andar; A/× pula; X/□ ou RT/R2 corre; LB/L1 ou baixo no ar faz a sentada; Menu pausa.',
-                'Menus: direcional escolhe; A/× confirma; B/○ volta. Na ajuda, ↑/↓ rola o texto e B/○ fecha.',
+            footerHint: pad => `↑/↓ rola o texto · Esc${pad && profileFor(pad).bindings.back.length ? ` ou ${buttons(pad, 'back')}` : ''} volta`,
+            navigation: pad => [
+                pad ? `Controle: Esquerda/Direita para andar; pular: ${buttons(pad, 'jump')}; correr: ${buttons(pad, 'run')}; sentada no ar: ${buttons(pad, 'down')}; pausar: ${buttons(pad, 'pause')}.`
+                    : 'No jogo, use os comandos da lista acima para andar, pular, correr e fazer a sentada no ar.',
+                pad ? `Menus: direções configuradas escolhem; confirmar: ${buttons(pad, 'confirm')}; voltar: ${buttons(pad, 'back')}. Na ajuda, Cima/Baixo rola o texto.`
+                    : 'Menus: Tab ou ↑/↓ para escolher; Enter ou Espaço para confirmar. Na ajuda, ↑/↓ rola o texto.',
                 'Esc fecha a ajuda. Na pausa, Esc continua a partida.',
                 'Recomeçar reinicia o trecho atual. Trechos concluídos permanecem salvos.',
                 optional ? 'Voltar ao mapa encerra o percurso opcional.' : 'Voltar ao mapa encerra a tentativa atual.',

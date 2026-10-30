@@ -28,10 +28,11 @@ interface ControlsHelpHost {
 export interface ControlsHelpContent {
     id?: string;
     regionLabel?: string;
-    navigation?: readonly string[];
+    /** Dynamic copy keeps the same paragraph count across binding/device changes. */
+    navigation?: readonly string[] | ((pad?: Gamepad) => readonly string[]);
     touch?: string;
     closeLabel?: string;
-    footerHint?: string;
+    footerHint?: string | ((pad?: Gamepad) => string);
     extraActions?: boolean;
     extraContent?: HTMLElement;
 }
@@ -50,7 +51,7 @@ export class WorldControlsHelp {
     private readonly navigation = new DomGamepadMenu();
     private readonly settings: ControlSettings;
     private readonly bindings = new Map<ControlAction, HTMLElement>();
-    private readonly defaultNavigationParagraphs: HTMLParagraphElement[] = [];
+    private readonly refreshText: ((pad?: Gamepad) => void)[] = [];
 
     constructor(private readonly canvas: HTMLCanvasElement, private readonly host: ControlsHelpHost, contentOptions: ControlsHelpContent = {}) {
         this.settings = new ControlSettings(contentOptions.extraActions);
@@ -69,9 +70,13 @@ export class WorldControlsHelp {
                 const term = document.createElement('dt'), description = document.createElement('dd');
                 term.textContent = CONTROL_LABELS[action]; this.bindings.set(action, description); list.append(term, description);
             }
-            const navigation = (contentOptions.navigation ?? defaultNavigation(selectedGamepad()))
+            const navigationText = contentOptions.navigation ?? defaultNavigation;
+            const navigation = (typeof navigationText === 'function' ? navigationText(selectedGamepad()) : navigationText)
                 .map(text => { const paragraph = document.createElement('p'); paragraph.textContent = text; return paragraph; });
-            if (!contentOptions.navigation) this.defaultNavigationParagraphs.push(...navigation);
+            if (typeof navigationText === 'function') this.refreshText.push(pad => {
+                const text = navigationText(pad);
+                navigation.forEach((paragraph, index) => { paragraph.textContent = text[index]; });
+            });
             const touchTitle = document.createElement('h3'); touchTitle.textContent = 'NA TELA DE TOQUE';
             const touch = document.createElement('p');
             touch.textContent = contentOptions.touch ?? '← / → para andar; ↑ para pular; segure X + direção para correr; ↓ no ar para a sentada. Toque no topo da tela para pausar.';
@@ -79,14 +84,17 @@ export class WorldControlsHelp {
             if (contentOptions.extraContent) content.append(contentOptions.extraContent);
             this.lifetime.listen(window, 'feka-controls-change', () => this.refreshBindings());
             this.lifetime.listen(window, 'feka-gamepad-select', () => this.refreshBindings());
-            this.refreshBindings();
             const footer = document.createElement('footer');
             this.closeButton.type = 'button'; this.closeButton.textContent = contentOptions.closeLabel ?? 'VOLTAR ÀS OPÇÕES';
             if (contentOptions.id) this.closeButton.id = `${contentOptions.id}-close`;
             if (contentOptions.footerHint) {
                 const hint = document.createElement('p'); hint.className = 'world-controls-footer-hint';
-                hint.textContent = contentOptions.footerHint; footer.append(hint);
+                const footerText = contentOptions.footerHint;
+                if (typeof footerText === 'function') this.refreshText.push(pad => { hint.textContent = footerText(pad); });
+                else hint.textContent = footerText;
+                footer.append(hint);
             }
+            this.refreshBindings();
             footer.append(this.closeButton); this.dialog.append(this.heading, content, footer); document.body.append(this.dialog);
             this.lifetime.listen(this.closeButton, 'click', () => this.close());
             this.lifetime.listen(this.dialog, 'cancel', event => { event.preventDefault(); this.close(); });
@@ -127,10 +135,7 @@ export class WorldControlsHelp {
             const buttons = action === 'mute' ? '' : (pad ? profileFor(pad).bindings[action] : []).map(b => bindingLabel(b, pad)).join(' / ');
             node.textContent = buttons ? `${keys} · ${buttons}` : keys;
         }
-        if (this.defaultNavigationParagraphs.length) {
-            const text = defaultNavigation(pad);
-            this.defaultNavigationParagraphs.forEach((paragraph, index) => { paragraph.textContent = text[index]; });
-        }
+        for (const refresh of this.refreshText) refresh(pad);
     }
 
     open(): void {
