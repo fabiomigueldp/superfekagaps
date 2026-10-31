@@ -775,20 +775,15 @@ export class Game {
 
     // Configura câmera
     const bounds = this.level.getBounds();
+    const center = this.player.getCenter();
     this.camera.bounds = bounds;
-    this.camera.x = 0;
-    this.camera.y = 0;
+    // Show the spawn on the first playable frame, including shifted worlds.
+    this.camera.x = Math.max(bounds.minX, Math.min(center.x - GAME_WIDTH / 2, bounds.maxX - GAME_WIDTH));
+    this.camera.y = Math.max(bounds.minY, Math.min(center.y - GAME_HEIGHT / 2, bounds.maxY - GAME_HEIGHT));
     this.camera.zoom = 1;
-    this.camera.targetX = 0;
-    this.camera.targetY = 0;
+    this.camera.targetX = this.camera.x;
+    this.camera.targetY = this.camera.y;
     this.activeCameraOverride = null;
-
-    // Snap camera to start position immediately to avoid weird initial pan
-    // Center on player spawn
-    // We can't use detailed centering logic easily here without duplicating code, 
-    // but setting it roughly near player is better than 0,0.
-    // Let's just trust updateCamera will fix it quickly, but x=0 is definitely bad if not at 0.
-    // Better to let updateCamera handle it, but definitely reset ZOOM.
 
     // Configura Background Procedural
     this.renderer.prepareLevelBackground(levelData.theme);
