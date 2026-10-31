@@ -41,7 +41,12 @@ export class WorldEditor {
         const controls = document.createElement('div');
         controls.className = 'world-editor-actions';
         this.bar.append(controls);
-        this.addButton(controls, 'Jogar / editar', () => { this.preview = !this.preview; this.reload(); });
+        this.addButton(controls, 'Jogar / editar', () => {
+            this.preview = !this.preview;
+            this.reload();
+            // Give gameplay the keyboard: Space on the button would stop the preview.
+            if (this.preview) this.canvas.focus({ preventScroll: true });
+        });
         this.addButton(controls, 'Desfazer', () => this.undo());
         this.addButton(controls, 'Refazer', () => this.redo());
         const tools = document.createElement('select');
