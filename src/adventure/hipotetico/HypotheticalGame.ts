@@ -25,7 +25,7 @@ import {HypotheticalChasePatrol} from './HypotheticalChasePatrol';
 import {drawChasePatrol} from './HypotheticalChasePatrolArt';
 import {ARRIVAL,arrivalFade,arrivalDeployment,arrivalLookAhead} from './HypotheticalArrival';
 import {arrivalStoryTime,HELICOPTER_SEQUENCE} from './HypotheticalHelicopterTiming';
-import {controlCode,keyAction} from '../../engine/ControlPreferences';
+import {controlCode,controlPreferences,keyAction,keyLabel,type ControlAction} from '../../engine/ControlPreferences';
 
 export class HypotheticalEncounter extends BossEncounter {
     readonly model: HypotheticalModel;
@@ -188,7 +188,7 @@ export class HypotheticalGame extends WorldGame {
         }
         const b=this.fight;
         if(this.act==='chase'&&!this.player.data.hasHelmet&&b.state==='rest'&&this.player.data.position.x-b.x<82)
-            return this.player.data.invincibleTimer>0?'SEM CAPACETE! APROVEITE PARA SE AFASTAR':'ELE ESTA PERTO! CORRA: SHIFT + DIREITA';
+            return this.player.data.invincibleTimer>0?'SEM CAPACETE! APROVEITE PARA SE AFASTAR':'ELE ESTA PERTO! CORRA PARA A DIREITA';
         if(this.act==='siege'&&!b.arrival.ready){
             const t=b.arrivalTime;
             if(b.backdrop.helicopter.active)return b.backdrop.helicopter.age<HELICOPTER_SEQUENCE.fire
@@ -465,7 +465,12 @@ export class HypotheticalGame extends WorldGame {
             if(fade>0&&!this.player.data.isDead){c.save();c.globalAlpha=fade;c.fillStyle='#122630';c.fillRect(0,0,320,180);c.restore();this.renderer.present();}
         }
         const retryHint=keyAction('KeyR')?'':'; R: retomar o trecho';
-        const status=`Flávio Bolsonaro Hipotético. ${this.act==='chase'?'Perseguição':this.act==='siege'?`Cerco, ${b.route.currentSector.name}, ${b.route.remaining[b.route.entered]} de ${b.route.currentSector.guards.length} guardas restantes`:`Confronto, fase ${b.phaseNumber}`}. ${this.state==='paused'?'Pausado.':this.encounterHint} ${b.health} lacres. Setas: mover; Shift: correr; Espaço: pular; baixo no ar: sentada; Esc: pausa${retryHint}.`;
+        // One active key per action keeps the live announcement concise.
+        const key=(action:ControlAction)=>{
+            const code=controlPreferences.keys[action][0];
+            return code?keyLabel(code):'Sem tecla';
+        };
+        const status=`Flávio Bolsonaro Hipotético. ${this.act==='chase'?'Perseguição':this.act==='siege'?`Cerco, ${b.route.currentSector.name}, ${b.route.remaining[b.route.entered]} de ${b.route.currentSector.guards.length} guardas restantes`:`Confronto, fase ${b.phaseNumber}`}. ${this.state==='paused'?'Pausado.':this.encounterHint} ${b.health} lacres. ${key('left')}/${key('right')}: mover; ${key('run')}: correr; ${key('jump')}: pular; ${key('down')} no ar: sentada; ${key('pause')}: pausa${retryHint}.`;
         if(this.status.textContent!==status)this.status.textContent=status;
     }
 }

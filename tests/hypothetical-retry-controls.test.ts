@@ -135,3 +135,27 @@ test('every configured action takes precedence over legacy retry',t=>{
         h.key('keydown');h.key('keyup');assert.equal(h.model(),model,action);
     }
 });
+
+test('accessible keyboard reference follows live primary bindings and restoration',t=>{
+    const h=fixture();t.after(()=>h.game.dispose());h.game.state='paused';
+    Object.assign(h.preferences.controlPreferences.keys,{left:['KeyH'],right:['KeyL'],run:['KeyV'],
+        jump:['KeyK','KeyR'],down:['KeyB'],pause:['KeyP']});
+    h.game.render();
+    assert.match(h.game.status.textContent??'',/H\/L: mover; V: correr; K: pular; B no ar: sentada; P: pausa/);
+    assert.doesNotMatch(h.game.status.textContent??'',/Setas: mover|Shift: correr|Espaço: pular|Esc: pausa|R: retomar/);
+    Object.assign(h.preferences.controlPreferences.keys,structuredClone(h.preferences.DEFAULT_KEYS));
+    h.game.render();
+    assert.match(h.game.status.textContent??'',/←\/→: mover; Shift esq\.: correr; Espaço: pular; ↓ no ar: sentada; Esc: pausa/);
+    assert.match(h.game.status.textContent??'',/R: retomar o trecho/);
+});
+
+test('nearby chase advice describes running without prescribing an inactive key',t=>{
+    const h=fixture();t.after(()=>h.game.dispose());
+    h.preferences.controlPreferences.keys.run=['KeyV'];
+    Object.assign(h.model(),{state:'rest',x:100});
+    Object.assign(h.game.player.data,{hasHelmet:false,invincibleTimer:0});
+    const hint=Object.getOwnPropertyDescriptor(Object.getPrototypeOf(h.game),'encounterHint')!.get!;
+    assert.equal(hint.call(h.game),'ELE ESTA PERTO! CORRA PARA A DIREITA');
+    h.game.player.data.invincibleTimer=1000;
+    assert.equal(hint.call(h.game),'SEM CAPACETE! APROVEITE PARA SE AFASTAR');
+});

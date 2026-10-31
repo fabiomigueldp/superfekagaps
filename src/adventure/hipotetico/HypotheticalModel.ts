@@ -175,7 +175,7 @@ export class HypotheticalModel {
             if(course.porticoAge>=0&&course.impactAge<0)return 'FOGUETE CONTRA O PORTICO. PASSARELA DE MANUTENCAO ADIANTE';
             if(course.impactAge>=0&&course.impactAge<120)return 'O PORTICO CEDEU. APOIOS BAIXOS E PASSARELA SUPERIOR';
         }
-        if (this.act === 'chase') return this.tick < 110 ? 'CORRA: SHIFT + DIREITA. PULE OS VAOS'
+        if (this.act === 'chase') return this.tick < 110 ? 'CORRA PARA A DIREITA. PULE OS VAOS'
             :['tell','attack'].includes(this.state)?this.pursuitKind==='high'?'TIRO ALTO! SIGA POR BAIXO'
             :this.pursuitKind==='low'?this.pursuitStep?'MIRA BAIXA AGORA! SALTE A RAJADA':'RAJADA BAIXA! SALTE QUANDO ELA CHEGAR':'INVESTIDA! SALTE A ONDA DE DESTROCOS'
             :this.counters.hint(this.tick)??'A PONTE CEDE! SIGA AS BORDAS CLARAS';
