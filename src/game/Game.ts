@@ -954,7 +954,8 @@ export class Game {
         y: resolvedWorldRow * TILE_SIZE
       };
 
-      const triggerTop = Math.max(0, (resolvedWorldRow - 1) * TILE_SIZE);
+      // The contact area is in world space, just like the visible flag.
+      const triggerTop = Math.max(originY * TILE_SIZE, (resolvedWorldRow - 1) * TILE_SIZE);
       flags.push({
         id: nextId++,
         kind: 'checkpoint',
@@ -992,7 +993,7 @@ export class Game {
         x: resolvedWorldCol * TILE_SIZE + Math.floor(TILE_SIZE / 2),
         y: resolvedWorldRow * TILE_SIZE
       };
-      const triggerTop = Math.max(0, (resolvedWorldRow - 2) * TILE_SIZE);
+      const triggerTop = Math.max(originY * TILE_SIZE, (resolvedWorldRow - 2) * TILE_SIZE);
       flags.push({
         id: nextId++,
         kind: 'goal',
