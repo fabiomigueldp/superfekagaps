@@ -38,9 +38,12 @@ export class AudioVoicePlayer {
   }
 
   update(deltaMs: number): void {
+    let gapDeltaMs = deltaMs;
     if (this.usingFallback) {
       this.fallbackRemainingMs -= deltaMs;
       if (this.fallbackRemainingMs <= 0) {
+        // Only time left after the clip ends belongs to the new gap.
+        gapDeltaMs = -this.fallbackRemainingMs;
         this.usingFallback = false;
         this.handleClipEnd('ended');
       }
@@ -48,7 +51,7 @@ export class AudioVoicePlayer {
 
     if (!this.currentItem && this.queue.length > 0) {
       if (this.pendingGapMs > 0) {
-        this.pendingGapMs -= deltaMs;
+        this.pendingGapMs -= gapDeltaMs;
       }
       if (this.pendingGapMs <= 0) {
         this.startNextClip();
