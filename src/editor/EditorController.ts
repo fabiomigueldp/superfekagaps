@@ -2333,10 +2333,10 @@ export class EditorController {
     }
 
     private createInspectorSelect(label: string, options: string[], value: string, onChange: (val: string) => void) {
-        const row = document.createElement('div');
+        const row = document.createElement('label');
         row.className = 'control-row';
 
-        const lbl = document.createElement('label');
+        const lbl = document.createElement('span');
         lbl.innerText = label;
 
         const select = document.createElement('select');
@@ -2378,10 +2378,11 @@ export class EditorController {
     }
 
     private createInspectorTextArea(label: string, value: string, onChange: (val: string) => void) {
-        const div = document.createElement('div');
+        const div = document.createElement('label');
+        div.style.display = 'block';
         div.style.marginBottom = '5px';
 
-        const lbl = document.createElement('label');
+        const lbl = document.createElement('span');
         lbl.innerText = label;
         lbl.style.display = 'block';
         lbl.style.marginBottom = '2px';
