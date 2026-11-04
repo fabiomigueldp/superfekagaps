@@ -7,7 +7,7 @@
   "metadataSha256": "042d6d20b289a3282784b4b706a82bc995d9d01e69320bd22798ee5999cde12b",
   "sourceHashes": {
     "tools/diorama/measure_fabrica_envelopes.ts": "e8484c4d5de19336cce4243cb7b471e8a92b944918ac6038adcf3656cdc70f14",
-    "src/assets/playerSpriteSpec.ts": "6a08f9d187cc0c5fa384ecae00ba743c2491580ecc06260b4a611279a07740e0",
+    "src/assets/playerSpriteSpec.ts": "4a875484b116c2a22fc1534056bbc978a36deddcaf1cfbc107f7cf0d838b1ce1",
     "src/adventure/WorldAtlasArt.ts": "96f15b5e68907b24b9a3f178f88e897a9b53b1357d7680c8c9b1071e2ff1f9e0",
     "src/adventure/WorldAtlasModel.ts": "08aec86444beff853975be56405f239461a345060a8e924640366cff4dcf1934",
     "src/adventure/WorldMapArt.ts": "407a5d9c0fc6e54e4a22bf4d05a6938f5613c1ade2e8cca2ec015f022fbaa50e",
