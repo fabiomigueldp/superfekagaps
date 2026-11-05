@@ -190,6 +190,10 @@ export class EditorController {
         this.canvas.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
         window.addEventListener('blur', () => { this.isCtrlPressed = false; this.cancelGesture(); });
         window.addEventListener('beforeunload', e => {
+            // Commit pending text through the field's normal validation and history path.
+            const focused = document.activeElement;
+            if ((focused instanceof HTMLInputElement || focused instanceof HTMLTextAreaElement)
+                && focused.closest('#editor-ui')) focused.blur();
             if (this.levelData && this.history.isDirty(this.levelData)) { e.preventDefault(); e.returnValue = ''; }
         });
         document.getElementById('editor-ui')?.addEventListener('change', () => this.recordChange());
