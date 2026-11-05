@@ -180,7 +180,9 @@ export class GlobalScoreboard {
       const data = await response.json() as RankingResponse;
       if (!this.isCurrentRequest(session, request)) return;
       if (!response.ok) throw new Error(data.error || 'Falha ao publicar. Tente novamente.');
-      localStorage.setItem(PLAYER_NAME_KEY, name);
+      // Remembering a name is optional; storage failure must not undo a confirmed POST.
+      try { localStorage.setItem(PLAYER_NAME_KEY, name); }
+      catch { /* Keep the server result even when the local preference cannot be saved. */ }
       this.render(data.entries);
       this.status.textContent = data.saved ? 'Recorde publicado! Seu nome já está no placar.' : 'Seu recorde publicado já é igual ou maior.';
       // Move focus before hiding the form, including a lost-focus fallback, but
