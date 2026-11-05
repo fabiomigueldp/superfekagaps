@@ -29,6 +29,7 @@ export class EditorController {
     private dragStartTile: Vector2 | null = null;
     private lastMousePos: Vector2 = { x: 0, y: 0 };
     private lastPaintPosition: Vector2 | null = null;
+    private eraserProtectedAreas: Array<{ x: number; y: number; w: number; h: number; logic?: boolean }> = [];
     private canvas: HTMLCanvasElement;
 
     private readonly history = new EditorHistory<LevelData>();
@@ -967,6 +968,7 @@ export class EditorController {
         this.activeEdge = null;
         this.dragStartTile = null;
         this.lastPaintPosition = null;
+        this.eraserProtectedAreas = [];
         this.boundsResizeStart = null;
         if (changed) this.recordChange();
     }
@@ -1547,6 +1549,15 @@ export class EditorController {
                     this.isDragging = true;
                 }
                 else if (this.activeTool === EditorTool.ERASER) {
+                    // Interpolated tile samples must not peel layers exposed by this gesture.
+                    const level = this.levelData;
+                    this.eraserProtectedAreas = level ? [
+                        ...level.triggers.map(t => ({ ...this.getEntityRect('TRIGGER', t), logic: true })),
+                        ...level.collectibles.map(c => this.getEntityRect('COLLECTIBLE', c)),
+                        ...level.checkpoints.map(c => this.getEntityRect('CHECKPOINT', c)),
+                        ...level.enemies.map(e => this.getEntityRect('ENEMY', e)),
+                        this.getEntityRect('GOAL', level.goalPosition)
+                    ] : [];
                     this.handleEraserInteract(worldX, worldY);
                     this.isDragging = true;
                 }
@@ -1621,7 +1632,20 @@ export class EditorController {
                     this.lastPaintPosition = { x: worldX, y: worldY };
                 }
             } else if (this.activeTool === EditorTool.ERASER) {
+                const previous = this.lastPaintPosition ?? { x: worldX, y: worldY };
+                const steps = Math.max(1, Math.ceil(Math.max(Math.abs(worldX - previous.x), Math.abs(worldY - previous.y)) / (TILE_SIZE / 2)));
+                const logic = this.isLogicMode();
+                for (let step = 1; step < steps; step++) {
+                    const x = previous.x + (worldX - previous.x) * step / steps;
+                    const y = previous.y + (worldY - previous.y) * step / steps;
+                    if (!this.eraserProtectedAreas.some(r => (!r.logic || logic) &&
+                        x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h)) {
+                        this.eraseTile(x, y);
+                    }
+                }
+                // Preserve object priority and one hit per actual pointer event.
                 this.handleEraserInteract(worldX, worldY);
+                this.lastPaintPosition = { x: worldX, y: worldY };
             } else if (this.activeTool === EditorTool.SELECT && this.activeSelection) {
                 // Handle Dragging Selection
                 let newX = worldX - this.selectionDragOffset.x;
@@ -2035,6 +2059,11 @@ export class EditorController {
         }
 
         // 2. Fallback: Erase Tile
+        this.eraseTile(worldX, worldY);
+    }
+
+    private eraseTile(worldX: number, worldY: number): void {
+        if (!this.levelData) return;
         const originX = this.levelData.originX ?? 0;
         const originY = this.levelData.originY ?? 0;
         const col = Math.floor(worldX / TILE_SIZE) - originX;
