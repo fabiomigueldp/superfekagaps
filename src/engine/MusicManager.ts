@@ -43,7 +43,8 @@ export class MusicManager {
       return;
     }
 
-    if (prevState === GameState.PAUSED && nextState === GameState.PLAYING) {
+    // Returning from Game Over has no respawn to clear the death attenuation.
+    if (nextState === GameState.MENU || (prevState === GameState.PAUSED && nextState === GameState.PLAYING)) {
       this.isPaused = false;
       this.engine.setMusicVolume(1, 200);
     }
