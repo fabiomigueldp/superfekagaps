@@ -750,17 +750,12 @@ export class EditorController {
                 // If we are using ERASER or SELECT, selecting a tile implies we want to paint -> Switch to BRUSH.
                 // If we are using BRUSH or RECTANGLE, keep the tool (user might want to paint a rect of the new tile).
                 if (this.activeTool === EditorTool.ERASER || this.activeTool === EditorTool.SELECT) {
-                    this.activeTool = EditorTool.BRUSH;
+                    this.setTool(EditorTool.BRUSH);
                 }
 
                 // Update UI state
                 Array.from(this.uiPalette.children).forEach(c => c.classList.remove('selected'));
                 btn.classList.add('selected');
-
-                // Sync Tool UI
-                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-                const activeBtn = document.querySelector(`.tool-btn[data-tool="${this.activeTool}"]`);
-                if (activeBtn) activeBtn.classList.add('active');
 
             };
             this.uiPalette.appendChild(btn);
@@ -802,17 +797,12 @@ export class EditorController {
                 this.activeContent = { type: 'TRIGGER', triggerType: item.triggerType };
 
                 // Auto-select Rectangle tool for zones
-                this.activeTool = EditorTool.RECTANGLE;
+                this.setTool(EditorTool.RECTANGLE);
 
                 // Update UI state
                 Array.from(this.uiLogicPalette.children).forEach(c => c.classList.remove('selected'));
                 Array.from(this.uiPalette.children).forEach(c => c.classList.remove('selected')); // Clear other palette too
                 btn.classList.add('selected');
-
-                // Sync Tool UI
-                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-                const activeBtn = document.querySelector(`.tool-btn[data-tool="${this.activeTool}"]`);
-                if (activeBtn) activeBtn.classList.add('active');
 
             };
             this.uiLogicPalette.appendChild(btn);
