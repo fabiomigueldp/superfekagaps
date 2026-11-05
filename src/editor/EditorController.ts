@@ -190,10 +190,7 @@ export class EditorController {
         this.canvas.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
         window.addEventListener('blur', () => { this.isCtrlPressed = false; this.cancelGesture(); });
         window.addEventListener('beforeunload', e => {
-            // Commit pending text through the field's normal validation and history path.
-            const focused = document.activeElement;
-            if ((focused instanceof HTMLInputElement || focused instanceof HTMLTextAreaElement)
-                && focused.closest('#editor-ui')) focused.blur();
+            this.commitFocusedField();
             if (this.levelData && this.history.isDirty(this.levelData)) { e.preventDefault(); e.returnValue = ''; }
         });
         document.getElementById('editor-ui')?.addEventListener('change', () => this.recordChange());
@@ -893,9 +890,18 @@ export class EditorController {
         (document.getElementById('level-is-boss') as HTMLInputElement).checked = this.levelData.isBossLevel;
     }
 
+    private commitFocusedField(): void {
+        // Commit pending text through the field's normal validation and history path.
+        const focused = document.activeElement;
+        if ((focused instanceof HTMLInputElement || focused instanceof HTMLTextAreaElement)
+            && focused.closest('#editor-ui')) focused.blur();
+    }
+
     private canReplaceDocument(): boolean {
-        return !this.saving && (!this.levelData || !this.history.isDirty(this.levelData)
-            || window.confirm('Descartar as alterações não salvas desta fase?'));
+        if (this.saving) return false;
+        this.commitFocusedField();
+        return !this.levelData || !this.history.isDirty(this.levelData)
+            || window.confirm('Descartar as alterações não salvas desta fase?');
     }
 
     private async save(exportOnly = false): Promise<void> {
