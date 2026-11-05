@@ -1518,6 +1518,8 @@ export class EditorController {
 
     private onMouseDown(e: MouseEvent) {
         e.preventDefault();
+        // Commit the previous field before starting a gesture and reclaim shortcuts.
+        this.canvas.focus({ preventScroll: true });
         const rect = this.canvas.getBoundingClientRect();
         const startX = e.clientX - rect.left;
         const startY = e.clientY - rect.top;
