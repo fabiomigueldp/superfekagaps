@@ -98,6 +98,9 @@ export class MusicManager {
       if (powerupActive) {
         this.onPowerupStart();
       } else {
+        // A state transition during the powerup may have made it the base track.
+        this.decision = decideMusic(snapshot);
+        this.baseTrackId = this.decision.trackId;
         this.onPowerupEnd();
       }
       this.lastPowerupActive = powerupActive;
