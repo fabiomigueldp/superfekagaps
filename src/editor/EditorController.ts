@@ -26,6 +26,7 @@ export class EditorController {
     private currentWorldMouse: Vector2 = { x: 0, y: 0 };
 
     private isDragging: boolean = false;
+    private activePointerId: number | null = null;
     private dragStartTile: Vector2 | null = null;
     private lastMousePos: Vector2 = { x: 0, y: 0 };
     private lastPaintPosition: Vector2 | null = null;
@@ -170,13 +171,22 @@ export class EditorController {
     private bindEvents() {
         // ... (Canvas events preserved via logic, but overwriting block method)
         this.canvas.addEventListener('pointerdown', e => {
+            if (this.activePointerId !== null) return;
             this.canvas.setPointerCapture(e.pointerId);
+            this.activePointerId = e.pointerId;
             this.onMouseDown(e);
         });
-        this.canvas.addEventListener('pointermove', this.onMouseMove.bind(this));
-        this.canvas.addEventListener('pointerup', this.onMouseUp.bind(this));
-        this.canvas.addEventListener('pointercancel', () => this.cancelGesture());
-        this.canvas.addEventListener('lostpointercapture', () => this.cancelGesture());
+        this.canvas.addEventListener('pointermove', e => {
+            if (this.activePointerId === null || this.activePointerId === e.pointerId) this.onMouseMove(e);
+        });
+        this.canvas.addEventListener('pointerup', e => {
+            if (this.activePointerId === e.pointerId) this.onMouseUp(e);
+        });
+        for (const type of ['pointercancel', 'lostpointercapture'] as const) {
+            this.canvas.addEventListener(type, e => {
+                if (this.activePointerId === e.pointerId) this.cancelGesture();
+            });
+        }
         this.canvas.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
         window.addEventListener('blur', () => { this.isCtrlPressed = false; this.cancelGesture(); });
         window.addEventListener('beforeunload', e => {
@@ -962,6 +972,9 @@ export class EditorController {
     }
 
     private cancelGesture(): void {
+        const pointerId = this.activePointerId;
+        // Clear ownership before releasing capture, which can dispatch lostpointercapture.
+        this.activePointerId = null;
         const changed = this.isDragging;
         this.isDragging = false;
         this.isResizingBounds = false;
@@ -971,6 +984,7 @@ export class EditorController {
         this.eraserProtectedAreas = [];
         this.boundsResizeStart = null;
         if (changed) this.recordChange();
+        if (pointerId !== null && this.canvas.hasPointerCapture(pointerId)) this.canvas.releasePointerCapture(pointerId);
     }
 
     private setTool(tool: EditorTool): void {
