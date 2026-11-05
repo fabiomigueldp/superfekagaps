@@ -251,19 +251,21 @@ export class Game {
       deliciaMode: this.deliciaMode
     });
 
-    const bossAlive = this.boss ? !this.boss.data.isDead : false;
-    this.bossVoice?.update(deltaTime, {
-      allowAmbient: this.state === GameState.PLAYING && bossAlive
-    });
+    if (this.state !== GameState.PAUSED) {
+      const bossAlive = this.boss ? !this.boss.data.isDead : false;
+      this.bossVoice?.update(deltaTime, {
+        allowAmbient: this.state === GameState.PLAYING && bossAlive
+      });
 
-    if (this.boss && this.boss.data.pendingDeath && !this.boss.data.isDead && !this.bossDeathPending) {
-      this.queueBossDeath();
-    }
+      if (this.boss && this.boss.data.pendingDeath && !this.boss.data.isDead && !this.bossDeathPending) {
+        this.queueBossDeath();
+      }
 
-    if (this.bossDeathPending) {
-      this.bossDeathTimer -= deltaTime;
-      if (this.bossDeathTimer <= 0) {
-        this.finalizeBossDeath();
+      if (this.bossDeathPending) {
+        this.bossDeathTimer -= deltaTime;
+        if (this.bossDeathTimer <= 0) {
+          this.finalizeBossDeath();
+        }
       }
     }
 
@@ -915,8 +917,11 @@ export class Game {
   }
 
   private finalizeBossDeath(): void {
-    this.bossDeathPending = false;
     this.bossDeathTimer = 0;
+    // Native voice completion can arrive while paused. Keep the defeat pending
+    // with no wait remaining so the first resumed update completes it.
+    if (this.state === GameState.PAUSED) return;
+    this.bossDeathPending = false;
     if (!this.boss || this.boss.data.isDead) return;
     this.boss.projectiles = [];
     this.boss.die();
