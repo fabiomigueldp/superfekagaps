@@ -420,10 +420,12 @@ export class EditorController {
         // Key modifiers
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Control') this.isCtrlPressed = true;
-            if ((e.target as HTMLElement)?.closest('input, textarea, select, [contenteditable="true"]')) return;
             const key = e.key.toLowerCase();
+            if ((e.ctrlKey || e.metaKey) && key === 's') {
+                e.preventDefault(); void this.save(); return;
+            }
+            if ((e.target as HTMLElement)?.closest('input, textarea, select, [contenteditable="true"]')) return;
             if (e.ctrlKey || e.metaKey) {
-                if (key === 's') { e.preventDefault(); void this.save(); }
                 if (key === 'z' || key === 'y') {
                     e.preventDefault(); this.restoreHistory(key === 'y' || e.shiftKey);
                 }
@@ -906,6 +908,7 @@ export class EditorController {
 
     private async save(exportOnly = false): Promise<void> {
         if (!this.levelData || this.saving) return;
+        this.commitFocusedField();
         this.cancelGesture();
         const data = structuredClone(this.levelData);
         const filename = this.newDocument
