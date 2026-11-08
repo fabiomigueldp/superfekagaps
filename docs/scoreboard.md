@@ -20,11 +20,18 @@ World usa o armazenamento `/home/ubuntu/torbware-world/`, ativação atômica e 
 reinicia `super-feka-gaps.service`. Não copie nem remova `data/` ao atualizar os
 arquivos estáticos; mantenha o backup consistente do SQLite descrito ao final.
 
-Para publicar uma revisão deste serviço, quando essa manutenção estiver autorizada:
+O `dist/` produzido pelo build padrão desta main não é um artefato Classic
+isolado: contém entradas World/Delícia/Guaíra e inicia World por padrão. Não o
+copie diretamente para o domínio Classic. `npm run check` e `npm run build`
+não produzem um artefato Classic isolado; este guia não fornece uma receita para
+separá-lo.
+
+A transferência abaixo só se aplica quando a manutenção estiver autorizada e
+já existir um artefato revisado destinado ao Classic. Substitua o caminho de
+exemplo pela pasta desse artefato, não pelo `dist/` do build padrão:
 
 ```sh
-npm run check
-rsync -az --delete dist/ oracle:/home/ubuntu/super-feka-gaps-remaster/dist/
+rsync -az --delete /caminho/para/artefato-classic-revisado/ oracle:/home/ubuntu/super-feka-gaps-remaster/dist/
 rsync -az server/leaderboard.mjs oracle:/home/ubuntu/super-feka-gaps-remaster/server/leaderboard.mjs
 ssh oracle 'sudo systemctl restart super-feka-gaps.service'
 curl -fsS https://superfekagaps.torbware.space/healthz
