@@ -2022,11 +2022,11 @@ export class EditorController {
                     item.position.x === finalX && item.position.y === finalY)) return;
                 this.levelData.collectibles.push({ type, position: { x: finalX, y: finalY } });
             } else if (this.activeContent.entityType === 'CHECKPOINT') {
-                if (!this.levelData.checkpoints.some(point => point.x === gridX && point.y === gridY)) {
-                    this.levelData.checkpoints.push({ x: gridX, y: gridY });
+                if (!this.levelData.checkpoints.some(point => point.x === finalX && point.y === finalY)) {
+                    this.levelData.checkpoints.push({ x: finalX, y: finalY });
                 }
             } else if (this.activeContent.entityType === 'GOAL') {
-                Object.assign(this.levelData.goalPosition, { x: gridX, y: gridY });
+                Object.assign(this.levelData.goalPosition, { x: finalX, y: finalY });
             }
         }
     }
