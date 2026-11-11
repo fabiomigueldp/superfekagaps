@@ -62,11 +62,13 @@ export class FileSystemManager {
         return content;
     }
 
-    async readLevel(filename: string): Promise<LevelData> {
+    /** The consumer may reject a candidate without authorizing a later overwrite. */
+    async readLevel(filename: string, accept: (data: LevelData) => boolean = () => true): Promise<LevelData> {
         const { directory, content } = await this.readContent(filename);
         const data = parseLevelFromText(content);
-        // A failed import must not authorize overwriting a newer, invalid file on disk.
-        if (directory === this.dirHandle) this.loadedFiles.set(filename, content);
+        if (directory !== this.dirHandle) return data;
+        // Keep the exact bytes only after the consumer has accepted and loaded the document.
+        if (accept(data) && directory === this.dirHandle) this.loadedFiles.set(filename, content);
         return data;
     }
 

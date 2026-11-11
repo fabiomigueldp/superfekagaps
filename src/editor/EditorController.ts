@@ -838,8 +838,11 @@ export class EditorController {
                 const version = this.documentVersion;
                 const request = ++this.loadRequest;
                 try {
-                    const level = await this.fs.readLevel(file);
-                    if (request === this.loadRequest && version === this.documentVersion && this.canReplaceDocument()) this.loadLevel(level, file, true);
+                    await this.fs.readLevel(file, level => {
+                        if (request !== this.loadRequest || version !== this.documentVersion || !this.canReplaceDocument()) return false;
+                        this.loadLevel(level, file, true);
+                        return true;
+                    });
                 } catch (error) { this.showError(error); }
             }));
             if (!files.length) this.uiLevelList.textContent = 'Nenhuma fase nesta pasta. Importe um arquivo ou abra src/data/levels.';

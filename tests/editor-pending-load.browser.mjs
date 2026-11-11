@@ -38,7 +38,9 @@ test('Classic checks pending fields when delayed document reads finish and ignor
       else {
         Object.defineProperty(e.fs, 'isMounted', { value: true });
         e.fs.listLevels = async () => ['incoming.ts'];
-        e.fs.readLevel = () => defer(structuredClone(incoming));
+        e.fs.readLevel = async (_filename, accept = () => true) => {
+          const data = await defer(structuredClone(incoming)); accept(data); return data;
+        };
         await e.refreshLevelList();
       }
       const field = source === 'import' ? document.getElementById('level-name') : document.querySelector('#inspector-content textarea');

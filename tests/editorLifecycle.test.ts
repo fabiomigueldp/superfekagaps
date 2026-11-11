@@ -220,7 +220,11 @@ test('the last requested level wins even when an earlier read finishes first', a
     e.fs = {
         isSupported: true, isMounted: true,
         listLevels: async () => ['first.ts', 'last.ts'],
-        readLevel: (filename: string) => filename === 'first.ts' ? first.promise : last.promise
+        readLevel: async (filename: string, accept: (data: LevelData) => boolean = () => true) => {
+            const data = await (filename === 'first.ts' ? first.promise : last.promise);
+            accept(data);
+            return data;
+        }
     };
     await e.refreshLevelList();
     const [firstButton, lastButton] = get('level-list').children;
