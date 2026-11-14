@@ -79,3 +79,8 @@ env/
 # under public/, docs/ and tools/. Review captures must remain untracked.
 /output/
 *.blend[0-9]
+
+# Historical review recordings and derived island model exports
+/docs/**/*.mp4
+/docs/**/*.webm
+/docs/world/delicia/imperio-delicia-v*.glb
