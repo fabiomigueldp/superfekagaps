@@ -658,6 +658,15 @@ export class EditorController {
         });
     }
 
+    private selectPaletteButton(selected: HTMLButtonElement): void {
+        for (const palette of [this.uiPalette, this.uiLogicPalette]) {
+            for (const button of palette.querySelectorAll('button')) {
+                button.classList.toggle('selected', button === selected);
+                button.setAttribute('aria-pressed', String(button === selected));
+            }
+        }
+    }
+
     private buildPalette() {
         this.uiPalette.innerHTML = '';
 
@@ -708,6 +717,7 @@ export class EditorController {
             if (item.type !== 'TRIGGER' && this.activeContent.type !== 'TRIGGER' && this.activeContent.type === item.type && this.activeContent.id === item.id) {
                 btn.classList.add('selected');
             }
+            btn.setAttribute('aria-pressed', String(btn.classList.contains('selected')));
 
             // Create mini canvas for thumbnail
             const thumb = document.createElement('canvas');
@@ -768,8 +778,7 @@ export class EditorController {
                 }
 
                 // Update UI state
-                Array.from(this.uiPalette.children).forEach(c => c.classList.remove('selected'));
-                btn.classList.add('selected');
+                this.selectPaletteButton(btn);
 
             };
             this.uiPalette.appendChild(btn);
@@ -791,6 +800,9 @@ export class EditorController {
             btn.className = 'tile-btn';
             btn.type = 'button';
             btn.title = item.label;
+            const selected = this.activeContent.type === 'TRIGGER' && this.activeContent.triggerType === item.triggerType;
+            btn.classList.toggle('selected', selected);
+            btn.setAttribute('aria-pressed', String(selected));
             btn.style.display = 'flex';
             btn.style.flexDirection = 'column';
             btn.style.alignItems = 'center';
@@ -814,9 +826,7 @@ export class EditorController {
                 this.setTool(EditorTool.RECTANGLE);
 
                 // Update UI state
-                Array.from(this.uiLogicPalette.children).forEach(c => c.classList.remove('selected'));
-                Array.from(this.uiPalette.children).forEach(c => c.classList.remove('selected')); // Clear other palette too
-                btn.classList.add('selected');
+                this.selectPaletteButton(btn);
 
             };
             this.uiLogicPalette.appendChild(btn);
