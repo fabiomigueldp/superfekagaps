@@ -584,7 +584,7 @@ export class Game {
             this.renderer.drawGameOver(
               this.score,
               this.highScore,
-              false, // newRecord
+              this.newRecord,
               0, // totalRunTime (not tracked in this scope easily?)
               this.bestTime,
               this.newTimeRecord
