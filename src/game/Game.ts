@@ -1104,14 +1104,15 @@ export class Game {
 
   private isBossVisible(): boolean {
     if (!this.boss) return false;
+    const zoom = sceneZoom(this.camera.zoom || 1);
     const left = this.boss.data.position.x;
     const right = left + this.boss.data.width;
     const top = this.boss.data.position.y;
     const bottom = top + this.boss.data.height;
     return right >= this.camera.x &&
-      left <= this.camera.x + GAME_WIDTH &&
+      left <= this.camera.x + GAME_WIDTH / zoom &&
       bottom >= this.camera.y &&
-      top <= this.camera.y + GAME_HEIGHT;
+      top <= this.camera.y + GAME_HEIGHT / zoom;
   }
 
   private checkMinionCollision(minion: Minion): void {
