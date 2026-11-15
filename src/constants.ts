@@ -14,6 +14,7 @@ export const TILE_SIZE = 16;
 export const GRAVITY = 0.5;
 export const MAX_FALL_SPEED = 10;
 export const CULLING_MARGIN = 64; // Pixels off-screen before we stop rendering/updating
+export const POWERUP_EMERGENCE_MS = 240; // Visual only; collection is available immediately.
 export const PLAYER_SPEED = 2;
 export const PLAYER_RUN_SPEED = 3.5;
 export const PLAYER_JUMP_FORCE = -8;

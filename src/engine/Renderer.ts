@@ -1,4 +1,4 @@
-import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, TileType, FALLING_PLATFORM_FALL_MS, FALLING_PLATFORM_FALL_DISTANCE, PLAYER_RESPAWN_REVEAL_MS } from '../constants';
+import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, TileType, FALLING_PLATFORM_FALL_MS, FALLING_PLATFORM_FALL_DISTANCE, PLAYER_RESPAWN_REVEAL_MS, POWERUP_EMERGENCE_MS } from '../constants';
 import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState, FallingPlatformPhase, LevelTheme, PaletteItem, LevelTrigger, TriggerType } from '../types';
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_WALK } from '../assets/playerSpriteSpec';
 import { playerDeathMotion, deathIrisProgress, DEATH_HIT_STOP_MS } from '../graphics/playerDeathMotion';
@@ -327,9 +327,15 @@ export class Renderer {
   drawCollectible(p:CollectibleData,camera:CameraData,ctx=this.offscreenCtx):void {
     if(!p.active||p.collected)return;
     const x=Math.round(p.position.x)-Math.round(camera.x),y=Math.round(p.position.y)-Math.round(camera.y);
+    const emergence=!this.reducedMotion&&p.type!==CollectibleType.COIN
+      ?Math.round(TILE_SIZE*Math.min(1,(p.emergenceTimer??0)/POWERUP_EMERGENCE_MS)):0;
+    if(emergence){
+      ctx.save();ctx.beginPath();ctx.rect(x,y,p.width,p.height);ctx.clip();ctx.translate(0,emergence);
+    }
     if(p.type===CollectibleType.COIN)this.drawCoin(x,y,p.animationTimer,ctx);
     else if(p.type===CollectibleType.MINI_FANTA)this.drawFanta(x,y,p.animationTimer,ctx);
     else this.drawHelmet(x,y,ctx);
+    if(emergence)ctx.restore();
   }
   drawCoin(x:number,y:number,time:number,ctx=this.offscreenCtx):void {
     this.atlas.draw(ctx,COIN_FRAMES[animationIndex(time,6,110)],SPRITE_PALETTE,x,y);

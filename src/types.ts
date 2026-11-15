@@ -95,6 +95,8 @@ export enum EnemyType {
 
 // Dados de coletável
 export interface CollectibleData extends Entity {
+  /** Transient block-release visual; never changes the collision rectangle. */
+  emergenceTimer?: number;
   type: CollectibleType;
   collected: boolean;
   animationFrame: number;

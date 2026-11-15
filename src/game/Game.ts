@@ -5,7 +5,7 @@ import {
   INITIAL_LIVES, COIN_SCORE, ENEMY_SCORE, TIME_BONUS_MULTIPLIER, TileType,
   GP_IMPACT_RADIUS_PX, GP_SHAKE_MS, GP_SHAKE_MAG,
   BLOCK_BREAK_SCORE, BOSS_DEFEAT_SCORE, COINS_PER_LIFE, LIVES_BONUS_SCORE,
-  CULLING_MARGIN
+  CULLING_MARGIN, POWERUP_EMERGENCE_MS
 } from '../constants';
 import {
   CameraData, Vector2, FlagData, CollectibleData,
@@ -397,6 +397,7 @@ export class Game {
           this.collectibles.push({
             position: { x: spawnX, y: spawnY },
             velocity: { x: 0, y: -1 },
+            emergenceTimer: POWERUP_EMERGENCE_MS,
             width: 16,
             height: 16,
             active: true,
@@ -1236,6 +1237,9 @@ export class Game {
 
       // Atualiza animação
       c.animationTimer += deltaTime;
+      if (c.emergenceTimer !== undefined) {
+        c.emergenceTimer = Math.max(0, c.emergenceTimer - deltaTime) || undefined;
+      }
 
       // Culling de lógica
       if (c.position.x < this.camera.x - CULLING_MARGIN ||
@@ -1365,6 +1369,7 @@ export class Game {
         this.collectibles.push({
           position: { x: spawnX, y: spawnY },
           velocity: { x: 0, y: -2 },
+          emergenceTimer: POWERUP_EMERGENCE_MS,
           width: 16,
           height: 16,
           active: true,
