@@ -662,7 +662,7 @@ export class Game {
     this.collectibles.forEach(c => {
       // Simple culling
       if (c.position.x < this.camera.x - CULLING_MARGIN ||
-        c.position.x > this.camera.x + GAME_WIDTH + CULLING_MARGIN) {
+        c.position.x > this.camera.x + GAME_WIDTH / zoom + CULLING_MARGIN) {
         return;
       }
       this.renderer.drawCollectible(c, this.camera);
@@ -1224,6 +1224,7 @@ export class Game {
     if (!this.player) return;
 
     const playerRect = this.player.getRect();
+    const viewWidth = GAME_WIDTH / sceneZoom(this.camera.zoom || 1);
 
     this.collectibles.forEach(c => {
       if (c.collected || !c.active) return;
@@ -1233,7 +1234,7 @@ export class Game {
 
       // Culling de lógica
       if (c.position.x < this.camera.x - CULLING_MARGIN ||
-        c.position.x > this.camera.x + GAME_WIDTH + CULLING_MARGIN) {
+        c.position.x > this.camera.x + viewWidth + CULLING_MARGIN) {
         return;
       }
 
