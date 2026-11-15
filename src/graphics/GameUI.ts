@@ -1,5 +1,6 @@
 import { ART } from './palette';
-import { pixelText, panel, fitText } from './BitmapFont';
+import { pixelText, panel, fitText, textWidth } from './BitmapFont';
+import { controlPreferences, keyAction, keyLabel, type ControlAction } from '../engine/ControlPreferences';
 import { SpriteAtlas } from './pixels';
 import { PLAYER_PALETTE, PLAYER_SPRITES } from '../assets/playerSpriteSpec';
 import { COIN_FRAMES, FANTA_SPRITE, SPRITE_PALETTE } from './sprites';
@@ -47,9 +48,28 @@ export class GameUI {
     panel(c,82,80,156,21,ART.ink,ART.gold);
     pixelText(c,touch?'TOQUE PARA JOGAR':'ENTER PARA JOGAR',160,87,ART.paper,1,'center');
     c.fillStyle=ART.goldLight;c.fillRect(91,88+Math.floor(time/700)%2,2,3);
-    c.fillStyle=ART.ink;c.fillRect(0,146,320,34);
-    pixelText(c,touch?'← → MOVER   X CORRER   ↑ PULAR':'A/D OU ←/→ MOVER  W/ESPAÇO PULAR  SHIFT CORRER',160,153,ART.paper,1,'center');
-    pixelText(c,touch?'↓ NO AR: SENTADA   TOPO: PAUSA':'S/↓ NO AR: SENTADA  ESC PAUSA  M SOM',160,166,ART.muted,1,'center');
+    if(touch){
+      c.fillStyle=ART.ink;c.fillRect(0,146,320,34);
+      pixelText(c,'← → MOVER   X CORRER   ↑ PULAR',160,153,ART.paper,1,'center');
+      pixelText(c,'↓ NO AR: SENTADA   TOPO: PAUSA',160,166,ART.muted,1,'center');
+    }else{
+      const actions:[ControlAction,string][]=[['left','ESQUERDA'],['right','DIREITA'],['jump','PULAR'],
+        ['run','CORRER'],['down','SENTADA NO AR'],['pause','PAUSA'],['mute','SOM']];
+      const lines:string[]=[];
+      for(const [action,label] of actions){
+        // Match Input's conflict priority; one effective key is enough for a hint.
+        const code=controlPreferences.keys[action].find(code=>keyAction(code)===action)
+          ??(action==='pause'&&!keyAction('Escape')?'Escape':undefined);
+        const hint=label+': '+(code?keyLabel(code):'SEM TECLA');
+        const last=lines.length-1;
+        if(last>=0&&textWidth(lines[last]+'  '+hint)<=304)lines[last]+='  '+hint;
+        else lines.push(hint);
+      }
+      // Expand upwards for long key names, keeping every hint below the start button.
+      const top=Math.min(146,172-lines.length*10);
+      c.fillStyle=ART.ink;c.fillRect(0,top,320,180-top);
+      lines.forEach((line,i)=>pixelText(c,line,160,top+6+i*10,ART.paper,1,'center'));
+    }
   }
   pause(c:CanvasRenderingContext2D,touch:boolean):void {
     this.dim(c);panel(c,49,52,222,78,ART.ink,ART.teal);
