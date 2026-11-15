@@ -591,7 +591,7 @@ export class Game {
             );
           }
           else if (this.state === GameState.LEVEL_CLEAR) {
-            const timeBonus = Math.floor(this.levelTime) * 2; // Fixed multiplier
+            const timeBonus = Math.floor(this.levelTime) * TIME_BONUS_MULTIPLIER;
             this.renderer.drawLevelClear(
               this.level?.data.name || '',
               this.score,
