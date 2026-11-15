@@ -659,11 +659,18 @@ export class EditorController {
                 div.querySelector('output')!.value = layer.scrollFactor.toFixed(2);
                 // The renderer keeps a reference to the layer specification.
             });
-            div.querySelector<HTMLButtonElement>('.remove')!.addEventListener('click', () => {
+            div.querySelector<HTMLButtonElement>('.remove')!.addEventListener('click', event => {
+                const restoreFocus = document.activeElement === event.currentTarget;
                 layers.splice(index, 1);
                 this.populateThemeEditor();
                 this.updateTheme();
                 this.recordChange();
+                if (restoreFocus) {
+                    const remaining = list.querySelectorAll<HTMLButtonElement>('.remove');
+                    const target = remaining[Math.min(index, remaining.length - 1)]
+                        ?? document.getElementById(id === 'theme-layers-list' ? 'btn-add-layer' : 'btn-add-underground-layer');
+                    target?.focus();
+                }
             });
             list.appendChild(div);
         });
