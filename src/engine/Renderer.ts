@@ -4,6 +4,7 @@ import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_WALK } from '../assets/playerSpr
 import { playerDeathMotion, deathIrisProgress, DEATH_HIT_STOP_MS } from '../graphics/playerDeathMotion';
 import { drawRespawnArrival } from '../graphics/playerRespawnArt';
 import { drawPlayerProtection } from '../graphics/playerProtectionArt';
+import { FLAG_SIZES } from '../graphics/flagGeometry';
 import { ART, hashAt } from '../graphics/palette';
 import { SpriteAtlas, VisualClock, animationIndex, PixelFrame, sceneZoom } from '../graphics/pixels';
 import { drawBlockImpacts } from '../graphics/blockImpactArt';
@@ -370,7 +371,7 @@ export class Renderer {
     if(flag.enabled)this.flagAt(this.offscreenCtx,Math.round(flag.anchor.x-camera.x),Math.round(flag.anchor.y-camera.y),flag.kind,flag.state);
   }
   private flagAt(c:CanvasRenderingContext2D,x:number,y:number,kind:FlagData['kind'],state:FlagData['state']):void {
-    const h=kind==='goal'?34:28,w=kind==='goal'?18:14,top=y-h;
+    const {height:h,width:w}=FLAG_SIZES[kind],top=y-h;
     const active=state!=='inactive',color=kind==='goal'?ART.gold:active?ART.teal:ART.red;
     c.fillStyle=ART.ink;c.fillRect(x-2,top,4,h);c.fillRect(x-5,y-2,10,2);
     c.fillStyle=ART.soilTop;c.fillRect(x-1,top+2,1,h-4);c.fillStyle=ART.goldLight;c.fillRect(x-2,top-1,3,2);
