@@ -61,6 +61,7 @@ export class WorldArt {
         drawWorldObjects(c, objects, this.atlas, cx, cy, time, world, level, includeStructures);
     }
     foe(c: CanvasRenderingContext2D, e: WorldFoe, cx: number, cy: number, _time: number) {
+        const reducedMotion = this.foeMotion?.matches ?? false;
         if (e.dead && e.deadTimer > 360)
             return;
         const x = Math.round(e.x - cx), y = Math.round(e.y - cy);
@@ -87,15 +88,17 @@ export class WorldArt {
         c.save();
         if (e.dead)
             c.globalAlpha = Math.max(0, 1 - e.deadTimer / 360);
-        else if (e.flash > 0 && Math.floor(e.flash / 45) % 2)
-            c.globalAlpha = .55;
+        else if (e.flash > 0 && (reducedMotion || Math.floor(e.flash / 45) % 2))
+            c.globalAlpha = reducedMotion ? .8 : .55;
         const frames = e.spec.kind === 'minion' ? MINION_FRAMES : null;
-        const frame = frames ? e.dead ? MINION_SQUASH : frames[Math.floor(e.age / 150) % frames.length] : foeFrame(e.spec.kind as Exclude<typeof e.spec.kind, 'minion'>, e.dead ? 'stunned' : e.phase, e.phase === 'walk' ? e.age : e.timer, e.armor, this.foeMotion?.matches ?? false);
-        const xx = x + e.width / 2 - frame[0].length / 2, yy = y + e.height - frame.length - (e.dead ? Math.sin(e.deadTimer / 360 * Math.PI) * 12 : 0);
+        const stillFeedback = reducedMotion && (e.dead || e.flash > 0);
+        const frame = frames ? e.dead ? MINION_SQUASH : frames[stillFeedback ? 0 : Math.floor(e.age / 150) % frames.length] : foeFrame(e.spec.kind as Exclude<typeof e.spec.kind, 'minion'>, e.dead ? 'stunned' : e.phase, stillFeedback ? 0 : e.phase === 'walk' ? e.age : e.timer, e.armor, reducedMotion);
+        const xx = x + e.width / 2 - frame[0].length / 2, yy = y + e.height - frame.length - (e.dead && !reducedMotion ? Math.sin(e.deadTimer / 360 * Math.PI) * 12 : 0);
         this.atlas.draw(c, frame, frames ? SPRITE_PALETTE : WORLD_PALETTE, xx, yy, e.facing > 0);
         if (!e.dead && e.spec.kind === 'helmet' && !e.armor && e.phase === 'stunned') {
-            rect(c, x - 7, y - 12 - e.timer * .012, 13, 4, '#edc267');
-            rect(c, x - 4, y - 15 - e.timer * .012, 7, 3, '#ffe7a4');
+            const lift = reducedMotion ? 0 : e.timer * .012;
+            rect(c, x - 7, y - 12 - lift, 13, 4, '#edc267');
+            rect(c, x - 4, y - 15 - lift, 7, 3, '#ffe7a4');
         }
         if (!e.dead && e.phase === 'rest' && e.spec.kind === 'charger')
             pixelText(c, '...', x + e.width / 2, y - 9, '#a8d3da', 1, 'center');
@@ -103,6 +106,7 @@ export class WorldArt {
     }
     arena(c: CanvasRenderingContext2D, b: BossEncounter, cx: number, cy: number, time: number) { drawArena(c, b, cx, cy, time); }
     boss(c: CanvasRenderingContext2D, b: BossEncounter, cx: number, cy: number, time: number) {
+        const reducedMotion = this.foeMotion?.matches ?? false;
         if (b.shockWarning) {
             for (let x = 160; x < 288; x += 22)
                 pixelText(c, '←', x - cx, 218 - cy, '#f6ce86', 1, 'center');
@@ -155,16 +159,16 @@ export class WorldArt {
         }
         const loops = BOSS_LOOPS[b.id === 'C2' ? 'calabrezzoCold' : b.character as 'joao' | 'biel' | 'calabrezzo'];
         const animation = loops[b.pose as BossPose];
-        const phaseTime = b.poseTime;
+        const phaseTime = reducedMotion && ['hurt', 'defeated', 'open'].includes(b.phase) ? 0 : b.poseTime;
         const index = ['windup', 'shoot', 'smash'].includes(b.pose) ? Math.min(2, Math.floor(phaseTime / (b.pose === 'windup' ? 280 : 130))) : Math.floor(phaseTime / 240) % 3;
         const frame = animation ? animation[index] : bossFrame(b.character, b.pose as BossPose);
-        const recoil = b.phase === 'hurt' ? Math.sin(Math.min(1, b.timer / 700) * Math.PI) * 5 : 0;
+        const recoil = b.phase === 'hurt' && !reducedMotion ? Math.sin(Math.min(1, b.timer / 700) * Math.PI) * 5 : 0;
         c.save();
-        if (b.phase === 'hurt' && Math.floor(b.timer / 80) % 2)
-            c.globalAlpha = .55;
+        if (b.phase === 'hurt' && (reducedMotion || Math.floor(b.timer / 80) % 2))
+            c.globalAlpha = reducedMotion ? .8 : .55;
         const xx = b.x - cx + b.width / 2 - frame[0].length / 2, yy = b.y - cy + b.height - frame.length + recoil;
         if (b.phase === 'defeated') {
-            const t = Math.min(1, b.timer / 750);
+            const t = reducedMotion ? 1 : Math.min(1, b.timer / 750);
             c.translate(Math.round(xx), Math.round(yy + frame.length * t * .55));
             c.scale(1 + t * .1, 1 - t * .55);
             this.atlas.draw(c, frame, WORLD_PALETTE, 0, 0, false);
@@ -174,7 +178,7 @@ export class WorldArt {
         c.restore();
         if (['open', 'defeated'].includes(b.phase))
             for (let i = 0; i < 3; i++) {
-                const a = time / 250 + i * Math.PI * 2 / 3;
+                const a = (reducedMotion ? 0 : time / 250) + i * Math.PI * 2 / 3;
                 pixelText(c, '★', b.x - cx + b.width / 2 + Math.cos(a) * 22, b.y - cy - 12 + Math.sin(a) * 5, '#f8d887', 1, 'center');
             }
         if (b.phase === 'open') {
