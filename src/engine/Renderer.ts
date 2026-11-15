@@ -167,7 +167,7 @@ export class Renderer {
     for(const p of platforms){
       if(p.phase==='cooldown')continue;
       const progress=p.phase==='falling'?Math.max(0,1-p.timer/FALLING_PLATFORM_FALL_MS):0;
-      const shake=p.phase==='arming'?(Math.floor(p.timer/40)%2?1:-1):0;
+      const shake=p.phase==='arming'&&!this.reducedMotion?(Math.floor(p.timer/40)%2?1:-1):0;
       const x=(p.col+originX)*16-Math.round(camera.x)+shake;
       const y=(p.row+originY)*16-Math.round(camera.y)+Math.round(progress*FALLING_PLATFORM_FALL_DISTANCE);
       c.save();c.globalAlpha=1-progress*.4;
