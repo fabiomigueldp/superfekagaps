@@ -1367,9 +1367,9 @@ export class WorldGame {
             journal.entries.forEach((entry, i) => pixelText(c,
                 fitText(`${entry.complete ? 'OK' : '--'}  ${entry.title}`, 280), 20, 36 + i * 12,
                 entry.complete ? '#b2d4d4' : ART.paper));
-            pixelText(c, journal.waterReleased ? 'ÁGUA LIBERADA · SERRA ABERTA' : 'ÁGUA: CONCLUA O PREFEITO DA VAZÃO', 20, 101, ART.goldLight);
+            wrapText(journal.water, 280).forEach((line, i) => pixelText(c, line, 20, 98 + i * 9, ART.goldLight));
             journal.optional.forEach((entry, i) => pixelText(c,
-                fitText(`${entry.complete ? 'OK' : '--'} ${entry.title} (opcional)`, 280), 20, 114 + i * 9, ART.paper));
+                fitText(`${entry.complete ? 'OK' : '--'} ${entry.title} (opcional)`, 280), 20, 117 + i * 9, ART.paper));
             this.button(c, 'VOLTAR AO CADERNO', 80, 153, 160, () => this.backGallery());
             return;
         }

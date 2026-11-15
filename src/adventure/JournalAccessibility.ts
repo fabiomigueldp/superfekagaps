@@ -29,7 +29,7 @@ export class JournalAccessibility {
         if (page === null || document.hidden || this.canvas.inert) { this.clear(); return; }
         // The save may mutate in place. Rebuild only when this page's displayed facts change.
         const key = JSON.stringify([page, page === 7 ? [save.guaira.opening, save.guaira.completed,
-            save.guaira.optional, save.seen] : null]);
+            save.guaira.optional, save.seen, save.legacySerraAccess] : null]);
         if (key === this.key) return;
         this.key = key;
         const heading = document.createElement('h2');
@@ -44,7 +44,7 @@ export class JournalAccessibility {
                 receipts.append(item);
             }
             const water = document.createElement('p');
-            water.textContent = journal.waterReleased ? 'Água liberada · Serra aberta.' : 'Água: conclua o Prefeito da Vazão.';
+            water.textContent = journal.water;
             const optional = document.createElement('ul');
             for (const entry of journal.optional) {
                 const item = document.createElement('li');
