@@ -57,16 +57,18 @@ const marks: Readonly<Record<string, readonly number[]>> = {
 const advance = (c: string) => c === ' ' ? 4 : (glyphs.get(c.normalize('NFD')[0])?.advance ?? 6);
 export function textWidth(value: string, scale = 1): number {
   let width = 0;
-  for (const c of value.toLocaleUpperCase('pt-BR')) width += advance(c);
+  for (const c of value.toLocaleUpperCase('pt-BR').normalize('NFC')) width += advance(c);
   return Math.max(0, width - 1) * scale;
 }
 export function fitText(value: string, width: number, scale = 1): string {
+  value = value.normalize('NFC');
   if (textWidth(value, scale) <= width) return value;
   let out = value;
   while (out && textWidth(out + '...', scale) > width) out = out.slice(0, -1);
   return out + '...';
 }
 export function wrapText(value: string, width: number): string[] {
+  value = value.normalize('NFC');
   const lines: string[] = []; let line = '';
   for (const word of value.split(/\s+/)) {
     if (line && textWidth(line + ' ' + word) > width) { lines.push(line); line = ''; }
@@ -83,7 +85,7 @@ export function pixelText(ctx: CanvasRenderingContext2D, value: string, x: numbe
   color: string = ART.paper, scale = 1, align: 'left' | 'center' | 'right' = 'left'): void {
   x = Math.round(x - (align === 'center' ? textWidth(value, scale) / 2 : align === 'right' ? textWidth(value, scale) : 0));
   y = Math.round(y); ctx.fillStyle = color;
-  for (const c of value.toLocaleUpperCase('pt-BR')) {
+  for (const c of value.toLocaleUpperCase('pt-BR').normalize('NFC')) {
     if (c !== ' ') {
       const [base, mark] = c.normalize('NFD');
       const pixels = (glyphs.get(base) ?? glyphs.get('?')!).pixels;
