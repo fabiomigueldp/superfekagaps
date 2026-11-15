@@ -1,5 +1,5 @@
 import { PLAYER_SPEED } from '../constants';
-import { CONTROL_LABELS, controlPreferences, keyLabel, type ControlAction } from '../engine/ControlPreferences';
+import { CONTROL_LABELS, controlPreferences, keyAction, keyLabel, type ControlAction } from '../engine/ControlPreferences';
 import { wrapText } from '../graphics/BitmapFont';
 import type { InputState, PlayerData, Rect } from '../types';
 import { ProgressStore } from './progress';
@@ -13,11 +13,12 @@ export interface TutorialCue {
 
 function keyboardInstruction(lesson: Lesson): string {
     const actions: ControlAction[] = lesson === 'jump' ? ['jump'] : lesson === 'run' ? ['run', 'right'] : ['jump', 'down'];
-    const missing = actions.find(action => !controlPreferences.keys[action].length);
-    if (missing) return `${CONTROL_LABELS[missing]}: SEM TECLA CONFIGURADA`.toLocaleUpperCase('pt-BR');
+    const binding = (action: ControlAction) => controlPreferences.keys[action].find(code => keyAction(code) === action);
+    const missing = actions.find(action => !binding(action));
+    if (missing) return `${CONTROL_LABELS[missing]}: SEM TECLA DISPONÍVEL`.toLocaleUpperCase('pt-BR');
     // A short, actionable example; the controls reference lists every alternative.
     // Read on each cue so remapping or restoring defaults takes effect immediately.
-    const key = (action: ControlAction) => keyLabel(controlPreferences.keys[action][0]).toLocaleUpperCase('pt-BR');
+    const key = (action: ControlAction) => keyLabel(binding(action)!).toLocaleUpperCase('pt-BR');
     if (lesson === 'jump') return `${key('jump')} PARA PULAR`;
     if (lesson === 'run') return `SEGURE ${key('run')} + ${key('right')} PARA CORRER`;
     return `PULE ${key('jump')}, DEPOIS ${key('down')} NO AR`;
