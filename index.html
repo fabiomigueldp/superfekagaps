@@ -75,30 +75,30 @@
     </div>
 
     <div class="sidebar">
-      <div class="tabs-nav">
-        <button class="tab-btn active" data-tab="tab-tiles">Tiles</button>
-        <button class="tab-btn" data-tab="tab-logic">Logic</button>
-        <button class="tab-btn" data-tab="tab-levels">Levels</button>
-        <button class="tab-btn" data-tab="tab-bounds">Bounds</button>
-        <button class="tab-btn" data-tab="tab-theme">Theme</button>
+      <div class="tabs-nav" role="tablist" aria-label="Painéis do editor">
+        <button id="tab-button-tiles" class="tab-btn active" data-tab="tab-tiles" role="tab" aria-controls="tab-tiles" aria-selected="true" tabindex="0">Tiles</button>
+        <button id="tab-button-logic" class="tab-btn" data-tab="tab-logic" role="tab" aria-controls="tab-logic" aria-selected="false" tabindex="-1">Logic</button>
+        <button id="tab-button-levels" class="tab-btn" data-tab="tab-levels" role="tab" aria-controls="tab-levels" aria-selected="false" tabindex="-1">Levels</button>
+        <button id="tab-button-bounds" class="tab-btn" data-tab="tab-bounds" role="tab" aria-controls="tab-bounds" aria-selected="false" tabindex="-1">Bounds</button>
+        <button id="tab-button-theme" class="tab-btn" data-tab="tab-theme" role="tab" aria-controls="tab-theme" aria-selected="false" tabindex="-1">Theme</button>
       </div>
 
       <!-- Tab Content: Tiles -->
-      <div id="tab-tiles" class="tab-content active">
+      <div id="tab-tiles" class="tab-content active" role="tabpanel" aria-labelledby="tab-button-tiles">
         <div id="tile-palette" class="tile-palette">
           <!-- Populated by JS -->
         </div>
       </div>
 
       <!-- Tab Content: Logic -->
-      <div id="tab-logic" class="tab-content">
+      <div id="tab-logic" class="tab-content" role="tabpanel" aria-labelledby="tab-button-logic">
         <div id="logic-palette" class="tile-palette">
           <!-- Populated by JS -->
         </div>
       </div>
 
       <!-- Tab Content: Levels -->
-      <div id="tab-levels" class="tab-content">
+      <div id="tab-levels" class="tab-content" role="tabpanel" aria-labelledby="tab-button-levels">
         <button id="btn-new-level" class="editor-btn full-width">Nova fase</button>
         <div class="control-row"><label for="level-id">ID</label><input id="level-id" type="text"></div>
         <div class="control-row"><label for="level-name">Nome</label><input id="level-name" type="text"></div>
@@ -110,7 +110,7 @@
       </div>
 
       <!-- Tab Content: Bounds -->
-      <div id="tab-bounds" class="tab-content">
+      <div id="tab-bounds" class="tab-content" role="tabpanel" aria-labelledby="tab-button-bounds">
         <div class="bounds-section">
           <h4>📐 Level Bounds</h4>
           <div class="control-row">
@@ -155,7 +155,7 @@
       </div>
 
       <!-- Tab Content: Theme -->
-      <div id="tab-theme" class="tab-content">
+      <div id="tab-theme" class="tab-content" role="tabpanel" aria-labelledby="tab-button-theme">
         <p class="theme-hint">Edite as cores e veja o resultado no mapa.</p>
         <div class="control-row">
           <label for="theme-biome">Materiais</label>

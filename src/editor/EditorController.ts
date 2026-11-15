@@ -256,19 +256,18 @@ export class EditorController {
         });
 
         // Tab Switching Logic
-        const tabs = document.querySelectorAll('.tab-btn');
-        tabs.forEach(btn => {
+        const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.tab-btn'));
+        tabs.forEach((btn, index) => {
             btn.addEventListener('click', () => {
-                // Deactivate all
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-                // Activate clicked
-                btn.classList.add('active');
-                const target = (btn as HTMLElement).dataset.tab;
-                if (target) {
-                    document.getElementById(target)?.classList.add('active');
-                }
+                if (btn.dataset.tab) this.selectTab(btn.dataset.tab);
+            });
+            btn.addEventListener('keydown', e => {
+                const next = e.key === 'ArrowRight' ? (index + 1) % tabs.length
+                    : e.key === 'ArrowLeft' ? (index + tabs.length - 1) % tabs.length
+                    : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : -1;
+                if (next < 0) return;
+                e.preventDefault();
+                this.selectTab(tabs[next].dataset.tab!);
             });
         });
 
@@ -482,8 +481,20 @@ export class EditorController {
     }
 
     private selectTab(tabId: string) {
-        const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`) as HTMLElement;
-        if (btn) btn.click();
+        const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.tab-btn'));
+        const selected = tabs.find(button => button.dataset.tab === tabId);
+        if (!selected) return;
+        const focused = document.activeElement;
+        const panel = focused?.closest('.tab-content');
+        // Blur pending fields before hiding their panel; keep unrelated toolbar focus.
+        if (focused?.matches('.tab-btn') || (panel && panel.id !== tabId)) selected.focus({ preventScroll: true });
+        for (const button of tabs) {
+            const active = button === selected;
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-selected', String(active));
+            button.tabIndex = active ? 0 : -1;
+            document.getElementById(button.dataset.tab!)?.classList.toggle('active', active);
+        }
     }
 
     private ensureTheme() {
