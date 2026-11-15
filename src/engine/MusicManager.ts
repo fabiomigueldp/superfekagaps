@@ -93,7 +93,9 @@ export class MusicManager {
 
   update(deltaTime: number, snapshot: MusicSnapshot): void {
     void deltaTime;
-    const powerupActive = snapshot.powerupActive;
+    // A lingering buff must not override completion, ending or menu music.
+    const powerupActive = snapshot.powerupActive &&
+      (snapshot.gameState === GameState.PLAYING || snapshot.gameState === GameState.PAUSED);
     if (powerupActive !== this.lastPowerupActive) {
       if (powerupActive) {
         this.onPowerupStart();
