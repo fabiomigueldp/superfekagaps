@@ -1258,6 +1258,7 @@ export class WorldGame {
                 time: this.time, reducedMotion: this.renderer.reducedMotion, activationAge: complete ? this.clearTimer : null,
             });
         }
+        const pickupTime = this.renderer.reducedMotion ? 0 : this.time;
         for (const item of this.stage.pickups) {
             if (this.collected.has(item.id))
                 continue;
@@ -1265,13 +1266,13 @@ export class WorldGame {
             if (x < -20 || x > 340)
                 continue;
             if (item.kind === 'seal')
-                this.art.seal(c, x, y, this.time, this.store.save.seals.includes(item.id));
+                this.art.seal(c, x, y, pickupTime, this.store.save.seals.includes(item.id));
             else if (item.kind === 'coin')
-                this.renderer.drawCoin(x, y, this.time, c);
+                this.renderer.drawCoin(x, y, pickupTime, c);
             else if (item.kind === 'helmet')
                 this.renderer.drawHelmet(x, y, c);
             else
-                this.renderer.drawFanta(x, y, this.time, c);
+                this.renderer.drawFanta(x, y, pickupTime, c);
         }
         for (const e of this.foes)
             this.art.foe(c, e, cx, cy, this.time);
