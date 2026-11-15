@@ -339,6 +339,10 @@ export class Game {
       return;
     }
 
+    if (playerResult.jumpStarted) {
+      this.audio.playJump();
+    }
+
     // Processa início de Ground Pound
     if (playerResult && playerResult.groundPoundStarted) {
       this.audio.playGroundPoundStart();
