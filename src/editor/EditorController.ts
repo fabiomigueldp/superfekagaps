@@ -1963,7 +1963,11 @@ export class EditorController {
         const worldMouseY = (mouseY / this.zoom) + this.camera.y;
 
         const zoomSpeed = 0.0002; // ~2% per scroll step (was 0.0005 = ~5%)
-        const zoomDelta = -e.deltaY * zoomSpeed;
+        // Canvas has no text rows: a wheel line is 16 CSS px, a page is its visible height.
+        // Pixel-mode input keeps the existing sensitivity; never use the DPR-scaled backing size.
+        const wheelUnit = e.deltaMode === WheelEvent.DOM_DELTA_LINE ? 16
+            : e.deltaMode === WheelEvent.DOM_DELTA_PAGE ? rect.height : 1;
+        const zoomDelta = -e.deltaY * wheelUnit * zoomSpeed;
         const newZoom = Math.max(0.03, Math.min(8, this.zoom + zoomDelta));
 
         // Apply new zoom
