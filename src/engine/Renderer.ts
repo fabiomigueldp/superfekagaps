@@ -121,7 +121,7 @@ export class Renderer {
   private composeWorld():void {
     if(this.composed)return;
     this.compositeCtx.setTransform(1,0,0,1,0,0);this.compositeCtx.imageSmoothingEnabled=false;
-    // Zoom the finished world once. Transforming individual rectangles causes antialiased edges at fractional zoom.
+    // Zoom each completed world layer once. Individual rectangle transforms blur fractional zoom.
     this.compositeCtx.drawImage(this.worldCanvas,0,0,GAME_WIDTH/this.zoom,GAME_HEIGHT/this.zoom,0,0,GAME_WIDTH,GAME_HEIGHT);
     this.composed=true;this.offscreenCtx=this.compositeCtx;
   }
@@ -376,16 +376,20 @@ export class Renderer {
     this.atlas.draw(this.offscreenCtx,YASMIN_FRAMES[animationIndex(this.clock.time,2,600)],SPRITE_PALETTE,x,y);
   }
   drawSpeechBubble(bubble:SpeechBubbleRenderState,camera:CameraData):void {
-    const c=this.offscreenCtx,lines=wrapText(bubble.text,210).slice(0,5);
+    const lines=wrapText(bubble.text,210).slice(0,5);
     if(!lines.length)return;
     const w=Math.max(...lines.map(s=>textWidth(s)))+12,h=lines.length*12+8;
-    const viewWidth=GAME_WIDTH/this.zoom,viewHeight=GAME_HEIGHT/this.zoom;
-    const x=Math.round(Math.max(4,Math.min(viewWidth-w-4,bubble.position.x-camera.x-w/2)));
-    const y=Math.round(Math.max(25/this.zoom,Math.min(viewHeight-h-5,bubble.position.y-camera.y-h-8)));
-    c.save();c.globalAlpha=bubble.alpha;panel(c,x,y,w,h,ART.paper,ART.ink);
-    lines.forEach((s,i)=>pixelText(c,s,x+6,y+6+i*12,ART.ink));
-    c.fillStyle=ART.ink;c.fillRect(Math.round(x+w/2)-3,y+h,6,2);c.fillRect(Math.round(x+w/2)-1,y+h+2,2,2);
-    c.restore();
+    const x=Math.round(Math.max(4,Math.min(GAME_WIDTH-w-4,(bubble.position.x-camera.x)*this.zoom-w/2)));
+    const y=Math.round(Math.max(25,Math.min(GAME_HEIGHT-h-5,(bubble.position.y-camera.y)*this.zoom-h-8)));
+    this.screen(c=>{
+      c.globalAlpha=bubble.alpha;panel(c,x,y,w,h,ART.paper,ART.ink);
+      lines.forEach((s,i)=>pixelText(c,s,x+6,y+6+i*12,ART.ink));
+      c.fillStyle=ART.ink;c.fillRect(Math.round(x+w/2)-3,y+h,6,2);c.fillRect(Math.round(x+w/2)-1,y+h+2,2,2);
+    });
+    // Keep later world draws (player, particles, or another bubble) above this bubble.
+    // The composed background stays intact; only the next transparent world layer is cleared.
+    this.worldCtx.clearRect(0,0,this.worldCanvas.width,this.worldCanvas.height);
+    this.offscreenCtx=this.worldCtx;this.composed=false;
   }
   drawParticles(particles:Particle[]):void {
     const c=this.offscreenCtx;c.save();
