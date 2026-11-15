@@ -191,6 +191,11 @@ export class Renderer {
       const grounded=p.deathWasGrounded??p.isGrounded;
       const direction=p.deathDirection??(p.facingRight?-1:1);
       const motion=playerDeathMotion(elapsed,grounded,direction);
+      if(this.reducedMotion){
+        // A steady damage pose communicates the hit without recoil, launch or impact rays.
+        if(motion.alpha>0)this.atlas.draw(ctx,PLAYER_SPRITES.deathImpact,PLAYER_PALETTE,x,y,!p.facingRight);
+        return;
+      }
       if(grounded && elapsed<650){
         ctx.save();ctx.globalAlpha*=Math.max(0,1-elapsed/650);
         const width=Math.round(Math.max(4,12+Math.min(0,motion.y)*.18));
@@ -264,6 +269,14 @@ export class Renderer {
     const amount=p.isDead
       ? deathIrisProgress(elapsed,p.deathKind??'hit',p.deathTimerMax)
       : Math.max(0,Math.min(1,((p.respawnRevealTimer??0)-(this.interpolationMs??0))/PLAYER_RESPAWN_REVEAL_MS));
+    if(this.reducedMotion){
+      const draw=(c:CanvasRenderingContext2D)=>{
+        c.save();c.globalAlpha*=amount;c.fillStyle=ART.ink;
+        c.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);c.restore();
+      };
+      if(ctx)draw(ctx);else this.screen(draw);
+      return;
+    }
     const position=p.isDead?(p.deathOrigin??p.position):p.position;
     const motion=p.isDead&&p.deathKind!=='fall'
       ? playerDeathMotion(elapsed,p.deathWasGrounded??p.isGrounded,p.deathDirection??-1) : {x:0,y:0};
