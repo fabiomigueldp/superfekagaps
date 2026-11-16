@@ -346,8 +346,9 @@ export class Renderer {
     if(emergence){
       ctx.save();ctx.beginPath();ctx.rect(x,y,p.width,p.height);ctx.clip();ctx.translate(0,emergence);
     }
-    if(p.type===CollectibleType.COIN)this.drawCoin(x,y,p.animationTimer,ctx);
-    else if(p.type===CollectibleType.MINI_FANTA)this.drawFanta(x,y,p.animationTimer,ctx);
+    const itemTime=this.reducedMotion?0:p.animationTimer;
+    if(p.type===CollectibleType.COIN)this.drawCoin(x,y,itemTime,ctx);
+    else if(p.type===CollectibleType.MINI_FANTA)this.drawFanta(x,y,itemTime,ctx);
     else this.drawHelmet(x,y,ctx);
     if(emergence)ctx.restore();
   }
@@ -375,7 +376,7 @@ export class Renderer {
     const active=state!=='inactive',color=kind==='goal'?ART.gold:active?ART.teal:ART.red;
     c.fillStyle=ART.ink;c.fillRect(x-2,top,4,h);c.fillRect(x-5,y-2,10,2);
     c.fillStyle=ART.soilTop;c.fillRect(x-1,top+2,1,h-4);c.fillStyle=ART.goldLight;c.fillRect(x-2,top-1,3,2);
-    const wave=animationIndex(this.clock.time,4,180);
+    const wave=this.reducedMotion?0:animationIndex(this.clock.time,4,180);
     for(let i=0;i<w;i++){
       const shift=i<5?0:Math.round(Math.sin((i/5+wave)*Math.PI/2));
       c.fillStyle=ART.ink;c.fillRect(x+2+i,top+4+shift,1,11);
