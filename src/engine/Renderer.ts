@@ -161,7 +161,7 @@ export class Renderer {
       this.landingMotion?.matches??false,level.originX,level.originY,GAME_WIDTH/this.zoom,GAME_HEIGHT/this.zoom);
   }
   drawTile(type:number,x:number,y:number,tiles:number[][],row:number,col:number,ctx=this.offscreenCtx,worldCol=col,worldRow=row):void {
-    this.tiles.draw(ctx,type,x,y,tiles,row,col,this.background.theme.biome??'meadow',this.clock.time,worldCol,worldRow);
+    this.tiles.draw(ctx,type,x,y,tiles,row,col,this.background.theme.biome??'meadow',this.reducedMotion?0:this.clock.time,worldCol,worldRow);
   }
   drawFallingPlatforms(platforms:PlatformVisual[],camera:CameraData,originX=0,originY=0):void {
     const c=this.offscreenCtx;
@@ -450,7 +450,7 @@ export class Renderer {
   private postcard(c:CanvasRenderingContext2D):void {
     this.menuBackground.draw(c,0,15,320,180,this.reducedMotion?0:this.clock.time);
     const ground=Array.from({length:4},()=>Array<number>(22).fill(TileType.GROUND));
-    for(let row=0;row<4;row++)for(let col=0;col<22;col++)this.tiles.draw(c,TileType.GROUND,col*16,130+row*16,ground,row,col,'meadow',this.clock.time);
+    for(let row=0;row<4;row++)for(let col=0;col<22;col++)this.tiles.draw(c,TileType.GROUND,col*16,130+row*16,ground,row,col,'meadow',this.reducedMotion?0:this.clock.time);
   }
   drawTitleScreen():void {
     if(this.editorLink)this.editorLink.hidden=false;
