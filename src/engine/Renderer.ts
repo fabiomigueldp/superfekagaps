@@ -143,7 +143,7 @@ export class Renderer {
     this.background=new BackgroundScene(theme);this.impacts=[];
   }
   drawBackground(camera:CameraData,ctx=this.offscreenCtx,width=GAME_WIDTH,height=GAME_HEIGHT):void {
-    this.background.draw(ctx,Math.round(camera.x),Math.round(camera.y),width,height,this.clock.time);
+    this.background.draw(ctx,Math.round(camera.x),Math.round(camera.y),width,height,this.reducedMotion?0:this.clock.time);
   }
   drawTiles(tiles:number[][],camera:CameraData,originX=0,originY=0,impacts?:BlockImpacts):void {
     const cx=Math.round(camera.x),cy=Math.round(camera.y);
@@ -448,7 +448,7 @@ export class Renderer {
     this.screen(c=>this.ui.hud(c,{score,lives,time,level,soundEnabled,hasHelmet,miniFantaTimer,coins,bossHealth}));
   }
   private postcard(c:CanvasRenderingContext2D):void {
-    this.menuBackground.draw(c,0,15,320,180,this.clock.time);
+    this.menuBackground.draw(c,0,15,320,180,this.reducedMotion?0:this.clock.time);
     const ground=Array.from({length:4},()=>Array<number>(22).fill(TileType.GROUND));
     for(let row=0;row<4;row++)for(let col=0;col<22;col++)this.tiles.draw(c,TileType.GROUND,col*16,130+row*16,ground,row,col,'meadow',this.clock.time);
   }
