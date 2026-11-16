@@ -331,7 +331,7 @@ export class Renderer {
   }
   private drawAttackPreview(p:NonNullable<EnemyData['attackPreview']>,camera:CameraData,c:CanvasRenderingContext2D):void {
     const x=Math.round(p.x-camera.x),y=Math.round(p.y-camera.y);
-    const color=animationIndex(this.clock.time,2,90)?ART.redLight:ART.goldLight;
+    const color=!this.reducedMotion&&animationIndex(this.clock.time,2,90)?ART.redLight:ART.goldLight;
     c.fillStyle=ART.ink;c.fillRect(x,y-3,p.width,5);c.fillStyle=color;c.fillRect(x,y-2,p.width,2);
     const filled=Math.round(p.width*p.progress);
     c.fillStyle=ART.red;c.fillRect(x,y+1,filled,1);
